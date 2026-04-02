@@ -1,24 +1,84 @@
+"use client";
+
+const links = [
+  { label: "About", href: "#about" },
+  { label: "Experience", href: "#experience" },
+  { label: "Skills", href: "#skills" },
+  { label: "Contact", href: "#contact" },
+];
+
 export default function Nav() {
+  function handleClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
+    e.preventDefault();
+    const target = document.querySelector(href);
+    if (target) target.scrollIntoView({ behavior: "smooth" });
+  }
+
   return (
-    <nav className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-8 h-16 bg-cream/90 backdrop-blur-sm border-b border-ink/10">
-      <a href="#" className="font-heading text-xl text-ink">
-        Mindy Wu
-      </a>
-      <ul className="flex gap-8 items-center text-sm font-body font-medium text-ink-soft">
-        <li><a href="#work" className="hover:text-clay transition-colors">Work</a></li>
-        <li><a href="#about" className="hover:text-clay transition-colors">About</a></li>
-        <li><a href="#contact" className="hover:text-clay transition-colors">Contact</a></li>
-        <li>
-          <a
-            href="https://mindys-ai-guide.vercel.app"
-            target="_blank"
-            rel="noopener"
-            className="px-4 py-1.5 rounded-full bg-clay text-white text-sm hover:bg-clay-dark transition-colors"
-          >
-            AI Guide →
-          </a>
-        </li>
-      </ul>
+    <nav
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        borderBottom: "1px solid var(--border)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        backgroundColor: "rgba(248, 247, 244, 0.80)",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 1100,
+          margin: "0 auto",
+          padding: "0 48px",
+          height: 56,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        {/* Logo */}
+        <a
+          href="#"
+          onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: 13,
+            fontWeight: 400,
+            color: "var(--navy)",
+            letterSpacing: "0.01em",
+            textDecoration: "none",
+          }}
+        >
+          Mindy Wu
+        </a>
+
+        {/* Links */}
+        <ul style={{ display: "flex", gap: 36, listStyle: "none", margin: 0, padding: 0 }}>
+          {links.map(({ label, href }) => (
+            <li key={href}>
+              <a
+                href={href}
+                onClick={(e) => handleClick(e, href)}
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: "var(--text-secondary)",
+                  textDecoration: "none",
+                  transition: "color 0.15s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--blue-mid)")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
+              >
+                {label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </nav>
   );
 }

@@ -1,28 +1,70 @@
 @import "tailwindcss";
 
 @theme inline {
+  /* Fonts */
   --font-heading: var(--font-heading);
   --font-mono: var(--font-mono);
   --font-body: var(--font-body);
 
-  --color-cream: #FBF7F0;
-  --color-warm-white: #FFFCF7;
-  --color-clay: #C85F3A;
-  --color-clay-dark: #9B3F22;
-  --color-clay-light: #F5E8E2;
-  --color-sage: #4A7C59;
-  --color-butter: #F2C94C;
-  --color-ink: #1E1A16;
-  --color-ink-soft: #5A4F45;
-  --color-ink-muted: #9A8F85;
+  /* Backgrounds */
+  --color-bg: #F8F7F4;
+  --color-surface: #FFFFFF;
+  --color-cream: #F8F7F4;
+
+  /* Borders */
+  --color-border: #E2E8F0;
+
+  /* Text */
+  --color-text-primary: #011F4B;
+  --color-text-secondary: #3A5A7A;
+  --color-text-tertiary: #8FA8C0;
+
+  /* Brand palette */
+  --color-navy: #011F4B;
+  --color-blue-mid: #005B96;
+  --color-blue-light: #90E0EF;
+  --color-blue-pale: #E8F7FB;
 }
 
 :root {
-  --background: #FBF7F0;
-  --foreground: #1E1A16;
+  --bg: #F8F7F4;
+  --surface: #FFFFFF;
+  --border: #E2E8F0;
+  --text-primary: #011F4B;
+  --text-secondary: #3A5A7A;
+  --text-tertiary: #8FA8C0;
+  --navy: #011F4B;
+  --blue-mid: #005B96;
+  --blue-light: #90E0EF;
+  --blue-pale: #E8F7FB;
+  --cream: #F8F7F4;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg);
+  color: var(--text-primary);
 }
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  opacity: 0;
+  animation: fadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.fade-up-1 { animation-delay: 0.05s; }
+.fade-up-2 { animation-delay: 0.18s; }
+.fade-up-3 { animation-delay: 0.30s; }
+.fade-up-4 { animation-delay: 0.44s; }

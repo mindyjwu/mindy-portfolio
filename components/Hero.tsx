@@ -1,32 +1,137 @@
+"use client";
+
 export default function Hero() {
   return (
-    <section className="pt-32 pb-24 px-8 max-w-4xl mx-auto">
-      <p className="font-mono text-xs tracking-widest text-clay uppercase mb-6">
-        CS &amp; Data Science · NYU · Consulting
-      </p>
-      <h1 className="font-heading text-6xl md:text-7xl text-ink leading-tight mb-8">
-        Building things<br />
-        <em>that actually help.</em>
-      </h1>
-      <p className="font-body text-lg text-ink-soft max-w-xl leading-relaxed mb-10">
-        I'm Mindy — I study CS &amp; Data Science at NYU and work in consulting. I build tools
-        and tutorials to help non-technical people get the most out of AI.
-      </p>
-      <div className="flex gap-4 flex-wrap">
-        <a
-          href="#work"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-clay text-white rounded-full font-body font-medium hover:bg-clay-dark transition-colors"
+    <section
+      style={{
+        paddingTop: 160,
+        paddingBottom: 120,
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 1100,
+          margin: "0 auto",
+          padding: "0 48px",
+        }}
+      >
+        {/* Monospaced tag */}
+        <p
+          className="fade-up fade-up-1"
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: 12,
+            fontWeight: 400,
+            color: "var(--text-tertiary)",
+            letterSpacing: "0.04em",
+            marginBottom: 28,
+          }}
         >
-          See my work
-        </a>
-        <a
-          href="https://mindys-ai-guide.vercel.app"
-          target="_blank"
-          rel="noopener"
-          className="inline-flex items-center gap-2 px-6 py-3 border border-ink/20 text-ink rounded-full font-body font-medium hover:border-clay hover:text-clay transition-colors"
+          // based in New York
+        </p>
+
+        {/* Headline */}
+        <h1
+          className="fade-up fade-up-2"
+          style={{
+            fontFamily: "var(--font-heading)",
+            fontSize: "clamp(44px, 6vw, 72px)",
+            fontWeight: 400,
+            color: "var(--navy)",
+            lineHeight: 1.08,
+            letterSpacing: "-0.02em",
+            marginBottom: 28,
+            maxWidth: 740,
+          }}
         >
-          Mindy&apos;s AI Guide →
-        </a>
+          Technology Consultant
+          <br />& AI Builder
+        </h1>
+
+        {/* Subheadline */}
+        <p
+          className="fade-up fade-up-3"
+          style={{
+            fontFamily: "var(--font-body)",
+            fontSize: 17,
+            fontWeight: 400,
+            color: "var(--text-secondary)",
+            lineHeight: 1.7,
+            maxWidth: 520,
+            marginBottom: 44,
+          }}
+        >
+          I build and implement AI systems for media &amp; entertainment companies —
+          turning strategy into shipped product. Currently open to StratOps and
+          Solutions roles at AI-native companies.
+        </p>
+
+        {/* CTAs */}
+        <div
+          className="fade-up fade-up-4"
+          style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}
+        >
+          <a
+            href="#experience"
+            onClick={(e) => {
+              e.preventDefault();
+              document.querySelector("#experience")?.scrollIntoView({ behavior: "smooth" });
+            }}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "11px 24px",
+              borderRadius: 8,
+              backgroundColor: "var(--navy)",
+              color: "#FFFFFF",
+              fontFamily: "var(--font-body)",
+              fontSize: 14,
+              fontWeight: 500,
+              textDecoration: "none",
+              letterSpacing: "0.01em",
+              transition: "background-color 0.15s ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--blue-mid)")}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "var(--navy)")}
+          >
+            View My Work
+          </a>
+
+          <a
+            href="#contact"
+            onClick={(e) => {
+              e.preventDefault();
+              document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" });
+            }}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "10px 24px",
+              borderRadius: 8,
+              backgroundColor: "transparent",
+              color: "var(--navy)",
+              border: "1px solid var(--border)",
+              fontFamily: "var(--font-body)",
+              fontSize: 14,
+              fontWeight: 500,
+              textDecoration: "none",
+              letterSpacing: "0.01em",
+              transition: "border-color 0.15s ease, color 0.15s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "var(--blue-mid)";
+              e.currentTarget.style.color = "var(--blue-mid)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "var(--border)";
+              e.currentTarget.style.color = "var(--navy)";
+            }}
+          >
+            Get in Touch
+          </a>
+        </div>
       </div>
     </section>
   );
