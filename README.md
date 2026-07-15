@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mindy Wu — Portfolio
 
-## Getting Started
+Personal portfolio site for Mindy Wu, a technology consultant and AI builder based in New York. It's a single-page site covering what I've built, who I am, and how to reach me, and it links out to my other projects like [Mindy's AI Guide](https://mindys-ai-guide.vercel.app).
 
-First, run the development server:
+**Live site:** [mindy-portfolio.vercel.app](https://mindy-portfolio.vercel.app)
+
+## Screenshots
+
+![Hero section — Technology Consultant & AI Builder](docs/screenshot-hero.png)
+
+![Work section — project cards](docs/screenshot-work.png)
+
+## Tech stack
+
+- [Next.js 16](https://nextjs.org) (App Router) with React 19
+- TypeScript
+- Tailwind CSS 4
+- DM Serif Display, DM Sans, and DM Mono loaded through `next/font`
+- Deployed on Vercel
+
+## Features
+
+- Single-page layout with smooth-scroll navigation
+- Editorial type system: serif display headings, sans body text, monospaced accents
+- Staggered fade-up entrance animations
+- Project cards linking to live work
+
+## Why I built it
+
+I wanted one place that shows what I actually do — consulting work on enterprise AI deployments and side projects that make AI approachable for non-technical people. Building it was also a chance to work hands-on with the current Next.js App Router and Tailwind 4.
+
+Built with [Claude Code](https://claude.com/claude-code).
+
+## Running locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Then open [http://localhost:3000](http://localhost:3000).

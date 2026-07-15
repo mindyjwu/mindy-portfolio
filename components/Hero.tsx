@@ -72,10 +72,10 @@ export default function Hero() {
           style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}
         >
           <a
-            href="#experience"
+            href="#work"
             onClick={(e) => {
               e.preventDefault();
-              document.querySelector("#experience")?.scrollIntoView({ behavior: "smooth" });
+              document.querySelector("#work")?.scrollIntoView({ behavior: "smooth" });
             }}
             style={{
               display: "inline-flex",
