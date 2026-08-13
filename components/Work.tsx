@@ -16,6 +16,22 @@ const projects = [
     bg: "bg-[#E4EFE8]",
   },
   {
+    tag: "Interactive map · React + MapLibre GL + Vite",
+    title: "Global Explorer",
+    desc: "Click any country on a 3D globe and explore its cities, each tagged by what makes it worth visiting.",
+    link: "https://global-explorer.vercel.app",
+    linkLabel: "Visit site →",
+    bg: "bg-blue-pale",
+  },
+  {
+    tag: "Communication style discovery · Next.js + Claude + Supabase",
+    title: "GenAI",
+    desc: "Ask anything and get two perspectives — Kyle and Kylie respond in distinct communication styles. Pick what resonates, and discover what your choices say about you.",
+    link: "https://gender-ai.vercel.app",
+    linkLabel: "Visit site →",
+    bg: "bg-[#EEE8FF]",
+  },
+  {
     tag: "Coming soon",
     title: "More projects",
     desc: "Data science projects, consulting case studies, and other builds. Check back soon.",
