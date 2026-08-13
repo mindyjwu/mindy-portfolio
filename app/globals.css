@@ -24,6 +24,14 @@
   --color-blue-mid: #005B96;
   --color-blue-light: #90E0EF;
   --color-blue-pale: #E8F7FB;
+
+  /* Shared with mindys-ai-guide */
+  --color-clay: #C85F3A;
+  --color-clay-light: #F5E8E2;
+  --color-clay-dark: #9B3F22;
+  --color-ink: #1E1A16;
+  --color-ink-soft: #5A4F45;
+  --color-ink-muted: #9A8F85;
 }
 
 :root {
