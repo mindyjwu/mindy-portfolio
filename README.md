@@ -1,41 +1,33 @@
 # Mindy Wu — Portfolio
 
-Personal portfolio site for Mindy Wu, a technology consultant and AI builder based in New York. It's a single-page site covering what I've built, who I am, and how to reach me, and it links out to my other projects like [Mindy's AI Guide](https://mindys-ai-guide.vercel.app).
+**[mindy-portfolio.vercel.app](https://mindy-portfolio.vercel.app)**
 
-**Live site:** [mindy-portfolio.vercel.app](https://mindy-portfolio.vercel.app)
+The one-page version of "what do you actually do." Consulting work on enterprise AI deployments during the day, a handful of side projects that try to make AI feel less intimidating the rest of the time. This site is where those two things sit next to each other.
 
-## Screenshots
+## What's on it
 
-![Hero section — Technology Consultant & AI Builder](docs/screenshot-hero.png)
+- A single-page layout, smooth-scroll navigation, no clicking through five tabs to find anything
+- An editorial type system — serif display headings, sans body text, monospaced accents — instead of the default SaaS-landing-page look
+- Project cards that link straight out to the live work, not to more marketing copy
+- Staggered fade-up entrances, kept subtle on purpose
 
-![Work section — project cards](docs/screenshot-work.png)
+## Stack
 
-## Tech stack
+Next.js 16 (App Router), React 19, TypeScript, Tailwind 4. Type is DM Serif Display, DM Sans, and DM Mono, loaded through `next/font`. Deployed on Vercel.
 
-- [Next.js 16](https://nextjs.org) (App Router) with React 19
-- TypeScript
-- Tailwind CSS 4
-- DM Serif Display, DM Sans, and DM Mono loaded through `next/font`
-- Deployed on Vercel
+## Why this exists as its own site
 
-## Features
+Mindy's AI Guide is written for someone with zero AI background — it's deliberately not about me. This site is the opposite: it's the one place that's actually about the work, for anyone who clicks through from a resume or a LinkedIn message wanting the fuller picture.
 
-- Single-page layout with smooth-scroll navigation
-- Editorial type system: serif display headings, sans body text, monospaced accents
-- Staggered fade-up entrance animations
-- Project cards linking to live work
-
-## Why I built it
-
-I wanted one place that shows what I actually do — consulting work on enterprise AI deployments and side projects that make AI approachable for non-technical people. Building it was also a chance to work hands-on with the current Next.js App Router and Tailwind 4.
-
-Built with [Claude Code](https://claude.com/claude-code).
-
-## Running locally
+## Running it locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-Then open [http://localhost:3000](http://localhost:3000).
+Then open `http://localhost:3000`.
+
+## Status
+
+Currently redeploying — if the live link 404s, that's a deployment gap on my end, not a broken build. Fixing.
