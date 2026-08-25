@@ -7,45 +7,45 @@
   --font-body: var(--font-body);
 
   /* Backgrounds */
-  --color-bg: #F8F7F4;
+  --color-bg: #F7F8F4;
   --color-surface: #FFFFFF;
-  --color-cream: #F8F7F4;
+  --color-cream: #F5F7F0;
 
   /* Borders */
-  --color-border: #E2E8F0;
+  --color-border: #DCE6DD;
 
   /* Text */
-  --color-text-primary: #011F4B;
-  --color-text-secondary: #3A5A7A;
-  --color-text-tertiary: #8FA8C0;
+  --color-text-primary: #1E2B22;
+  --color-text-secondary: #4B5C50;
+  --color-text-tertiary: #8B9C90;
 
-  /* Brand palette */
-  --color-navy: #011F4B;
-  --color-blue-mid: #005B96;
-  --color-blue-light: #90E0EF;
-  --color-blue-pale: #E8F7FB;
+  /* Brand palette — sage green */
+  --color-navy: #1E2B22;
+  --color-blue-mid: #4A7C59;
+  --color-blue-light: #8FBE9E;
+  --color-blue-pale: #E4EFE8;
 
   /* Shared with mindys-ai-guide */
-  --color-clay: #C85F3A;
-  --color-clay-light: #F5E8E2;
-  --color-clay-dark: #9B3F22;
-  --color-ink: #1E1A16;
-  --color-ink-soft: #5A4F45;
-  --color-ink-muted: #9A8F85;
+  --color-clay: #4A7C59;
+  --color-clay-light: #E4EFE8;
+  --color-clay-dark: #355C41;
+  --color-ink: #1E2B22;
+  --color-ink-soft: #4B5C50;
+  --color-ink-muted: #8B9C90;
 }
 
 :root {
-  --bg: #F8F7F4;
+  --bg: #F7F8F4;
   --surface: #FFFFFF;
-  --border: #E2E8F0;
-  --text-primary: #011F4B;
-  --text-secondary: #3A5A7A;
-  --text-tertiary: #8FA8C0;
-  --navy: #011F4B;
-  --blue-mid: #005B96;
-  --blue-light: #90E0EF;
-  --blue-pale: #E8F7FB;
-  --cream: #F8F7F4;
+  --border: #DCE6DD;
+  --text-primary: #1E2B22;
+  --text-secondary: #4B5C50;
+  --text-tertiary: #8B9C90;
+  --navy: #1E2B22;
+  --blue-mid: #4A7C59;
+  --blue-light: #8FBE9E;
+  --blue-pale: #E4EFE8;
+  --cream: #F5F7F0;
 }
 
 html {

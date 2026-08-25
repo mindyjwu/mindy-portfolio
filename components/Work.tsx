@@ -13,7 +13,7 @@ const projects = [
     desc: "A 7-screen user research prototype exploring how people perceive AI, misinformation, and trust — built to validate content direction for the AI Guide.",
     link: "https://mindys-ai-guide.vercel.app/research.html",
     linkLabel: "See prototype →",
-    bg: "bg-[#E4EFE8]",
+    bg: "bg-[#EEF5F0]",
   },
   {
     tag: "Interactive map · React + MapLibre GL + Vite",
@@ -21,7 +21,7 @@ const projects = [
     desc: "Click any country on a 3D globe and explore its cities, each tagged by what makes it worth visiting.",
     link: "https://global-explorer.vercel.app",
     linkLabel: "Visit site →",
-    bg: "bg-blue-pale",
+    bg: "bg-[#DCEEE3]",
   },
   {
     tag: "Communication style discovery · Next.js + Claude + Supabase",
@@ -29,7 +29,7 @@ const projects = [
     desc: "Ask anything and get two perspectives — Kyle and Kylie respond in distinct communication styles. Pick what resonates, and discover what your choices say about you.",
     link: "https://gender-ai.vercel.app",
     linkLabel: "Visit site →",
-    bg: "bg-[#EEE8FF]",
+    bg: "bg-[#E9F0DE]",
   },
   {
     tag: "AI stock dashboard · Python + Streamlit + Claude",
@@ -37,7 +37,7 @@ const projects = [
     desc: "Grades stocks on fundamentals, technicals, and AI-analyzed news sentiment, then turns cash deposits into diversified buy plans. Educational tool, not financial advice.",
     link: "https://github.com/mindyjwu/stock_advisor",
     linkLabel: "View on GitHub →",
-    bg: "bg-[#DFF3F0]",
+    bg: "bg-[#DFF3EC]",
   },
   {
     tag: "Coming soon",
@@ -45,7 +45,7 @@ const projects = [
     desc: "Data science projects, consulting case studies, and other builds. Check back soon.",
     link: null,
     linkLabel: null,
-    bg: "bg-[#FDF6DC]",
+    bg: "bg-[#F1F0EA]",
   },
 ];
 
