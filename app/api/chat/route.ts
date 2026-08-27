@@ -4,10 +4,10 @@ import type { NextRequest } from "next/server";
 // Route handlers are never cached for POST; this runs at request time.
 export const runtime = "nodejs";
 
-// Model: defaults to Claude Opus 5. For a public portfolio Q&A, Claude Haiku 4.5
-// ("claude-haiku-4-5") is ~5x cheaper and noticeably snappier — swap this one line
-// if you'd rather optimize for cost/latency over raw capability.
-const MODEL = "claude-opus-5";
+// Model: Claude Haiku 4.5 — fast and inexpensive, a good fit for a public
+// portfolio Q&A. Swap to "claude-opus-5" if you want a more capable (but
+// slower and ~5x pricier) model.
+const MODEL = "claude-haiku-4-5";
 
 const SYSTEM = `You are the assistant on Mindy Wu's personal portfolio website. Visitors — often recruiters — ask you about Mindy. Answer as a knowledgeable, friendly guide to her work.
 
