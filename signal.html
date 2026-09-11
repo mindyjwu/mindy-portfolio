@@ -34,6 +34,9 @@
     .brand{font-size:26px;font-weight:900;letter-spacing:-1.5px;color:var(--sd)}
     .brand span{color:var(--sage)}
     .lvbg{font-size:9px;font-weight:800;letter-spacing:2px;color:var(--sage);border:1.5px solid var(--sage);padding:2px 7px;border-radius:4px}
+    .lvbg.snap{color:#b45309;border-color:#b45309}
+    .lvbg.sample{color:var(--mu);border-color:var(--br)}
+    .ldot.off{animation:none;background:var(--sm)}
     .hsub{font-size:11.5px;color:var(--mu)}
 
     /* ── Stats bar ── */
@@ -65,6 +68,7 @@
     .stbar.live{background:#f0fdf4;color:#15803d;border-bottom:1px solid #bbf7d0}
     .stbar.demo{background:#f8faff;color:#3b5a9a;border-bottom:1px solid #c7d8f7}
     .stbar.arch{background:#f5f3ff;color:#5b21b6;border-bottom:1px solid #ddd6fe}
+    .stbar.snap{background:#fff7ed;color:#9a3412;border-bottom:1px solid #fed7aa}
     .stdt{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 
     /* ── Grid & Cards ── */
@@ -172,16 +176,16 @@
 <!-- ── SIGNAL header ───────────────────────────── -->
 <div class="signal-header">
   <div class="sh-top">
-    <div class="ldot"></div>
+    <div class="ldot off" id="ldot"></div>
     <div class="brand">SIG<span>NAL</span></div>
-    <div class="lvbg">LIVE</div>
+    <div class="lvbg sample" id="lvbg">LOADING</div>
   </div>
   <div class="hsub">AI &amp; innovation intelligence · 15+ stories daily across 16 industries</div>
 </div>
 
 <!-- ── Stats bar ───────────────────────────────── -->
 <div class="sbar">
-  <div class="si"><div class="sn" id="s-st">—</div><div class="sl2">Today</div></div>
+  <div class="si"><div class="sn" id="s-st">—</div><div class="sl2">Stories</div></div>
   <div class="sdv"></div>
   <div class="si"><div class="sn" id="s-ind">—</div><div class="sl2">Industries</div></div>
   <div class="sdv"></div>
@@ -262,7 +266,8 @@ const PHOTO={
 const TODAY=new Date().toISOString().split('T')[0];
 const IND_COUNT=Object.keys(META).length;
 let todayStories=[],archiveDays=[],curView='today',selIndustry=null;
-let isDemo=true,sweepsDone=0,fetchingInd=null;
+// mode: 'live' (today's sweep) | 'snapshot' (the committed last-good sweep) | 'sample' (hardcoded placeholder)
+let mode='sample',SNAP=null,sweepsDone=0,fetchingInd=null;
 const fetchedInd=new Set();
 
 function imgUrl(s){const pid=PHOTO[s.industry]||PHOTO.others;return`https://images.unsplash.com/photo-${pid}?w=800&h=300&fit=crop&auto=format&q=75`;}
@@ -325,6 +330,29 @@ function spokenMins(list){
 }
 function coveredCount(){return new Set(todayStories.map(s=>s.industry)).size;}
 
+/* ═══ Data mode ═══════════════════════════════════════════
+   The badge, the pulsing dot, and every date label derive from `mode`, so the
+   page can never say LIVE over stories that aren't. */
+function fmtDay(iso){return new Date(iso+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});}
+function feedDate(){return mode==='snapshot'&&SNAP?new Date(SNAP.date+'T12:00:00'):new Date();}
+function dateLabel(){
+  if(mode==='snapshot'&&SNAP)return 'Sweep from '+fmtDay(SNAP.date);
+  if(mode==='sample')return 'Sample stories';
+  return 'Today — '+fmtDay(TODAY);
+}
+function setMode(m){
+  mode=m;
+  const b=document.getElementById('lvbg'),d=document.getElementById('ldot');
+  b.className='lvbg'+(m==='live'?'':m==='snapshot'?' snap':' sample');
+  b.textContent=m==='live'?'LIVE':m==='snapshot'?'SNAPSHOT':'SAMPLE';
+  d.classList.toggle('off',m!=='live');
+}
+function snapStatus(){
+  return SNAP.frozen
+    ? 'Frozen snapshot · sweep from '+fmtDay(SNAP.date)+' · live refresh off'
+    : 'Live refresh unavailable · showing the '+fmtDay(SNAP.date)+' sweep';
+}
+
 /* ═══ Story helpers ═══════════════════════════════════════ */
 function keyOf(s){return (s.url||'')+'|'+String(s.headline||'').toLowerCase().replace(/\W+/g,'');}
 function mergeStories(incoming){
@@ -363,7 +391,7 @@ function scriptFor(s,i,total){
   return p.filter(Boolean).join(' ');
 }
 function introText(list){
-  const d=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  const d=feedDate().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   const inds=[...new Set(list.map(s=>(META[s.industry]||META.others).label))];
   return `This is Signal, your A.I. and innovation briefing for ${d}. ${list.length} `+
     `${list.length===1?'story':'stories'} today across ${inds.length} `+
@@ -375,7 +403,7 @@ function outroText(list){
     `about ${mins} minutes of reading if you open every source. Every link is on the page. See you tomorrow.`;
 }
 function fullScript(list){
-  const d=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const d=feedDate().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
   const out=[`SIGNAL — ${d}`,`${list.length} stories · ~${spokenMins(list)} min read aloud · ${readTotal(list)} min to read every source`,'',
     'COLD OPEN','',introText(list),''];
   list.forEach((s,i)=>{
@@ -441,6 +469,7 @@ function rGrid(stories,container){
 }
 
 function fetchRow(id,haveSome){
+  if(SNAP&&SNAP.frozen)return null;
   const m=META[id];if(!m)return null;
   const wrap=document.createElement('div');wrap.className='fetchrow';
   const b=document.createElement('button');b.className='fetchmore';
@@ -460,8 +489,8 @@ function showToday(){
   const lbl=document.createElement('div');lbl.className='slbl';
   if(fs.length){
     lbl.textContent=selIndustry
-      ? `Today · ${META[selIndustry].label} · ${fs.length} ${fs.length===1?'story':'stories'} · ${readTotal(fs)} min of reading`
-      : `Today — ${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})} · ${fs.length} stories · ${readTotal(fs)} min of reading`;
+      ? `${dateLabel()} · ${META[selIndustry].label} · ${fs.length} ${fs.length===1?'story':'stories'} · ${readTotal(fs)} min of reading`
+      : `${dateLabel()} · ${fs.length} stories · ${readTotal(fs)} min of reading`;
     c.appendChild(lbl);rGrid(fs,c);
   }else{
     c.innerHTML=`<div class="empty"><h2>${selIndustry?'Nothing in this category yet today':'No stories yet'}</h2>
@@ -503,7 +532,8 @@ function switchView(v){
   document.getElementById('t-today').classList.toggle('active',v==='today');
   document.getElementById('t-arch').classList.toggle('active',v==='archive');
   if(v==='archive')setSt('arch','#8b5cf6','Viewing archive — past stories stored locally');
-  else if(todayStories.length&&!isDemo)setSt('live','#15803d',`✓ ${todayStories.length} stories today · ${coveredCount()} industries · ${TODAY}`);
+  else if(mode==='live'&&todayStories.length)setSt('live','#15803d',`✓ ${todayStories.length} stories today · ${coveredCount()} industries · ${TODAY}`);
+  else if(mode==='snapshot'&&SNAP)setSt('snap','#b45309',snapStatus());
   renderView();
 }
 
@@ -606,7 +636,7 @@ async function getJSON(url){
 
 function absorb(stories,meta){
   if(!stories||!stories.length)return 0;
-  if(isDemo){isDemo=false;todayStories=[];}
+  if(mode!=='live'){setMode('live');todayStories=[];}
   const added=mergeStories(stories);
   applyMeta(meta);
   saveDay(todayStories);
@@ -618,7 +648,10 @@ function absorb(stories,meta){
 // Three parallel sweeps, five industries each — far more coverage than one
 // request can find inside a single function timeout.
 async function fetchAll(){
-  setSt('loading','#d97706','Sweeping 16 industries for today\'s stories (up to 2 min on the first load of the day)…');
+  const hasSnap=!!(SNAP&&SNAP.stories.length);
+  setSt('loading','#d97706',hasSnap
+    ?`Showing the ${fmtDay(SNAP.date)} sweep while today\'s loads (up to 2 min)…`
+    :'Sweeping 16 industries for today\'s stories (up to 2 min on the first load of the day)…');
   sweepsDone=0;
   await Promise.all([1,2,3].map(async n=>{
     try{
@@ -626,10 +659,11 @@ async function fetchAll(){
       absorb(d.stories,d.meta);
     }catch(e){console.warn('[signal] sweep '+n,e);}
     sweepsDone++;
-    if(sweepsDone<3&&!isDemo)setSt('loading','#d97706',`${todayStories.length} stories in · sweep ${sweepsDone} of 3 done…`);
+    if(sweepsDone<3&&mode==='live')setSt('loading','#d97706',`${todayStories.length} stories in · sweep ${sweepsDone} of 3 done…`);
   }));
-  if(isDemo)setSt('demo','#3b82f6','Showing sample stories · live data unavailable');
-  else setSt('live','#15803d',`✓ ${todayStories.length} live stories · ${coveredCount()} of ${IND_COUNT} industries · ${TODAY}`);
+  if(mode==='live')setSt('live','#15803d',`✓ ${todayStories.length} live stories · ${coveredCount()} of ${IND_COUNT} industries · ${TODAY}`);
+  else if(hasSnap)setSt('snap','#b45309',snapStatus());
+  else setSt('demo','#3b82f6','Showing sample stories · live data unavailable');
   updStats();renderView();
 }
 
@@ -656,22 +690,54 @@ function wireControls(){
   document.getElementById('dlb').onclick=downloadScript;
 }
 
-async function init(){
-  buildDD();wireControls();
-  archiveDays=loadArchive();
-  const stored=loadDay();
-  if(stored&&stored.length){
-    isDemo=false;todayStories=stored;
-    updStats();
-    setSt('live','#15803d',`✓ Today's ${stored.length} stories · ${coveredCount()} industries · ${TODAY}`);
-    renderView();return;
-  }
+/* The snapshot is a real sweep committed to the repo at data/signal-snapshot.json.
+   Refresh it with `node scripts/snapshot-signal.mjs capture`; flip `frozen` to
+   demo it with zero API calls. */
+async function loadSnapshot(){
+  try{
+    const r=await fetch('/data/signal-snapshot.json',{cache:'no-cache'});
+    if(!r.ok)return null;
+    const j=await r.json();
+    return (j&&Array.isArray(j.stories)&&typeof j.date==='string')?j:null;
+  }catch(e){return null;}
+}
+function useSnapshot(){
+  setMode('snapshot');
+  todayStories=SNAP.stories.slice();
+  applyMeta(SNAP.meta);
+  updStats();renderView();
+}
+function useSample(){
+  setMode('sample');
   todayStories=DEMO.slice();
   updStats();
   document.getElementById('s-hot').textContent='AI';
   document.getElementById('s-fund').textContent='$14B+';
-  setSt('demo','#3b82f6','Showing sample stories — fetching live data…');
   renderView();
+}
+
+async function init(){
+  buildDD();wireControls();
+  archiveDays=loadArchive();
+  SNAP=await loadSnapshot();
+  const hasSnap=!!(SNAP&&SNAP.stories.length);
+
+  // Frozen: render the committed sweep and never touch the API.
+  // Zero credits, zero cold start — this is the demo switch.
+  if(hasSnap&&SNAP.frozen){
+    useSnapshot();
+    setSt('snap','#b45309',snapStatus());
+    return;
+  }
+  const stored=loadDay();
+  if(stored&&stored.length){
+    setMode('live');todayStories=stored;
+    updStats();
+    setSt('live','#15803d',`✓ Today's ${stored.length} stories · ${coveredCount()} industries · ${TODAY}`);
+    renderView();return;
+  }
+  // Real last-good data as the placeholder while the sweeps run — not fiction.
+  if(hasSnap)useSnapshot();else useSample();
   fetchAll();
 }
 init();

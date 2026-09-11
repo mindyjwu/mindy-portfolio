@@ -36,6 +36,19 @@ npm install -g vercel
 vercel dev
 ```
 
+## SIGNAL snapshot (demos and credit control)
+
+`data/signal-snapshot.json` holds the last real sweep, committed to the repo. The page shows it as an honest placeholder while today's sweep loads, and falls back to it if the API is down or the Anthropic account is out of credits — labelled with its real date, never as "today".
+
+```bash
+node scripts/snapshot-signal.mjs capture   # pull today's sweeps and save them (the only command that spends credits)
+node scripts/snapshot-signal.mjs freeze    # page serves the snapshot only, never calls the API
+node scripts/snapshot-signal.mjs unfreeze
+node scripts/snapshot-signal.mjs status
+```
+
+Commit and push after any of these. Freeze before a demo: zero API calls, instant load, no cold-start wait.
+
 ## Environment variables
 
 Copy `.env.example` to `.env` and set `ANTHROPIC_API_KEY` (get one at console.anthropic.com). In Vercel, set it under Project → Settings → Environment Variables.
