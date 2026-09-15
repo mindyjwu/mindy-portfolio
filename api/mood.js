@@ -102,6 +102,9 @@ export default async function handler(req, res) {
     console.error('mood error:', err);
     // Surface the real reason — a dead API key must never look like a taste problem.
     const status = err instanceof Anthropic.APIError ? err.status : 500;
-    res.status(status >= 400 ? status : 500).json({ error: err.message });
+    const message = /credit balance/i.test(err.message)
+      ? 'The site\'s Claude API key is out of credits, so nothing can be chosen right now. Mindy has to top it up.'
+      : err.message;
+    res.status(status >= 400 ? status : 500).json({ error: message });
   }
 }
