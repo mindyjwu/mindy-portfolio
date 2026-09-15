@@ -8,10 +8,9 @@ It teaches non-technical people how to actually use Claude for the stuff that's 
 
 ## What's on the site
 
-- **Guides by audience** — separate tracks for explorers, creators, and readers, because "how do I use AI" means something different to a musician than it does to my mom
+- **Mood Wall** (`mood.html`) — tell it how you feel and get a wall of real art, books, music, film, documentaries and festivals chosen for that feeling. Claude picks; the browser resolves every pick against The Met, Open Library, iTunes (30-second previews) and Wikipedia, so every card is a real thing with a real link. Save cards to a local wall, share a mood by URL. This replaced the old Explorer / Creator / Reader / Film / Score chat pages, which now redirect here.
 - **Prompt library** — real prompts for real situations, ready to paste into Claude
 - **Ask the guide** — an embedded chat that answers AI questions in plain English
-- **Explore Art with AI** — browsing MoMA's open-access collection by mood instead of by artist name
 - **Quick Research prototype** — a 7-screen flow probing how people actually perceive AI, misinformation, and trust
 - **SIGNAL** — an AI-news feed that sweeps all 16 industries each morning in three parallel passes, with an estimated read time on every story, an on-demand search for any industry the day's sweep missed, and a downloadable podcast script
 - **About page** (`about.html`) — the "why" behind the site: AI as a talent amplifier, not a replacement

@@ -2,6 +2,9 @@
   "functions": {
     "api/signal.js": {
       "maxDuration": 300
+    },
+    "api/mood.js": {
+      "maxDuration": 60
     }
   }
 }
