@@ -19,7 +19,7 @@ const projects = [
     tag: "Interactive map · React + MapLibre GL + Vite",
     title: "Global Explorer",
     desc: "Click any country on a 3D globe and explore its cities, each tagged by what makes it worth visiting.",
-    link: "https://global-explorer.vercel.app",
+    link: "https://global-explorer-ivory.vercel.app",
     linkLabel: "Visit site →",
     bg: "bg-[#DCEEE3]",
   },
