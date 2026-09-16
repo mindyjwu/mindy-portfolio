@@ -112,6 +112,35 @@
     }
     .mood-chip:hover { border-color: var(--clay); color: var(--clay); background: var(--clay-light); }
 
+    .mood-chips--places { margin-top: 10px; }
+    .chips-lead {
+      align-self: center;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-right: 4px;
+    }
+    .mood-chip--place { border-style: dashed; }
+
+    .mood-mode {
+      max-width: 760px;
+      margin: 10px auto 0;
+      padding: 0 2rem;
+      text-align: center;
+      font-size: 12.5px;
+      color: var(--ink-muted);
+    }
+    .mood-mode .dot {
+      display: inline-block;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: 1px;
+      background: var(--butter);
+    }
+    .mood-mode.is-live .dot { background: #1A7A4A; }
+
     /* Medium toggles */
     .mood-mediums {
       display: flex;
@@ -424,6 +453,9 @@
     <button type="button" class="mood-chip">3am and wide awake</button>
     <button type="button" class="mood-chip">homesick for a place I've never been</button>
   </div>
+  <div class="mood-chips mood-chips--places" id="mood-places" hidden>
+    <span class="chips-lead">or a place</span>
+  </div>
   <div class="mood-mediums" id="mood-mediums">
     <span class="label">Build it from</span>
     <button type="button" class="medium-toggle" data-medium="art" aria-pressed="true">Art</button>
@@ -436,6 +468,7 @@
 </form>
 
 <p class="mood-reading" id="mood-reading" hidden></p>
+<p class="mood-mode" id="mood-mode" hidden></p>
 <div class="wall-filters" id="wall-filters" hidden></div>
 <div class="wall" id="wall"></div>
 
@@ -467,7 +500,9 @@
 
 <div class="toast" id="toast" role="status"></div>
 
-<script>
+<script type="module">
+import { resolve, norm, overlap } from './js/mood-resolvers.js';
+
 /* ============================================================
    STATE
    ============================================================ */
@@ -476,10 +511,15 @@ const MEDIUM_PLURAL = { art: 'Art', book: 'Books', music: 'Music', film: 'Films'
 const MEDIUM_GLYPH = { art: '✦', book: '❡', music: '♪', film: '▸', documentary: '◉', festival: '✺' };
 const SAVED_KEY = 'moodwall.saved.v1';
 
-let cards = [];            // resolved cards for the current mood
+let cards = [];            // cards for the current wall
 let currentMood = '';
 let audioEl = null;        // single shared <audio> so only one preview plays
 let playingBtn = null;
+
+// Curated walls: written once, resolved once, served as static JSON — no API spend.
+// index.frozen === true means the page never calls /api/mood at all.
+let SNAP = { frozen: true, walls: [] };
+const snapCache = new Map();
 
 /* ============================================================
    HELPERS
@@ -489,116 +529,12 @@ function esc(s) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
 }
-function norm(s) {
-  return String(s ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
-}
-function words(s) { return new Set(norm(s).split(' ').filter(w => w.length > 1)); }
-// Share of the smaller set found in the larger — forgiving of subtitles and "(Remastered)".
-function overlap(a, b) {
-  const A = words(a), B = words(b);
-  if (!A.size || !B.size) return 0;
-  let n = 0; for (const w of A) if (B.has(w)) n++;
-  return n / Math.min(A.size, B.size);
-}
-// Jaccard — punishes extra names, so "AURORA & Nick Drake" ranks below "Nick Drake".
-function same(a, b) {
-  const A = words(a), B = words(b);
-  if (!A.size || !B.size) return 0;
-  let n = 0; for (const w of A) if (B.has(w)) n++;
-  return n / (A.size + B.size - n);
-}
-function withTimeout(promise, ms) {
-  return Promise.race([promise, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
-}
-async function getJSON(url, ms = 6000) {
-  const r = await withTimeout(fetch(url), ms);
-  if (!r.ok) throw new Error(`${r.status}`);
-  return r.json();
-}
 function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('is-on');
   clearTimeout(t._timer);
   t._timer = setTimeout(() => t.classList.remove('is-on'), 1800);
-}
-
-/* ============================================================
-   RESOLVERS — each returns { imageUrl, link, preview?, sourceName } or null
-   ============================================================ */
-async function resolveWiki(title) {
-  if (!title) return null;
-  const d = await getJSON(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title.replace(/ /g, '_'))}`);
-  if (d.type === 'disambiguation') return null;
-  // Wikimedia only serves pre-rendered thumbnail widths (rewriting the px size 400s),
-  // so take the original when it's a sane size and the ~330px thumb otherwise.
-  const orig = d.originalimage;
-  const img = orig && orig.width <= 2000 ? orig.source : (d.thumbnail?.source || orig?.source || '');
-  return { imageUrl: img, link: d.content_urls?.desktop?.page || '', sourceName: 'Wikipedia' };
-}
-
-async function resolveMet(pick) {
-  const q = pick.metQuery || `${pick.title} ${pick.creator}`;
-  const s = await getJSON(`https://collectionapi.metmuseum.org/public/collection/v1/search?q=${encodeURIComponent(q)}&hasImages=true`);
-  const ids = (s.objectIDs || []).slice(0, 6);
-  if (!ids.length) return null;
-  const objs = await Promise.all(ids.map(id =>
-    getJSON(`https://collectionapi.metmuseum.org/public/collection/v1/objects/${id}`, 5000).catch(() => null)));
-  const scored = objs.filter(o => o && o.primaryImageSmall).map(o => ({
-    o,
-    score: overlap(o.title, pick.title) * 2 + same(o.artistDisplayName, pick.creator),
-  })).sort((a, b) => b.score - a.score);
-  if (!scored.length || scored[0].score < 0.5) return null;
-  const o = scored[0].o;
-  return {
-    imageUrl: o.primaryImageSmall,
-    link: o.objectURL,
-    sourceName: 'The Met',
-    meta: [o.artistDisplayName || pick.creator, o.objectDate || pick.year].filter(Boolean).join(' · '),
-  };
-}
-
-async function resolveBook(pick) {
-  const d = await getJSON(`https://openlibrary.org/search.json?title=${encodeURIComponent(pick.title)}&author=${encodeURIComponent(pick.creator)}&limit=5&fields=key,title,author_name,cover_i,first_publish_year`);
-  const docs = (d.docs || []).filter(x => x.cover_i);
-  const best = docs.map(x => ({ x, score: overlap(x.title, pick.title) + same((x.author_name || []).join(' '), pick.creator) }))
-    .sort((a, b) => b.score - a.score)[0];
-  if (!best || best.score < 0.5) return null;
-  return {
-    imageUrl: `https://covers.openlibrary.org/b/id/${best.x.cover_i}-L.jpg`,
-    link: `https://openlibrary.org${best.x.key}`,
-    sourceName: 'Open Library',
-  };
-}
-
-async function resolveMusic(pick) {
-  const d = await getJSON(`https://itunes.apple.com/search?term=${encodeURIComponent(`${pick.title} ${pick.creator}`)}&entity=song&limit=5`);
-  const best = (d.results || []).map(x => ({ x, score: overlap(x.trackName, pick.title) * 2 + same(x.artistName, pick.creator) * 1.5 }))
-    .sort((a, b) => b.score - a.score)[0];
-  if (!best || best.score < 0.6) return null;
-  const x = best.x;
-  return {
-    imageUrl: (x.artworkUrl100 || '').replace('100x100bb', '600x600bb'),
-    link: x.trackViewUrl,
-    preview: x.previewUrl || '',
-    sourceName: 'Apple Music',
-    meta: [x.artistName, x.collectionName].filter(Boolean).join(' · '),
-  };
-}
-
-async function resolve(pick) {
-  const chain = {
-    art:         [() => resolveMet(pick), () => resolveWiki(pick.wiki)],
-    book:        [() => resolveBook(pick), () => resolveWiki(pick.wiki)],
-    music:       [() => resolveMusic(pick), () => resolveWiki(pick.wiki)],
-    film:        [() => resolveWiki(pick.wiki), () => resolveWiki(pick.title)],
-    documentary: [() => resolveWiki(pick.wiki), () => resolveWiki(pick.title)],
-    festival:    [() => resolveWiki(pick.wiki), () => resolveWiki(pick.title)],
-  }[pick.medium] || [];
-  for (const step of chain) {
-    try { const r = await step(); if (r && (r.imageUrl || r.link)) return r; } catch { /* try next */ }
-  }
-  return null;
 }
 
 /* ============================================================
@@ -677,6 +613,11 @@ function loadSaved() { try { return JSON.parse(localStorage.getItem(SAVED_KEY) |
 function storeSaved(list) { try { localStorage.setItem(SAVED_KEY, JSON.stringify(list)); } catch { /* private mode */ } }
 function isSaved(c) { const k = saveKey(c); return loadSaved().some(s => saveKey(s) === k); }
 
+function setHearts(key, on) {
+  document.querySelectorAll(`#wall .card__save[data-key="${CSS.escape(key)}"]`).forEach(b => {
+    b.classList.toggle('is-saved', on); b.textContent = on ? '♥' : '♡';
+  });
+}
 function toggleSave(key) {
   let list = loadSaved();
   const idx = list.findIndex(s => saveKey(s) === key);
@@ -689,12 +630,8 @@ function toggleSave(key) {
   }
   storeSaved(list);
   renderSaved();
-  // refresh heart state on the live wall
-  document.querySelectorAll(`#wall .card__save[data-key="${CSS.escape(key)}"]`).forEach(b => {
-    const on = idx < 0; b.classList.toggle('is-saved', on); b.textContent = on ? '♥' : '♡';
-  });
+  setHearts(key, idx < 0);
 }
-
 function renderSaved() {
   const list = loadSaved();
   document.getElementById('saved-count').textContent = list.length ? `(${list.length})` : '';
@@ -720,16 +657,15 @@ document.addEventListener('click', e => {
   const play = e.target.closest('.card__play');
   if (play) { togglePreview(play); return; }
   const save = e.target.closest('.card__save');
-  if (save) {
-    // On the saved wall, the card may not be in `cards`; remove by key directly.
-    const key = save.dataset.key;
-    if (save.closest('#saved-wall')) {
-      storeSaved(loadSaved().filter(s => saveKey(s) !== key));
-      renderSaved(); toast('Removed from your wall');
-      document.querySelectorAll(`#wall .card__save[data-key="${CSS.escape(key)}"]`).forEach(b => { b.classList.remove('is-saved'); b.textContent = '♡'; });
-    } else {
-      toggleSave(key);
-    }
+  if (!save) return;
+  const key = save.dataset.key;
+  if (save.closest('#saved-wall')) {
+    // On the saved wall the card may not be in `cards`; remove by key directly.
+    storeSaved(loadSaved().filter(s => saveKey(s) !== key));
+    renderSaved(); toast('Removed from your wall');
+    setHearts(key, false);
+  } else {
+    toggleSave(key);
   }
 });
 
@@ -751,69 +687,162 @@ function togglePreview(btn) {
 }
 
 /* ============================================================
+   CURATED WALLS (static snapshots)
+   ============================================================ */
+async function loadIndex() {
+  try {
+    const r = await fetch('data/moods/index.json', { cache: 'no-cache' });
+    if (r.ok) SNAP = await r.json();
+  } catch { /* no snapshots: page falls back to live only */ }
+  renderChips();
+}
+function renderChips() {
+  const moods = SNAP.walls.filter(w => w.chip && !w.place);
+  const places = SNAP.walls.filter(w => w.chip && w.place);
+  if (moods.length) {
+    document.getElementById('mood-chips').innerHTML =
+      moods.map(w => `<button type="button" class="mood-chip">${esc(w.mood)}</button>`).join('');
+  }
+  const pl = document.getElementById('mood-places');
+  pl.hidden = !places.length;
+  pl.innerHTML = '<span class="chips-lead">or a place</span>' +
+    places.map(w => `<button type="button" class="mood-chip mood-chip--place">${esc(w.mood)}</button>`).join('');
+}
+function findSnapshot(mood) {
+  const n = norm(mood);
+  return SNAP.walls.find(w => norm(w.mood) === n) || null;
+}
+// Closest curated wall by word overlap; the first wall is the default when nothing overlaps.
+function nearestSnapshot(mood) {
+  if (!SNAP.walls.length) return null;
+  let best = SNAP.walls[0], bestScore = 0;
+  for (const w of SNAP.walls) {
+    const s = overlap(mood, w.mood);
+    if (s > bestScore) { best = w; bestScore = s; }
+  }
+  return best;
+}
+async function loadSnapshot(slug) {
+  if (snapCache.has(slug)) return snapCache.get(slug);
+  const r = await fetch(`data/moods/${slug}.json`);
+  if (!r.ok) throw new Error('snapshot missing');
+  const snap = await r.json();
+  snapCache.set(slug, snap);
+  return snap;
+}
+
+function setMode(kind, text) {
+  const el = document.getElementById('mood-mode');
+  el.hidden = false;
+  el.className = `mood-mode ${kind === 'live' ? 'is-live' : ''}`;
+  el.innerHTML = `<span class="dot"></span>${esc(text)}`;
+}
+
+/* ============================================================
    BUILD THE WALL
    ============================================================ */
 function selectedMediums() {
   return [...document.querySelectorAll('.medium-toggle[aria-pressed="true"]')].map(b => b.dataset.medium);
 }
 
-async function buildWall(mood) {
-  mood = String(mood || '').trim();
-  if (!mood) { document.getElementById('mood-input').focus(); return; }
-  const mediums = selectedMediums();
-  const reading = document.getElementById('mood-reading');
-  const go = document.getElementById('mood-go');
-  if (!mediums.length) { reading.hidden = false; reading.className = 'mood-reading is-error'; reading.textContent = 'Switch on at least one medium.'; return; }
-
+function beginBuild(mood) {
   stopPreview();
   currentMood = mood;
   activeFilter = 'all';
   cards = [];
   document.getElementById('mood-input').value = mood;
   history.replaceState(null, '', `?mood=${encodeURIComponent(mood)}`);
+  const go = document.getElementById('mood-go');
   go.disabled = true; go.textContent = 'Reading the mood…';
+  const reading = document.getElementById('mood-reading');
   reading.hidden = false; reading.className = 'mood-reading'; reading.textContent = '…';
+  document.getElementById('mood-mode').hidden = true;
   document.getElementById('wall').innerHTML = '';
   document.getElementById('wall-filters').hidden = true;
-
-  let data;
-  try {
-    const r = await fetch('/api/mood', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mood, mediums }),
-    });
-    data = await r.json();
-    if (!r.ok || data.error) throw new Error(data.error || `Server error ${r.status}`);
-  } catch (err) {
-    reading.className = 'mood-reading is-error';
-    reading.textContent = `Couldn't build the wall: ${err.message}`;
-    go.disabled = false; go.textContent = 'Build the wall →';
-    return;
-  }
-
-  reading.textContent = data.reading || '';
-  cards = (data.picks || []).map(p => ({ ...p, imageUrl: '', link: '', preview: '', resolved: false }));
-  renderFilters();
-  renderWall();
+}
+function endBuild() {
+  const go = document.getElementById('mood-go');
   go.disabled = false; go.textContent = 'Build the wall →';
-  reading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.getElementById('mood-reading').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function showError(msg) {
+  const reading = document.getElementById('mood-reading');
+  reading.className = 'mood-reading is-error';
+  reading.textContent = msg;
+  endBuild();
+}
 
-  // Resolve every pick in parallel; cards fill in as each source answers.
+// Curated: pre-resolved cards, filtered to the mediums switched on.
+async function showSnapshot(wall, mediums, note) {
+  const snap = await loadSnapshot(wall.slug);
+  document.getElementById('mood-reading').textContent = snap.reading;
+  cards = snap.cards.filter(c => mediums.includes(c.medium)).map(c => ({ ...c, resolved: true }));
+  setMode('curated', note || 'A curated wall — chosen once, kept for good.');
+  renderFilters(); renderWall(); endBuild();
+}
+
+// Live: one Claude call for picks, then the browser resolves each card.
+async function showLive(mood, mediums) {
+  const r = await fetch('/api/mood', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mood, mediums }),
+  });
+  const data = await r.json();
+  if (!r.ok || data.error) throw new Error(data.error || `Server error ${r.status}`);
+  document.getElementById('mood-reading').textContent = data.reading || '';
+  cards = (data.picks || []).map(p => ({ ...p, imageUrl: '', link: '', preview: '', resolved: false }));
+  setMode('live', 'Live picks — chosen just now for this exact mood.');
+  renderFilters(); renderWall(); endBuild();
   await Promise.all(cards.map(async c => {
-    const r = await resolve(c);
-    Object.assign(c, r || {}, { resolved: true });
+    const res = await resolve(c);
+    Object.assign(c, res || {}, { resolved: true });
     updateCard(c);
   }));
+}
+
+async function buildWall(mood) {
+  mood = String(mood || '').trim();
+  if (!mood) { document.getElementById('mood-input').focus(); return; }
+  const mediums = selectedMediums();
+  if (!mediums.length) { showError('Switch on at least one medium.'); return; }
+  beginBuild(mood);
+
+  try {
+    const exact = findSnapshot(mood);
+    if (exact) return await showSnapshot(exact, mediums);
+
+    if (SNAP.frozen) {
+      const near = nearestSnapshot(mood);
+      if (near) return await showSnapshot(near, mediums, `Live picks are resting at the moment — this is the curated wall for “${near.mood}”.`);
+    }
+
+    try {
+      await showLive(mood, mediums);
+    } catch (err) {
+      // The live route failed (credits, outage). Fall back to the closest curated wall, honestly labelled.
+      const near = nearestSnapshot(mood);
+      if (!near) throw err;
+      console.warn('[mood] live picks unavailable:', err.message);
+      await showSnapshot(near, mediums, `Live picks are resting at the moment — this is the curated wall for “${near.mood}”.`);
+    }
+  } catch (err) {
+    showError(`Couldn't build the wall: ${err.message}`);
+  }
 }
 
 document.getElementById('mood-form').addEventListener('submit', e => {
   e.preventDefault();
   buildWall(document.getElementById('mood-input').value);
 });
-document.getElementById('mood-chips').addEventListener('click', e => {
-  const chip = e.target.closest('.mood-chip'); if (!chip) return;
-  buildWall(chip.textContent);
+document.getElementById('mood-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); buildWall(e.target.value); }
 });
+for (const id of ['mood-chips', 'mood-places']) {
+  document.getElementById(id).addEventListener('click', e => {
+    const chip = e.target.closest('.mood-chip'); if (!chip) return;
+    buildWall(chip.textContent);
+  });
+}
 document.getElementById('mood-mediums').addEventListener('click', e => {
   const t = e.target.closest('.medium-toggle'); if (!t) return;
   t.setAttribute('aria-pressed', t.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
@@ -823,6 +852,7 @@ document.getElementById('mood-mediums').addEventListener('click', e => {
    INIT
    ============================================================ */
 renderSaved();
+await loadIndex();
 const initial = new URLSearchParams(location.search).get('mood');
 if (initial) buildWall(initial);
 </script>

@@ -1,0 +1,72 @@
+{
+  "frozen": true,
+  "updatedAt": "2026-09-16T15:39:51.117Z",
+  "walls": [
+    {
+      "slug": "rainy-sunday",
+      "mood": "rainy Sunday, nothing to do",
+      "chip": false,
+      "place": false
+    },
+    {
+      "slug": "last-week-of-summer",
+      "mood": "the last week of summer",
+      "chip": true,
+      "place": false
+    },
+    {
+      "slug": "quietly-furious",
+      "mood": "quietly furious",
+      "chip": true,
+      "place": false
+    },
+    {
+      "slug": "new-city-no-friends",
+      "mood": "new city, no friends yet",
+      "chip": true,
+      "place": false
+    },
+    {
+      "slug": "in-love-embarrassed",
+      "mood": "in love and slightly embarrassed about it",
+      "chip": true,
+      "place": false
+    },
+    {
+      "slug": "3am-wide-awake",
+      "mood": "3am and wide awake",
+      "chip": true,
+      "place": false
+    },
+    {
+      "slug": "homesick-never-been",
+      "mood": "homesick for a place I've never been",
+      "chip": true,
+      "place": false
+    },
+    {
+      "slug": "paris-in-the-rain",
+      "mood": "Paris in the rain",
+      "chip": true,
+      "place": true
+    },
+    {
+      "slug": "tokyo-after-midnight",
+      "mood": "Tokyo after midnight",
+      "chip": true,
+      "place": true
+    },
+    {
+      "slug": "mexico-city-first-morning",
+      "mood": "Mexico City, first morning",
+      "chip": true,
+      "place": true
+    },
+    {
+      "slug": "new-york-in-october",
+      "mood": "New York in October",
+      "chip": true,
+      "place": true
+    }
+  ]
+}

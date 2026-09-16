@@ -8,7 +8,7 @@ It teaches non-technical people how to actually use Claude for the stuff that's 
 
 ## What's on the site
 
-- **Mood Wall** (`mood.html`) — tell it how you feel and get a wall of real art, books, music, film, documentaries and festivals chosen for that feeling. Claude picks; the browser resolves every pick against The Met, Open Library, iTunes (30-second previews) and Wikipedia, so every card is a real thing with a real link. Save cards to a local wall, share a mood by URL. This replaced the old Explorer / Creator / Reader / Film / Score chat pages, which now redirect here.
+- **Mood Wall** (`mood.html`) — tell it how you feel and get a wall of real art, books, music, film, documentaries and festivals chosen for that feeling. Claude picks; the browser resolves every pick against The Met, Open Library, iTunes (30-second previews) and Wikipedia, so every card is a real thing with a real link. Save cards to a local wall, share a mood by URL. This replaced the old Explorer / Creator / Reader / Film / Score chat pages, which now redirect here. Eleven walls (the starter chips plus Paris, Tokyo, Mexico City and New York) are hand-authored in `data/moods/source.json` and resolved once by `node scripts/snapshot-moods.mjs capture` into static JSON, so they load instantly and cost nothing; `index.json`'s `frozen` flag (`freeze` / `unfreeze`) decides whether typed moods call Claude or get the nearest curated wall.
 - **Prompt library** — real prompts for real situations, ready to paste into Claude
 - **Ask the guide** — an embedded chat that answers AI questions in plain English
 - **Quick Research prototype** — a 7-screen flow probing how people actually perceive AI, misinformation, and trust

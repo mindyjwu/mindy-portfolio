@@ -1,0 +1,1547 @@
+{
+  "_note": "Hand-authored walls. Run `node scripts/snapshot-moods.mjs capture` to resolve every pick against The Met, Open Library, iTunes and Wikipedia and write <slug>.json + index.json. Nothing here calls the Claude API.",
+  "walls": [
+    {
+      "slug": "rainy-sunday",
+      "mood": "rainy Sunday, nothing to do",
+      "chip": false,
+      "reading": "The day has stopped asking anything of you, and you're finally letting it.",
+      "picks": [
+        {
+          "medium": "art",
+          "title": "Study of Water and Plants",
+          "creator": "Thomas Fearnley",
+          "year": "1837",
+          "why": "A Norwegian painter staring at a puddle for an entire afternoon. Rainy Sunday, in oil.",
+          "metQuery": "Study of Water and Plants Fearnley",
+          "wiki": ""
+        },
+        {
+          "medium": "art",
+          "title": "Sudden Shower over Shin-Ōhashi Bridge and Atake",
+          "creator": "Utagawa Hiroshige",
+          "year": "1857",
+          "why": "The most beautiful rain ever printed — everyone running, nobody minding.",
+          "metQuery": "Sudden Shower over Shin-Ohashi Bridge Hiroshige",
+          "wiki": "Sudden Shower over Shin-Ōhashi Bridge and Atake"
+        },
+        {
+          "medium": "art",
+          "title": "The Lacemaker",
+          "creator": "Nicolaes Maes",
+          "year": "ca. 1656",
+          "why": "An afternoon indoors, entirely absorbed in something small.",
+          "metQuery": "The Lacemaker Maes",
+          "wiki": ""
+        },
+        {
+          "medium": "book",
+          "title": "Stoner",
+          "creator": "John Williams",
+          "year": "1965",
+          "why": "A quiet life told so carefully it stops feeling small.",
+          "wiki": "Stoner (novel)"
+        },
+        {
+          "medium": "book",
+          "title": "Piranesi",
+          "creator": "Susanna Clarke",
+          "year": "2020",
+          "why": "A house full of tides and statues — you can lose a whole Sunday in there.",
+          "wiki": "Piranesi (novel)"
+        },
+        {
+          "medium": "book",
+          "title": "84, Charing Cross Road",
+          "creator": "Helene Hanff",
+          "year": "1970",
+          "why": "Letters between a reader and a bookshop; the coziest thing ever printed.",
+          "wiki": "84, Charing Cross Road"
+        },
+        {
+          "medium": "music",
+          "title": "Pink Moon",
+          "creator": "Nick Drake",
+          "year": "1972",
+          "why": "Two minutes, one guitar, and the exact texture of a grey afternoon.",
+          "wiki": "Pink Moon (song)"
+        },
+        {
+          "medium": "music",
+          "title": "Sunday Morning",
+          "creator": "The Velvet Underground",
+          "year": "1967",
+          "why": "Watch out, the world's behind you — sung like it's fine that it is.",
+          "wiki": "Sunday Morning (The Velvet Underground song)"
+        },
+        {
+          "medium": "music",
+          "title": "Rainy Days and Mondays",
+          "creator": "Carpenters",
+          "year": "1971",
+          "why": "On the nose, and Karen Carpenter earns every bit of it.",
+          "wiki": "Rainy Days and Mondays"
+        },
+        {
+          "medium": "film",
+          "title": "Paris, Texas",
+          "creator": "Wim Wenders",
+          "year": "1984",
+          "why": "Long roads, no rush, and a reunion that takes its time.",
+          "wiki": "Paris, Texas (film)"
+        },
+        {
+          "medium": "film",
+          "title": "Columbus",
+          "creator": "Kogonada",
+          "year": "2017",
+          "why": "Two people looking at buildings, slowly, until it means everything.",
+          "wiki": "Columbus (2017 film)"
+        },
+        {
+          "medium": "film",
+          "title": "Kiki's Delivery Service",
+          "creator": "Hayao Miyazaki",
+          "year": "1989",
+          "why": "A whole film about a slow week, and it's a comfort every time.",
+          "wiki": "Kiki's Delivery Service"
+        },
+        {
+          "medium": "documentary",
+          "title": "Jiro Dreams of Sushi",
+          "creator": "David Gelb",
+          "year": "2011",
+          "why": "Eighty minutes of rice, done properly.",
+          "wiki": "Jiro Dreams of Sushi"
+        },
+        {
+          "medium": "documentary",
+          "title": "The Gleaners and I",
+          "creator": "Agnès Varda",
+          "year": "2000",
+          "why": "Varda wandering France with a tiny camera, picking things up. That's the whole film, and it's perfect.",
+          "wiki": "The Gleaners and I"
+        },
+        {
+          "medium": "festival",
+          "title": "Big Ears Festival",
+          "creator": "Knoxville, USA",
+          "year": "March",
+          "why": "A festival that programs the way you listen when nobody's watching.",
+          "wiki": "Big Ears Festival"
+        },
+        {
+          "medium": "festival",
+          "title": "Hay Festival",
+          "creator": "Hay-on-Wye, Wales",
+          "year": "May–June",
+          "why": "A town made of bookshops, reliably in the rain.",
+          "wiki": "Hay Festival"
+        }
+      ]
+    },
+    {
+      "slug": "last-week-of-summer",
+      "mood": "the last week of summer",
+      "chip": true,
+      "reading": "It isn't over yet, and you can already feel yourself missing it.",
+      "picks": [
+        {
+          "medium": "art",
+          "title": "Garden at Sainte-Adresse",
+          "creator": "Claude Monet",
+          "year": "1867",
+          "why": "Flags snapping, water glittering, everyone pretending the afternoon will hold.",
+          "metQuery": "Garden at Sainte-Adresse Monet",
+          "wiki": "Garden at Sainte-Adresse"
+        },
+        {
+          "medium": "art",
+          "title": "Boating",
+          "creator": "Édouard Manet",
+          "year": "1874",
+          "why": "Two people, one boat, and nowhere to be.",
+          "metQuery": "Boating Manet",
+          "wiki": "Boating (Manet)"
+        },
+        {
+          "medium": "art",
+          "title": "Lake George",
+          "creator": "John Frederick Kensett",
+          "year": "1869",
+          "why": "The stillness of the last warm evening before the light changes.",
+          "metQuery": "Lake George Kensett",
+          "wiki": ""
+        },
+        {
+          "medium": "book",
+          "title": "The Summer Book",
+          "creator": "Tove Jansson",
+          "year": "1972",
+          "why": "An island, a grandmother, a child, and nothing that needs to happen.",
+          "wiki": "The Summer Book"
+        },
+        {
+          "medium": "book",
+          "title": "The Go-Between",
+          "creator": "L. P. Hartley",
+          "year": "1953",
+          "why": "One hot summer a boy will spend the rest of his life unpacking.",
+          "wiki": "The Go-Between"
+        },
+        {
+          "medium": "book",
+          "title": "Call Me by Your Name",
+          "creator": "André Aciman",
+          "year": "2007",
+          "why": "Six weeks in Italy, and every page knows they're ending.",
+          "wiki": "Call Me by Your Name (novel)"
+        },
+        {
+          "medium": "music",
+          "title": "Summer's End",
+          "creator": "John Prine",
+          "year": "2018",
+          "why": "Come on home — he means it, and so does the season.",
+          "wiki": ""
+        },
+        {
+          "medium": "music",
+          "title": "Dayvan Cowboy",
+          "creator": "Boards of Canada",
+          "year": "2005",
+          "why": "It builds like weather rolling in over a field.",
+          "wiki": "Dayvan Cowboy"
+        },
+        {
+          "medium": "music",
+          "title": "September",
+          "creator": "Earth, Wind & Fire",
+          "year": "1978",
+          "why": "The party the last week of summer wishes it could be.",
+          "wiki": "September (Earth, Wind & Fire song)"
+        },
+        {
+          "medium": "film",
+          "title": "Stand by Me",
+          "creator": "Rob Reiner",
+          "year": "1986",
+          "why": "The last summer before everything splits four ways.",
+          "wiki": "Stand by Me (film)"
+        },
+        {
+          "medium": "film",
+          "title": "Dazed and Confused",
+          "creator": "Richard Linklater",
+          "year": "1993",
+          "why": "One night, one town, and the very specific freedom of nothing mattering yet.",
+          "wiki": "Dazed and Confused (film)"
+        },
+        {
+          "medium": "film",
+          "title": "Aftersun",
+          "creator": "Charlotte Wells",
+          "year": "2022",
+          "why": "A holiday you only understand years later.",
+          "wiki": "Aftersun (film)"
+        },
+        {
+          "medium": "documentary",
+          "title": "Summer of Soul",
+          "creator": "Questlove",
+          "year": "2021",
+          "why": "Harlem, 1969, six weekends of music nobody thought to keep — until now.",
+          "wiki": "Summer of Soul"
+        },
+        {
+          "medium": "documentary",
+          "title": "The Endless Summer",
+          "creator": "Bruce Brown",
+          "year": "1966",
+          "why": "Two surfers chasing the season around the world so it never has to end.",
+          "wiki": "The Endless Summer"
+        },
+        {
+          "medium": "festival",
+          "title": "Burning Man",
+          "creator": "Black Rock Desert, USA",
+          "year": "late August",
+          "why": "A city built for a week and burned on purpose — the season's last word.",
+          "wiki": "Burning Man"
+        },
+        {
+          "medium": "festival",
+          "title": "Edinburgh Festival Fringe",
+          "creator": "Edinburgh, Scotland",
+          "year": "August",
+          "why": "Three thousand shows in a month; the whole city stays up to catch the end of it.",
+          "wiki": "Edinburgh Festival Fringe"
+        }
+      ]
+    },
+    {
+      "slug": "quietly-furious",
+      "mood": "quietly furious",
+      "chip": true,
+      "reading": "You're not going to raise your voice. That's exactly what makes it dangerous.",
+      "picks": [
+        {
+          "medium": "art",
+          "title": "Judith with the Head of Holofernes",
+          "creator": "Lucas Cranach the Elder",
+          "year": "ca. 1530",
+          "why": "She did it, cleaned up, and sat for her portrait.",
+          "metQuery": "Judith with the Head of Holofernes Cranach",
+          "wiki": ""
+        },
+        {
+          "medium": "art",
+          "title": "The Death of Socrates",
+          "creator": "Jacques-Louis David",
+          "year": "1787",
+          "why": "Calm to the last, and more damning for it.",
+          "metQuery": "The Death of Socrates David",
+          "wiki": "The Death of Socrates"
+        },
+        {
+          "medium": "art",
+          "title": "Ugolino and His Sons",
+          "creator": "Jean-Baptiste Carpeaux",
+          "year": "1865–67",
+          "why": "Rage turned so far inward it became marble.",
+          "metQuery": "Ugolino and His Sons Carpeaux",
+          "wiki": "Ugolino and His Sons"
+        },
+        {
+          "medium": "book",
+          "title": "The Remains of the Day",
+          "creator": "Kazuo Ishiguro",
+          "year": "1989",
+          "why": "A man so composed his fury never once reaches the page — and you feel every bit of it.",
+          "wiki": "The Remains of the Day"
+        },
+        {
+          "medium": "book",
+          "title": "My Brilliant Friend",
+          "creator": "Elena Ferrante",
+          "year": "2011",
+          "why": "Anger between two women that never needs to shout.",
+          "wiki": "My Brilliant Friend"
+        },
+        {
+          "medium": "book",
+          "title": "Eileen",
+          "creator": "Ottessa Moshfegh",
+          "year": "2015",
+          "why": "Cold, precise, and simmering the entire way.",
+          "wiki": "Eileen (novel)"
+        },
+        {
+          "medium": "music",
+          "title": "Cry Me a River",
+          "creator": "Julie London",
+          "year": "1955",
+          "why": "Revenge, sung at a whisper.",
+          "wiki": "Cry Me a River (1953 song)"
+        },
+        {
+          "medium": "music",
+          "title": "Every Breath You Take",
+          "creator": "The Police",
+          "year": "1983",
+          "why": "A love song that isn't one, once you actually listen.",
+          "wiki": "Every Breath You Take"
+        },
+        {
+          "medium": "music",
+          "title": "Bang Bang (My Baby Shot Me Down)",
+          "creator": "Nancy Sinatra",
+          "year": "1966",
+          "why": "Slow, quiet, and aiming.",
+          "wiki": "Bang Bang (My Baby Shot Me Down)"
+        },
+        {
+          "medium": "film",
+          "title": "Phantom Thread",
+          "creator": "Paul Thomas Anderson",
+          "year": "2017",
+          "why": "A battle of wills fought entirely over breakfast.",
+          "wiki": "Phantom Thread"
+        },
+        {
+          "medium": "film",
+          "title": "Michael Clayton",
+          "creator": "Tony Gilroy",
+          "year": "2007",
+          "why": "Composure as a weapon, in a very good coat.",
+          "wiki": "Michael Clayton (film)"
+        },
+        {
+          "medium": "film",
+          "title": "Sympathy for Lady Vengeance",
+          "creator": "Park Chan-wook",
+          "year": "2005",
+          "why": "Thirteen years of patience, then the plan.",
+          "wiki": "Sympathy for Lady Vengeance"
+        },
+        {
+          "medium": "documentary",
+          "title": "The Act of Killing",
+          "creator": "Joshua Oppenheimer",
+          "year": "2012",
+          "why": "Fury held so still it becomes a camera.",
+          "wiki": "The Act of Killing"
+        },
+        {
+          "medium": "documentary",
+          "title": "Citizenfour",
+          "creator": "Laura Poitras",
+          "year": "2014",
+          "why": "Room-temperature anger, meticulously documented in a Hong Kong hotel.",
+          "wiki": "Citizenfour"
+        },
+        {
+          "medium": "festival",
+          "title": "Berlin International Film Festival",
+          "creator": "Berlin, Germany",
+          "year": "February",
+          "why": "The most political of the big three, and proud of it.",
+          "wiki": "Berlin International Film Festival"
+        },
+        {
+          "medium": "festival",
+          "title": "Glastonbury Festival",
+          "creator": "Pilton, England",
+          "year": "June",
+          "why": "Mud, politics, and a very British refusal to be cheerful about the weather.",
+          "wiki": "Glastonbury Festival"
+        }
+      ]
+    },
+    {
+      "slug": "new-city-no-friends",
+      "mood": "new city, no friends yet",
+      "chip": true,
+      "reading": "Everything is a first time, and there's no one to tell about it yet.",
+      "picks": [
+        {
+          "medium": "art",
+          "title": "Young Woman with a Water Pitcher",
+          "creator": "Johannes Vermeer",
+          "year": "ca. 1662",
+          "why": "A quiet morning routine in a room that's finally yours.",
+          "metQuery": "Young Woman with a Water Pitcher Vermeer",
+          "wiki": "Young Woman with a Water Pitcher"
+        },
+        {
+          "medium": "art",
+          "title": "The Flatiron",
+          "creator": "Edward Steichen",
+          "year": "1904",
+          "why": "The city at dusk: big, indifferent, and beautiful.",
+          "metQuery": "The Flatiron Steichen",
+          "wiki": "The Flatiron (photograph)"
+        },
+        {
+          "medium": "art",
+          "title": "Young Woman Knitting",
+          "creator": "Berthe Morisot",
+          "year": "ca. 1883",
+          "why": "Alone with a small task, which is how a place starts becoming yours.",
+          "metQuery": "Young Woman Knitting Morisot",
+          "wiki": ""
+        },
+        {
+          "medium": "book",
+          "title": "The Idiot",
+          "creator": "Elif Batuman",
+          "year": "2017",
+          "why": "Freshman year, spent almost entirely inside your own head.",
+          "wiki": "The Idiot (Batuman novel)"
+        },
+        {
+          "medium": "book",
+          "title": "Convenience Store Woman",
+          "creator": "Sayaka Murata",
+          "year": "2016",
+          "why": "Finding a place to belong in the least likely doorway.",
+          "wiki": "Convenience Store Woman"
+        },
+        {
+          "medium": "book",
+          "title": "Just Kids",
+          "creator": "Patti Smith",
+          "year": "2010",
+          "why": "New York, no money, one friend — the one that mattered.",
+          "wiki": "Just Kids"
+        },
+        {
+          "medium": "music",
+          "title": "Chicago",
+          "creator": "Sufjan Stevens",
+          "year": "2005",
+          "why": "All things go — the anthem for arriving somewhere by mistake.",
+          "wiki": "Chicago (Sufjan Stevens song)"
+        },
+        {
+          "medium": "music",
+          "title": "Once in a Lifetime",
+          "creator": "Talking Heads",
+          "year": "1980",
+          "why": "Well, how did I get here?",
+          "wiki": "Once in a Lifetime (Talking Heads song)"
+        },
+        {
+          "medium": "music",
+          "title": "Alone Again Or",
+          "creator": "Love",
+          "year": "1967",
+          "why": "Cheerful about being alone, which is the whole trick.",
+          "wiki": "Alone Again Or"
+        },
+        {
+          "medium": "film",
+          "title": "Lost in Translation",
+          "creator": "Sofia Coppola",
+          "year": "2003",
+          "why": "Two strangers, one hotel bar, and a city neither of them can read.",
+          "wiki": "Lost in Translation (film)"
+        },
+        {
+          "medium": "film",
+          "title": "Frances Ha",
+          "creator": "Noah Baumbach",
+          "year": "2012",
+          "why": "Running through the streets to Bowie because there's nobody to run with yet.",
+          "wiki": "Frances Ha"
+        },
+        {
+          "medium": "film",
+          "title": "Paterson",
+          "creator": "Jim Jarmusch",
+          "year": "2016",
+          "why": "A city becomes home one routine at a time.",
+          "wiki": "Paterson (film)"
+        },
+        {
+          "medium": "documentary",
+          "title": "Bill Cunningham New York",
+          "creator": "Richard Press",
+          "year": "2010",
+          "why": "A man who made a whole city his friend just by paying attention.",
+          "wiki": "Bill Cunningham New York"
+        },
+        {
+          "medium": "documentary",
+          "title": "Tokyo-Ga",
+          "creator": "Wim Wenders",
+          "year": "1985",
+          "why": "A stranger walking a city, looking for a film he loved.",
+          "wiki": "Tokyo-Ga"
+        },
+        {
+          "medium": "festival",
+          "title": "Nuit Blanche",
+          "creator": "Paris, France",
+          "year": "October",
+          "why": "The whole city stays up all night and lets you in.",
+          "wiki": "Nuit Blanche"
+        },
+        {
+          "medium": "festival",
+          "title": "South by Southwest",
+          "creator": "Austin, USA",
+          "year": "March",
+          "why": "Ten thousand people who also don't know anyone yet.",
+          "wiki": "South by Southwest"
+        }
+      ]
+    },
+    {
+      "slug": "in-love-embarrassed",
+      "mood": "in love and slightly embarrassed about it",
+      "chip": true,
+      "reading": "You keep checking your phone and pretending you weren't.",
+      "picks": [
+        {
+          "medium": "art",
+          "title": "Springtime",
+          "creator": "Pierre-Auguste Cot",
+          "year": "1873",
+          "why": "Two people on a swing, entirely too pleased with themselves.",
+          "metQuery": "Springtime Cot",
+          "wiki": "Springtime (Cot)"
+        },
+        {
+          "medium": "art",
+          "title": "Madame X (Madame Pierre Gautreau)",
+          "creator": "John Singer Sargent",
+          "year": "1883–84",
+          "why": "Trying very hard to look like she doesn't care.",
+          "metQuery": "Madame X Sargent",
+          "wiki": "Portrait of Madame X"
+        },
+        {
+          "medium": "art",
+          "title": "Jeanne Hébuterne",
+          "creator": "Amedeo Modigliani",
+          "year": "1919",
+          "why": "Painted by someone hopelessly gone on her.",
+          "metQuery": "Jeanne Hebuterne Modigliani",
+          "wiki": ""
+        },
+        {
+          "medium": "book",
+          "title": "Normal People",
+          "creator": "Sally Rooney",
+          "year": "2018",
+          "why": "Two people who can't say it, for three hundred pages.",
+          "wiki": "Normal People"
+        },
+        {
+          "medium": "book",
+          "title": "Emma",
+          "creator": "Jane Austen",
+          "year": "1815",
+          "why": "Everyone can see it but her.",
+          "wiki": "Emma (novel)"
+        },
+        {
+          "medium": "book",
+          "title": "The Song of Achilles",
+          "creator": "Madeline Miller",
+          "year": "2011",
+          "why": "Adoration written from the inside, and not embarrassed at all.",
+          "wiki": "The Song of Achilles"
+        },
+        {
+          "medium": "music",
+          "title": "Lovefool",
+          "creator": "The Cardigans",
+          "year": "1996",
+          "why": "Saying please three times too many, on purpose.",
+          "wiki": "Lovefool"
+        },
+        {
+          "medium": "music",
+          "title": "First Day of My Life",
+          "creator": "Bright Eyes",
+          "year": "2005",
+          "why": "The most earnest song ever written, and it knows it.",
+          "wiki": "First Day of My Life (Bright Eyes song)"
+        },
+        {
+          "medium": "music",
+          "title": "Cheek to Cheek",
+          "creator": "Fred Astaire",
+          "year": "1935",
+          "why": "Heaven, I'm in heaven — with no irony whatsoever.",
+          "wiki": "Cheek to Cheek (song)"
+        },
+        {
+          "medium": "film",
+          "title": "Amélie",
+          "creator": "Jean-Pierre Jeunet",
+          "year": "2001",
+          "why": "Elaborate schemes to avoid saying one sentence.",
+          "wiki": "Amélie"
+        },
+        {
+          "medium": "film",
+          "title": "Before Sunrise",
+          "creator": "Richard Linklater",
+          "year": "1995",
+          "why": "One night in Vienna and a lot of not-quite-saying-it.",
+          "wiki": "Before Sunrise"
+        },
+        {
+          "medium": "film",
+          "title": "Say Anything...",
+          "creator": "Cameron Crowe",
+          "year": "1989",
+          "why": "The boombox. You know the one.",
+          "wiki": "Say Anything..."
+        },
+        {
+          "medium": "documentary",
+          "title": "Cutie and the Boxer",
+          "creator": "Zachary Heinzerling",
+          "year": "2013",
+          "why": "Forty years of marriage, still slightly embarrassing each other.",
+          "wiki": "Cutie and the Boxer"
+        },
+        {
+          "medium": "documentary",
+          "title": "Fire of Love",
+          "creator": "Sara Dosa",
+          "year": "2022",
+          "why": "Two volcanologists in love with each other and with lava, in that order on a good day.",
+          "wiki": "Fire of Love (2022 film)"
+        },
+        {
+          "medium": "festival",
+          "title": "Venice Film Festival",
+          "creator": "Venice, Italy",
+          "year": "late August",
+          "why": "Where every premiere is a slow-motion crush.",
+          "wiki": "Venice Film Festival"
+        },
+        {
+          "medium": "festival",
+          "title": "Fête de la Musique",
+          "creator": "France (everywhere)",
+          "year": "June 21",
+          "why": "The longest day of the year, and everyone's outside playing something.",
+          "wiki": "Fête de la Musique"
+        }
+      ]
+    },
+    {
+      "slug": "3am-wide-awake",
+      "mood": "3am and wide awake",
+      "chip": true,
+      "reading": "The thoughts are louder now that nothing else is.",
+      "picks": [
+        {
+          "medium": "art",
+          "title": "Night-Shining White",
+          "creator": "Han Gan",
+          "year": "ca. 750",
+          "why": "A horse that can't settle either.",
+          "metQuery": "Night-Shining White Han Gan",
+          "wiki": "Night-Shining White"
+        },
+        {
+          "medium": "art",
+          "title": "Moonlight, Wood Island Light",
+          "creator": "Winslow Homer",
+          "year": "1894",
+          "why": "Two figures on the rocks, awake for no reason, watching the water.",
+          "metQuery": "Moonlight Wood Island Light Homer",
+          "wiki": ""
+        },
+        {
+          "medium": "art",
+          "title": "Old Plum",
+          "creator": "Kano Sansetsu",
+          "year": "1646",
+          "why": "A gnarled thing that's been awake for four hundred years.",
+          "metQuery": "Old Plum Kano Sansetsu",
+          "wiki": ""
+        },
+        {
+          "medium": "book",
+          "title": "Dept. of Speculation",
+          "creator": "Jenny Offill",
+          "year": "2014",
+          "why": "Short paragraphs, because that's all the night can hold.",
+          "wiki": "Dept. of Speculation"
+        },
+        {
+          "medium": "book",
+          "title": "The Waves",
+          "creator": "Virginia Woolf",
+          "year": "1931",
+          "why": "Six voices thinking at once, which is roughly what your head is doing.",
+          "wiki": "The Waves"
+        },
+        {
+          "medium": "book",
+          "title": "The Master and Margarita",
+          "creator": "Mikhail Bulgakov",
+          "year": "1967",
+          "why": "Because the devil arrives in Moscow at exactly this hour.",
+          "wiki": "The Master and Margarita"
+        },
+        {
+          "medium": "music",
+          "title": "Nightcall",
+          "creator": "Kavinsky",
+          "year": "2010",
+          "why": "Driving nowhere, with the windows down.",
+          "wiki": "Nightcall"
+        },
+        {
+          "medium": "music",
+          "title": "Nude",
+          "creator": "Radiohead",
+          "year": "2007",
+          "why": "Don't get any big ideas — too late.",
+          "wiki": "Nude (song)"
+        },
+        {
+          "medium": "music",
+          "title": "'Round Midnight",
+          "creator": "Thelonious Monk",
+          "year": "1947",
+          "why": "Written for exactly this hour.",
+          "wiki": "'Round Midnight (song)"
+        },
+        {
+          "medium": "film",
+          "title": "Taxi Driver",
+          "creator": "Martin Scorsese",
+          "year": "1976",
+          "why": "Insomnia as an entire city.",
+          "wiki": "Taxi Driver"
+        },
+        {
+          "medium": "film",
+          "title": "Chungking Express",
+          "creator": "Wong Kar-wai",
+          "year": "1994",
+          "why": "Neon, noodles, and a heart that won't shut off.",
+          "wiki": "Chungking Express"
+        },
+        {
+          "medium": "film",
+          "title": "Collateral",
+          "creator": "Michael Mann",
+          "year": "2004",
+          "why": "Los Angeles at 3am, seen from the back of a cab.",
+          "wiki": "Collateral (film)"
+        },
+        {
+          "medium": "documentary",
+          "title": "Koyaanisqatsi",
+          "creator": "Godfrey Reggio",
+          "year": "1982",
+          "why": "Ninety minutes of watching the world move without a word of narration.",
+          "wiki": "Koyaanisqatsi"
+        },
+        {
+          "medium": "documentary",
+          "title": "Los Angeles Plays Itself",
+          "creator": "Thom Andersen",
+          "year": "2003",
+          "why": "Three hours of a city watching itself — ideal insomnia company.",
+          "wiki": "Los Angeles Plays Itself"
+        },
+        {
+          "medium": "festival",
+          "title": "Roskilde Festival",
+          "creator": "Roskilde, Denmark",
+          "year": "June–July",
+          "why": "Nobody sleeps for eight days, and it's fine.",
+          "wiki": "Roskilde Festival"
+        },
+        {
+          "medium": "festival",
+          "title": "Sónar",
+          "creator": "Barcelona, Spain",
+          "year": "June",
+          "why": "Sónar by Night runs until the sun's up.",
+          "wiki": "Sónar"
+        }
+      ]
+    },
+    {
+      "slug": "homesick-never-been",
+      "mood": "homesick for a place I've never been",
+      "chip": true,
+      "reading": "Fernweh — the ache for somewhere you'd recognize on sight.",
+      "picks": [
+        {
+          "medium": "art",
+          "title": "Heart of the Andes",
+          "creator": "Frederic Edwin Church",
+          "year": "1859",
+          "why": "A place painted so completely you'll swear you've stood there.",
+          "metQuery": "Heart of the Andes Church",
+          "wiki": "The Heart of the Andes"
+        },
+        {
+          "medium": "art",
+          "title": "Under the Wave off Kanagawa (The Great Wave)",
+          "creator": "Katsushika Hokusai",
+          "year": "ca. 1830–32",
+          "why": "A whole storm held perfectly still, somewhere you've never been.",
+          "metQuery": "Under the Wave off Kanagawa Hokusai",
+          "wiki": "The Great Wave off Kanagawa"
+        },
+        {
+          "medium": "art",
+          "title": "View of Toledo",
+          "creator": "El Greco",
+          "year": "ca. 1599–1600",
+          "why": "A city under a sky that never existed, and you miss it anyway.",
+          "metQuery": "View of Toledo El Greco",
+          "wiki": "View of Toledo"
+        },
+        {
+          "medium": "book",
+          "title": "Invisible Cities",
+          "creator": "Italo Calvino",
+          "year": "1972",
+          "why": "Fifty-five cities that don't exist, and you'll be homesick for each one.",
+          "wiki": "Invisible Cities"
+        },
+        {
+          "medium": "book",
+          "title": "The Shadow of the Wind",
+          "creator": "Carlos Ruiz Zafón",
+          "year": "2001",
+          "why": "Barcelona as a place you've apparently lived in before.",
+          "wiki": "The Shadow of the Wind"
+        },
+        {
+          "medium": "book",
+          "title": "Kafka on the Shore",
+          "creator": "Haruki Murakami",
+          "year": "2002",
+          "why": "Shikoku, dreamed.",
+          "wiki": "Kafka on the Shore"
+        },
+        {
+          "medium": "music",
+          "title": "Cucurrucucú Paloma",
+          "creator": "Caetano Veloso",
+          "year": "1995",
+          "why": "A song for a country you don't have.",
+          "wiki": "Cucurrucucú paloma"
+        },
+        {
+          "medium": "music",
+          "title": "Kothbiro",
+          "creator": "Ayub Ogada",
+          "year": "1993",
+          "why": "One nyatiti, and a longing that needs no translation.",
+          "wiki": ""
+        },
+        {
+          "medium": "music",
+          "title": "Wish You Were Here",
+          "creator": "Pink Floyd",
+          "year": "1975",
+          "why": "Obvious, and still the right one.",
+          "wiki": "Wish You Were Here (Pink Floyd song)"
+        },
+        {
+          "medium": "film",
+          "title": "In the Mood for Love",
+          "creator": "Wong Kar-wai",
+          "year": "2000",
+          "why": "Hong Kong, 1962, as remembered by someone who never quite left.",
+          "wiki": "In the Mood for Love"
+        },
+        {
+          "medium": "film",
+          "title": "Cinema Paradiso",
+          "creator": "Giuseppe Tornatore",
+          "year": "1988",
+          "why": "A Sicilian village you'll grieve for by the end.",
+          "wiki": "Cinema Paradiso"
+        },
+        {
+          "medium": "film",
+          "title": "The Darjeeling Limited",
+          "creator": "Wes Anderson",
+          "year": "2007",
+          "why": "Three brothers on a train through an India that's half real, half postcard.",
+          "wiki": "The Darjeeling Limited"
+        },
+        {
+          "medium": "documentary",
+          "title": "Baraka",
+          "creator": "Ron Fricke",
+          "year": "1992",
+          "why": "Twenty-four countries with no narration; pick one to miss.",
+          "wiki": "Baraka (film)"
+        },
+        {
+          "medium": "documentary",
+          "title": "Honeyland",
+          "creator": "Tamara Kotevska & Ljubomir Stefanov",
+          "year": "2019",
+          "why": "A mountain in North Macedonia, one woman, and her bees.",
+          "wiki": "Honeyland"
+        },
+        {
+          "medium": "festival",
+          "title": "Rio Carnival",
+          "creator": "Rio de Janeiro, Brazil",
+          "year": "February",
+          "why": "Two million people a day in the street; you'll swear you've danced there before.",
+          "wiki": "Rio Carnival"
+        },
+        {
+          "medium": "festival",
+          "title": "Fes Festival of World Sacred Music",
+          "creator": "Fez, Morocco",
+          "year": "June",
+          "why": "Sufi singers in a medina courtyard; you'll want to have been there.",
+          "wiki": "Fes Festival of World Sacred Music"
+        }
+      ]
+    },
+    {
+      "slug": "paris-in-the-rain",
+      "mood": "Paris in the rain",
+      "chip": true,
+      "place": true,
+      "reading": "Grey stone, wet zinc, and every café suddenly full.",
+      "picks": [
+        {
+          "medium": "art",
+          "title": "From France",
+          "creator": "",
+          "year": "",
+          "why": "One of the Met's own highlights made in France — a long way from the rain now.",
+          "metGeo": "France",
+          "metGeoIndex": 0,
+          "metGeoDept": 11
+        },
+        {
+          "medium": "art",
+          "title": "From France",
+          "creator": "",
+          "year": "",
+          "why": "Made in France, now on Fifth Avenue; the Met flags it as a highlight.",
+          "metGeo": "France",
+          "metGeoIndex": 1,
+          "metGeoDept": 11
+        },
+        {
+          "medium": "art",
+          "title": "From France",
+          "creator": "",
+          "year": "",
+          "why": "Another of the Met's French highlights, chosen by the museum, not by me.",
+          "metGeo": "France",
+          "metGeoIndex": 2,
+          "metGeoDept": 11
+        },
+        {
+          "medium": "book",
+          "title": "A Moveable Feast",
+          "creator": "Ernest Hemingway",
+          "year": "1964",
+          "why": "Paris in the 1920s, hungry and happy, by someone who never got over it.",
+          "wiki": "A Moveable Feast"
+        },
+        {
+          "medium": "book",
+          "title": "Giovanni's Room",
+          "creator": "James Baldwin",
+          "year": "1956",
+          "why": "A small room in Paris and everything it couldn't hold.",
+          "wiki": "Giovanni's Room"
+        },
+        {
+          "medium": "book",
+          "title": "The Elegance of the Hedgehog",
+          "creator": "Muriel Barbery",
+          "year": "2006",
+          "why": "One apartment building on the Left Bank, seen from the concierge's lodge.",
+          "wiki": "The Elegance of the Hedgehog"
+        },
+        {
+          "medium": "music",
+          "title": "La Vie en rose",
+          "creator": "Édith Piaf",
+          "year": "1947",
+          "why": "Because it's raining and you're in Paris; there's no getting around it.",
+          "wiki": "La Vie en rose"
+        },
+        {
+          "medium": "music",
+          "title": "Sous le ciel de Paris",
+          "creator": "Yves Montand",
+          "year": "1951",
+          "why": "Under the Paris sky — the grey one, specifically.",
+          "wiki": "Sous le ciel de Paris"
+        },
+        {
+          "medium": "music",
+          "title": "Bonnie and Clyde",
+          "creator": "Serge Gainsbourg & Brigitte Bardot",
+          "year": "1968",
+          "why": "Cigarette-voiced, and impossible not to walk slower to.",
+          "wiki": "Bonnie and Clyde (song)"
+        },
+        {
+          "medium": "film",
+          "title": "Cléo from 5 to 7",
+          "creator": "Agnès Varda",
+          "year": "1962",
+          "why": "Two hours of real time walking through a Paris that's still there.",
+          "wiki": "Cléo from 5 to 7"
+        },
+        {
+          "medium": "film",
+          "title": "Before Sunset",
+          "creator": "Richard Linklater",
+          "year": "2004",
+          "why": "Eighty minutes, one walk, and the Seine doing the work.",
+          "wiki": "Before Sunset"
+        },
+        {
+          "medium": "film",
+          "title": "The 400 Blows",
+          "creator": "François Truffaut",
+          "year": "1959",
+          "why": "A kid loose in a Paris of grey courtyards and wet streets.",
+          "wiki": "The 400 Blows"
+        },
+        {
+          "medium": "documentary",
+          "title": "Faces Places",
+          "creator": "Agnès Varda & JR",
+          "year": "2017",
+          "why": "Varda and JR driving around France pasting giant faces on walls, in the rain when it rained.",
+          "wiki": "Faces Places"
+        },
+        {
+          "medium": "documentary",
+          "title": "La Danse: The Paris Opera Ballet",
+          "creator": "Frederick Wiseman",
+          "year": "2009",
+          "why": "Behind the doors of the Palais Garnier — no narration, all discipline.",
+          "wiki": "La Danse (film)"
+        },
+        {
+          "medium": "festival",
+          "title": "Nuit Blanche",
+          "creator": "Paris, France",
+          "year": "October",
+          "why": "Art all night across the city, umbrellas optional.",
+          "wiki": "Nuit Blanche"
+        },
+        {
+          "medium": "festival",
+          "title": "Paris Photo",
+          "creator": "Grand Palais, Paris",
+          "year": "November",
+          "why": "The world's photographers under one glass roof, while it rains on it.",
+          "wiki": "Paris Photo"
+        }
+      ]
+    },
+    {
+      "slug": "tokyo-after-midnight",
+      "mood": "Tokyo after midnight",
+      "chip": true,
+      "place": true,
+      "reading": "The last train's gone. Good.",
+      "picks": [
+        {
+          "medium": "art",
+          "title": "From Japan",
+          "creator": "",
+          "year": "",
+          "why": "One of the Met's Japanese highlights — quiet company for a late hour.",
+          "metGeo": "Japan",
+          "metGeoIndex": 0,
+          "metGeoDept": 6
+        },
+        {
+          "medium": "art",
+          "title": "From Japan",
+          "creator": "",
+          "year": "",
+          "why": "Made in Japan; the Met flags it as a highlight of the collection.",
+          "metGeo": "Japan",
+          "metGeoIndex": 1,
+          "metGeoDept": 6
+        },
+        {
+          "medium": "art",
+          "title": "From Japan",
+          "creator": "",
+          "year": "",
+          "why": "Another of the museum's own Japanese picks.",
+          "metGeo": "Japan",
+          "metGeoIndex": 2,
+          "metGeoDept": 6
+        },
+        {
+          "medium": "book",
+          "title": "Tokyo Ueno Station",
+          "creator": "Yu Miri",
+          "year": "2014",
+          "why": "A ghost in a park by the station, watching the city not notice.",
+          "wiki": "Tokyo Ueno Station"
+        },
+        {
+          "medium": "book",
+          "title": "Strange Weather in Tokyo",
+          "creator": "Hiromi Kawakami",
+          "year": "2001",
+          "why": "Late nights in a bar with an old teacher, and nothing hurried.",
+          "wiki": "Strange Weather in Tokyo"
+        },
+        {
+          "medium": "book",
+          "title": "Norwegian Wood",
+          "creator": "Haruki Murakami",
+          "year": "1987",
+          "why": "Tokyo in the late sixties, walking home very late.",
+          "wiki": "Norwegian Wood (novel)"
+        },
+        {
+          "medium": "music",
+          "title": "Plastic Love",
+          "creator": "Mariya Takeuchi",
+          "year": "1984",
+          "why": "City pop at its most neon — the sound of a taxi you didn't take.",
+          "wiki": "Plastic Love"
+        },
+        {
+          "medium": "music",
+          "title": "Mayonaka no Door / Stay With Me",
+          "creator": "Miki Matsubara",
+          "year": "1979",
+          "why": "\"Midnight door\" — the title says it.",
+          "wiki": "Mayonaka no Door"
+        },
+        {
+          "medium": "music",
+          "title": "Merry Christmas Mr. Lawrence",
+          "creator": "Ryuichi Sakamoto",
+          "year": "1983",
+          "why": "A piano line the whole city seems to know.",
+          "wiki": "Merry Christmas, Mr. Lawrence (song)"
+        },
+        {
+          "medium": "film",
+          "title": "Tokyo Story",
+          "creator": "Yasujirō Ozu",
+          "year": "1953",
+          "why": "The quietest film about a city ever made.",
+          "wiki": "Tokyo Story"
+        },
+        {
+          "medium": "film",
+          "title": "Tampopo",
+          "creator": "Juzo Itami",
+          "year": "1985",
+          "why": "A ramen western; you will want noodles at 1am.",
+          "wiki": "Tampopo"
+        },
+        {
+          "medium": "film",
+          "title": "Shoplifters",
+          "creator": "Hirokazu Kore-eda",
+          "year": "2018",
+          "why": "A makeshift family in a Tokyo the guidebooks skip.",
+          "wiki": "Shoplifters (film)"
+        },
+        {
+          "medium": "documentary",
+          "title": "Tokyo Olympiad",
+          "creator": "Kon Ichikawa",
+          "year": "1965",
+          "why": "Tokyo at its most hopeful, shot like a dream rather than a sports report.",
+          "wiki": "Tokyo Olympiad"
+        },
+        {
+          "medium": "documentary",
+          "title": "Ryuichi Sakamoto: Coda",
+          "creator": "Stephen Nomura Schible",
+          "year": "2017",
+          "why": "Sakamoto listening to rain on a bucket, and to everything else.",
+          "wiki": "Ryuichi Sakamoto: Coda"
+        },
+        {
+          "medium": "festival",
+          "title": "Fuji Rock Festival",
+          "creator": "Naeba, Japan",
+          "year": "July",
+          "why": "Three days in the mountains; the trains back to Tokyo are the comedown.",
+          "wiki": "Fuji Rock Festival"
+        },
+        {
+          "medium": "festival",
+          "title": "Sanja Matsuri",
+          "creator": "Asakusa, Tokyo",
+          "year": "May",
+          "why": "Two million people and a hundred portable shrines in one neighbourhood.",
+          "wiki": "Sanja Matsuri"
+        }
+      ]
+    },
+    {
+      "slug": "mexico-city-first-morning",
+      "mood": "Mexico City, first morning",
+      "chip": true,
+      "place": true,
+      "reading": "Jacaranda, car horns, and coffee that tastes like it means it.",
+      "picks": [
+        {
+          "medium": "art",
+          "title": "From Mexico",
+          "creator": "",
+          "year": "",
+          "why": "One of the Met's highlights from Mexico — older than the city you woke up in.",
+          "metGeo": "Mexico",
+          "metGeoIndex": 0,
+          "metGeoDept": 5
+        },
+        {
+          "medium": "art",
+          "title": "From Mexico",
+          "creator": "",
+          "year": "",
+          "why": "Made in Mexico; flagged by the Met as a highlight.",
+          "metGeo": "Mexico",
+          "metGeoIndex": 1,
+          "metGeoDept": 5
+        },
+        {
+          "medium": "art",
+          "title": "From Mexico",
+          "creator": "",
+          "year": "",
+          "why": "Another of the museum's Mexican highlights.",
+          "metGeo": "Mexico",
+          "metGeoIndex": 2,
+          "metGeoDept": 5
+        },
+        {
+          "medium": "book",
+          "title": "Pedro Páramo",
+          "creator": "Juan Rulfo",
+          "year": "1955",
+          "why": "A town full of ghosts; every Mexican novel since is talking to it.",
+          "wiki": "Pedro Páramo"
+        },
+        {
+          "medium": "book",
+          "title": "The Savage Detectives",
+          "creator": "Roberto Bolaño",
+          "year": "1998",
+          "why": "Mexico City in the seventies, poets everywhere, nobody sleeping.",
+          "wiki": "The Savage Detectives"
+        },
+        {
+          "medium": "book",
+          "title": "Faces in the Crowd",
+          "creator": "Valeria Luiselli",
+          "year": "2011",
+          "why": "Two cities, two lives, one very thin wall between them.",
+          "wiki": "Faces in the Crowd (novel)"
+        },
+        {
+          "medium": "music",
+          "title": "La Llorona",
+          "creator": "Chavela Vargas",
+          "year": "1994",
+          "why": "A voice like the ground opening; hear it once and you'll hear it everywhere.",
+          "wiki": "La Llorona (song)"
+        },
+        {
+          "medium": "music",
+          "title": "Hasta la Raíz",
+          "creator": "Natalia Lafourcade",
+          "year": "2015",
+          "why": "\"Down to the root\" — the song you'll hear from three balconies at once.",
+          "wiki": "Hasta la Raíz (song)"
+        },
+        {
+          "medium": "music",
+          "title": "Amor Eterno",
+          "creator": "Juan Gabriel",
+          "year": "1984",
+          "why": "The whole country sings this one; you'll understand why by the second chorus.",
+          "wiki": "Amor Eterno (song)"
+        },
+        {
+          "medium": "film",
+          "title": "Roma",
+          "creator": "Alfonso Cuarón",
+          "year": "2018",
+          "why": "Colonia Roma, 1970, in black and white, every street still there.",
+          "wiki": "Roma (2018 film)"
+        },
+        {
+          "medium": "film",
+          "title": "Amores perros",
+          "creator": "Alejandro González Iñárritu",
+          "year": "2000",
+          "why": "Three stories, one car crash, the whole city's nervous system.",
+          "wiki": "Amores perros"
+        },
+        {
+          "medium": "film",
+          "title": "Güeros",
+          "creator": "Alonso Ruizpalacios",
+          "year": "2014",
+          "why": "A road movie that never leaves the city.",
+          "wiki": "Güeros"
+        },
+        {
+          "medium": "documentary",
+          "title": "Midnight Family",
+          "creator": "Luke Lorentzen",
+          "year": "2019",
+          "why": "A private ambulance racing through the night; the city with its pulse showing.",
+          "wiki": "Midnight Family"
+        },
+        {
+          "medium": "documentary",
+          "title": "Frida",
+          "creator": "Carla Gutiérrez",
+          "year": "2024",
+          "why": "Kahlo in her own words and paintings, from the Blue House out.",
+          "wiki": "Frida (2024 film)"
+        },
+        {
+          "medium": "festival",
+          "title": "Day of the Dead",
+          "creator": "Mexico City",
+          "year": "November 1–2",
+          "why": "Marigolds, sugar skulls, and a parade the city only started because of a Bond film.",
+          "wiki": "Day of the Dead"
+        },
+        {
+          "medium": "festival",
+          "title": "Vive Latino",
+          "creator": "Mexico City",
+          "year": "March",
+          "why": "Latin America's biggest rock festival, in a football stadium.",
+          "wiki": "Vive Latino"
+        }
+      ]
+    },
+    {
+      "slug": "new-york-in-october",
+      "mood": "New York in October",
+      "chip": true,
+      "place": true,
+      "reading": "The city finally has weather, and everyone's in a better mood about it.",
+      "picks": [
+        {
+          "medium": "art",
+          "title": "Autumn Rhythm (Number 30)",
+          "creator": "Jackson Pollock",
+          "year": "1950",
+          "why": "Painted on Long Island in the fall; it looks exactly like the name.",
+          "metQuery": "Autumn Rhythm Number 30 Pollock",
+          "wiki": "Autumn Rhythm (Number 30)"
+        },
+        {
+          "medium": "art",
+          "title": "Repose",
+          "creator": "John White Alexander",
+          "year": "1895",
+          "why": "A New York painter's idea of doing absolutely nothing on a cool afternoon.",
+          "metQuery": "Repose John White Alexander",
+          "wiki": ""
+        },
+        {
+          "medium": "art",
+          "title": "A Gorge in the Mountains (Kauterskill Clove)",
+          "creator": "Sanford Robinson Gifford",
+          "year": "1862",
+          "why": "The Catskills in October — three hours north, where the city goes to look at leaves.",
+          "metQuery": "Kauterskill Clove Gifford",
+          "wiki": ""
+        },
+        {
+          "medium": "book",
+          "title": "Open City",
+          "creator": "Teju Cole",
+          "year": "2011",
+          "why": "A man walks Manhattan for a year and thinks; the best October book there is.",
+          "wiki": "Open City (novel)"
+        },
+        {
+          "medium": "book",
+          "title": "The Age of Innocence",
+          "creator": "Edith Wharton",
+          "year": "1920",
+          "why": "Old New York, the season starting, everyone watching everyone.",
+          "wiki": "The Age of Innocence"
+        },
+        {
+          "medium": "book",
+          "title": "Here Is New York",
+          "creator": "E. B. White",
+          "year": "1949",
+          "why": "Fifty pages, one summer, and somehow the whole city.",
+          "wiki": "Here Is New York"
+        },
+        {
+          "medium": "music",
+          "title": "Autumn in New York",
+          "creator": "Billie Holiday",
+          "year": "1952",
+          "why": "The standard, sung by the one who owned it.",
+          "wiki": "Autumn in New York (song)"
+        },
+        {
+          "medium": "music",
+          "title": "New York, I Love You but You're Bringing Me Down",
+          "creator": "LCD Soundsystem",
+          "year": "2007",
+          "why": "The most honest love letter the city has.",
+          "wiki": "New York, I Love You but You're Bringing Me Down"
+        },
+        {
+          "medium": "music",
+          "title": "The Only Living Boy in New York",
+          "creator": "Simon & Garfunkel",
+          "year": "1970",
+          "why": "Half here, half gone — an October feeling.",
+          "wiki": "The Only Living Boy in New York"
+        },
+        {
+          "medium": "film",
+          "title": "When Harry Met Sally...",
+          "creator": "Rob Reiner",
+          "year": "1989",
+          "why": "The leaves in Central Park, the deli, all of it.",
+          "wiki": "When Harry Met Sally..."
+        },
+        {
+          "medium": "film",
+          "title": "The Royal Tenenbaums",
+          "creator": "Wes Anderson",
+          "year": "2001",
+          "why": "A New York that never existed, in exactly the right colours for the season.",
+          "wiki": "The Royal Tenenbaums"
+        },
+        {
+          "medium": "film",
+          "title": "Moonstruck",
+          "creator": "Norman Jewison",
+          "year": "1987",
+          "why": "Brooklyn Heights, the opera, and a very big moon.",
+          "wiki": "Moonstruck"
+        },
+        {
+          "medium": "documentary",
+          "title": "Paris Is Burning",
+          "creator": "Jennie Livingston",
+          "year": "1990",
+          "why": "The Harlem ball scene at its height; the city's most important documentary.",
+          "wiki": "Paris Is Burning (film)"
+        },
+        {
+          "medium": "documentary",
+          "title": "Man on Wire",
+          "creator": "James Marsh",
+          "year": "2008",
+          "why": "A man walks between the Twin Towers on a wire, one August morning in 1974.",
+          "wiki": "Man on Wire"
+        },
+        {
+          "medium": "festival",
+          "title": "Open House New York",
+          "creator": "New York City",
+          "year": "October",
+          "why": "For one weekend every locked building in the city opens its doors.",
+          "wiki": "Open House New York"
+        },
+        {
+          "medium": "festival",
+          "title": "Village Halloween Parade",
+          "creator": "Greenwich Village, New York",
+          "year": "October 31",
+          "why": "Sixth Avenue, fifty thousand costumes, and giant puppets.",
+          "wiki": "Village Halloween Parade"
+        }
+      ]
+    }
+  ]
+}
