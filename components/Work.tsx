@@ -35,8 +35,8 @@ const projects = [
     tag: "AI stock dashboard · Python + Streamlit + Claude",
     title: "Stock Advisor",
     desc: "Grades stocks on fundamentals, technicals, and AI-analyzed news sentiment, then turns cash deposits into diversified buy plans. Educational tool, not financial advice.",
-    link: "https://github.com/mindyjwu/stock_advisor",
-    linkLabel: "View on GitHub →",
+    link: "/stock-advisor.html",
+    linkLabel: "Visit site →",
     bg: "bg-[#DFF3EC]",
   },
   {
