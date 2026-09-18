@@ -9,6 +9,43 @@
   <script>location.replace('mood.html');</script>
 </head>
 <body>
+<!-- ===== PORTFOLIO NAV — shared across all pages (self-contained; keep identical everywhere) ===== -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600&family=DM+Sans:wght@400;500&display=swap');
+.mpnav{position:sticky;top:0;z-index:99999;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0 1.25rem;min-height:58px;background:#F8FBFD;border-bottom:1px solid rgba(22,35,46,.12);box-sizing:border-box;font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;}
+.mpnav *{box-sizing:border-box;}
+.mpnav a{text-decoration:none;}
+.mpnav__brand{font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:600;color:#2F6690;white-space:nowrap;flex-shrink:0;}
+.mpnav__brand span{color:#16232E;}
+.mpnav__links{display:flex;align-items:center;gap:1.15rem;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.mpnav__links::-webkit-scrollbar{display:none;}
+.mpnav__links a{font-size:14px;font-weight:500;color:#3E5A6E;white-space:nowrap;padding:4px 0;transition:opacity .15s;}
+.mpnav__links a:hover{opacity:.6;}
+.mpnav__links a.ge{color:#6B3FA8;}
+.mpnav__links a.genai{color:#1A4FCC;}
+.mpnav__links a.sa{color:#1A7A4A;}
+.mpnav__links a.mw{color:#B0253F;}
+.mpnav__links a.sig{color:#946200;}
+.mpnav__links a.plm{color:#5E8A63;}
+.mpnav__links a.fcr{color:#A8604F;}
+.mpnav__links a.is-here{border-bottom:2px solid currentColor;padding-bottom:2px;}
+@media(max-width:760px){.mpnav__brand span{display:none;}.mpnav{padding:0 .85rem;gap:.6rem;}.mpnav__links{gap:1rem;}}
+</style>
+<nav class="mpnav" aria-label="Mindy's Portfolio">
+  <a class="mpnav__brand" href="index.html">Mindy<span>'s Portfolio</span></a>
+  <div class="mpnav__links">
+    <a href="index.html#bio">About</a>
+    <a class="ge" href="https://global-explorer-ivory.vercel.app" target="_blank" rel="noopener">Global Explorer ✦</a>
+    <a class="genai" href="https://gender-ai.vercel.app" target="_blank" rel="noopener">GenAI ✦</a>
+    <a class="sa" href="stock-advisor.html">Stock Advisor ✦</a>
+    <a class="mw" href="mood.html">Mood Wall ✦</a>
+    <a class="sig" href="signal.html">SIGNAL ✦</a>
+    <a class="plm" href="people-like-me.html">People Like Me ✦</a>
+    <a class="fcr" href="festival-clash-resolver.html">Festival Clash Resolver ✦</a>
+  </div>
+</nav>
+<!-- ===== /PORTFOLIO NAV ===== -->
+
   <p>This page moved into the <a href="mood.html">Mood Wall</a>.</p>
 </body>
 </html>
