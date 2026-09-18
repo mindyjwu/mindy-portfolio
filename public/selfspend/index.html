@@ -38,7 +38,9 @@ input[type=text],input[type=number],input[type=date],input[type=file]{width:100%
 .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;margin-left:4px}
 .empty{color:var(--muted);text-align:center;padding:28px 12px}
 .timeline .day{color:var(--muted);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin:18px 0 6px}
-.hint{font-size:13px;color:var(--muted);margin-top:6px}
+.hint{font-size:13px;color:var(--muted);margin-top:6px}.hint a{color:var(--accent)}
+.promise{margin:8px 0 0;padding-left:18px;font-size:14px}.promise li{margin-bottom:8px}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:14px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}.consent input{margin-top:3px;accent-color:var(--accent)}
 .err{color:var(--accent);font-size:13px}
 [hidden]{display:none!important}
 </style></head><body>
@@ -57,6 +59,19 @@ input[type=text],input[type=number],input[type=date],input[type=file]{width:100%
     <button class="primary ghost" id="btn-manual-toggle" style="border-color:var(--line);color:var(--fg)">Type it in as I go</button>
     <div id="manual-box" hidden><input type="text" id="m-merchant" placeholder="Where (e.g. Chillhouse Soho)"><input type="number" id="m-amount" placeholder="Amount" step="0.01"><input type="date" id="m-date"><button class="primary" id="m-add">Add</button></div>
     <p class="err" id="setup-err"></p></div>
+  <div class="card" id="promise"><div class="cat">What you do not have to worry about</div>
+    <ul class="promise">
+      <li><b>We never see your bank password.</b> You log in on your bank's page via Plaid. We get a read-only token for the one card you pick.</li>
+      <li><b>We cannot move money.</b> Read-only means list transactions, nothing else.</li>
+      <li><b>No name, no account number, no balance.</b> We keep the merchant line, amount and date. That is all.</li>
+      <li><b>No monthly total, ever.</b> It is a design rule, tested in code.</li>
+      <li><b>Nothing is sold or shared.</b> No brokers, no ads, no merchants told you visited.</li>
+      <li><b>One tap deletes everything,</b> including revoking the bank link at Plaid. No waiting period.</li>
+      <li><b>This is a one-person beta,</b> on one server, not a bank. Skip bank connect if that is not for you. CSV and typing work the same.</li>
+    </ul>
+    <p class="hint"><a href="https://github.com/mindyjwu/selfspend/blob/main/docs/privacy-promise.md" target="_blank">Full promise</a> · <a href="https://github.com/mindyjwu/selfspend/blob/main/docs/privacy-policy.md" target="_blank">Privacy policy</a> · <a href="https://github.com/mindyjwu/selfspend/blob/main/docs/terms.md" target="_blank">Beta terms</a></p>
+    <label class="consent"><input type="checkbox" id="consent"> I have read the privacy policy and beta terms, and I am 18 or older.</label>
+  </div>
   <button class="primary" id="btn-done">Show me</button>
 </section>
 
@@ -85,6 +100,10 @@ input[type=text],input[type=number],input[type=date],input[type=file]{width:100%
     <input type="text" id="f-merchant" placeholder="Where"><input type="number" id="f-amount" placeholder="Amount" step="0.01"><input type="date" id="f-date"><button class="primary" id="f-add">Add</button>
     <div class="row" style="margin-top:10px"><button id="f-sync">Re-sync bank</button><label><input type="file" id="f-csv" accept=".csv" style="width:auto;margin:0"></label></div>
     <p class="err" id="fix-err"></p></div>
+  <div class="card"><div class="cat">Your data</div>
+    <p class="hint">Everything we hold is the merchant line, amount, date, your check-ins and your corrections. <a href="https://github.com/mindyjwu/selfspend/blob/main/docs/privacy-promise.md" target="_blank">The promise</a> · <a href="https://github.com/mindyjwu/selfspend/blob/main/docs/privacy-policy.md" target="_blank">Privacy</a> · <a href="https://github.com/mindyjwu/selfspend/blob/main/docs/terms.md" target="_blank">Terms</a></p>
+    <div class="row" style="margin-top:10px"><a class="book" href="#" onclick="alert('Export is available in the real app, not the demo.');return false">Export CSV</a><button id="btn-delete" style="color:var(--accent);border-color:var(--accent)">Disconnect and delete everything</button></div>
+    <p class="err" id="del-err"></p></div>
 </section>
 
 <nav class="tabs" id="tabs" hidden>
@@ -105,6 +124,7 @@ window.fetch=function(u,o){const url=new URL(u,location.href);const p=url.pathna
  if(p==='/api/checkin'){const wk=new Date();wk.setDate(wk.getDate()-((wk.getDay()+6)%7));const k=wk.toISOString().slice(0,10);S.checkin.history=S.checkin.history.filter(h=>h.checkin_date!==k);for(const d in b.scores)S.checkin.history.unshift({checkin_date:k,dimension:d,score:b.scores[d]});S.checkin.due=false;S.state.checkin_due=false;return ok({week:k})}
  if(p==='/api/dimensions'){S.state.dimensions=b.dimensions;S.checkin.dimensions=b.dimensions;return ok({ok:true})}
  if(p==='/api/correct'){S.unknowns.rows=S.unknowns.rows.filter(r=>r.merchant_raw!==b.merchant_raw);return ok({merchant_norm:b.merchant_raw})}
+ if(p==='/api/delete_all'){S.memory=[];S.unknowns.rows=[];S.state.n_transactions=0;S.state.dimensions=null;for(const k in S.next)S.next[k]=[];return ok({deleted:true,plaid_revoked:[]})}
  if(p==='/api/manual'){S.memory.unshift({date:b.date,merchant:b.merchant,category:'unknown',subcategory:null,amount:b.amount});S.unknowns.rows.unshift({merchant_raw:b.merchant,s:b.amount,n:1,last:b.date});return ok({id:'demo'})}
  return Promise.resolve(new Response(JSON.stringify({error:'not available in the static demo'}),{status:400}))};})();
 </script>
@@ -128,7 +148,7 @@ $('#tabs').onclick=e=>{const b=e.target.closest('button');if(b)show(b.dataset.v)
 async function loadSetup(){const chosen=new Set(STATE.dimensions||[]);
  $('#dims').innerHTML=STATE.suggested.map(d=>`<button data-d="${d}" class="${chosen.has(d)?'on':''}">${d}</button>`).join('');
  $('#dims').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.classList.contains('on'))chosen.delete(b.dataset.d);else if(chosen.size<3)chosen.add(b.dataset.d);$$('#dims button').forEach(x=>x.classList.toggle('on',chosen.has(x.dataset.d)))};
- $('#btn-plaid').onclick=async()=>{try{const {link_token}=await j('/api/link_token');
+ $('#btn-plaid').onclick=async()=>{if(!$('#consent').checked)return $('#setup-err').textContent='Please read and confirm the privacy policy and beta terms first.';try{const {link_token}=await j('/api/link_token');
    Plaid.create({token:link_token,onSuccess:async(public_token,meta)=>{await post('/api/exchange',{public_token,institution:meta.institution&&meta.institution.name});await refresh();show('next')}}).open()}
   catch(e){$('#setup-err').textContent='Bank connect is not set up on this build yet ('+e.message+'). Use CSV or type it in.'}};
  $('#btn-csv-toggle').onclick=()=>$('#csv-box').hidden=!$('#csv-box').hidden;
@@ -136,7 +156,7 @@ async function loadSetup(){const chosen=new Set(STATE.dimensions||[]);
  $('#csv').onchange=e=>uploadCsv(e.target.files[0],'#setup-err');
  $('#m-date').valueAsDate=new Date();
  $('#m-add').onclick=()=>addManual('#m-merchant','#m-amount','#m-date','#setup-err');
- $('#btn-done').onclick=async()=>{if(chosen.size!==3)return $('#setup-err').textContent='Pick exactly three.';await post('/api/dimensions',{dimensions:[...chosen]});await refresh();show('next')}}
+ $('#btn-done').onclick=async()=>{if(chosen.size!==3)return $('#setup-err').textContent='Pick exactly three.';if(!$('#consent').checked)return $('#setup-err').textContent='Please confirm you have read the privacy policy and beta terms.';await post('/api/dimensions',{dimensions:[...chosen]});await refresh();show('next')}}
 async function uploadCsv(file,errSel){if(!file)return;try{const r=await fetch('/api/csv',{method:'POST',body:await file.text()});const d=await r.json();if(!r.ok)throw new Error(d.error);$(errSel).textContent=`Imported ${d.imported} lines.`;await refresh()}catch(e){$(errSel).textContent=e.message}}
 async function addManual(m,a,d,errSel){try{await post('/api/manual',{merchant:$(m).value,amount:+$(a).value,date:$(d).value});$(m).value='';$(a).value='';$(errSel).textContent='Added.';await refresh()}catch(e){$(errSel).textContent=e.message}}
 
@@ -174,6 +194,7 @@ async function loadUnknowns(){const u=await j('/api/unknowns');const cats=Object
  $('#unknowns').onclick=async e=>{const b=e.target.closest('button');if(!b)return;const r=u.rows[b.dataset.i];await post('/api/correct',{merchant_raw:r.merchant_raw,category:b.dataset.c});loadUnknowns()};
  $('#f-date').valueAsDate=new Date();$('#f-add').onclick=()=>addManual('#f-merchant','#f-amount','#f-date','#fix-err').then(loadUnknowns);
  $('#f-csv').onchange=e=>uploadCsv(e.target.files[0],'#fix-err').then(loadUnknowns);
+ $('#btn-delete').onclick=async()=>{if(!confirm('Revoke the bank connection and delete every transaction, check-in and correction? This cannot be undone.'))return;try{const r=await post('/api/delete_all',{});$('#del-err').textContent='Deleted. '+(r.plaid_revoked.length?'Plaid: '+r.plaid_revoked.join('; '):'');await refresh();show('setup')}catch(e){$('#del-err').textContent=e.message}};
  $('#f-sync').onclick=async()=>{try{await post('/api/sync',{});$('#fix-err').textContent='Synced.';loadUnknowns()}catch(e){$('#fix-err').textContent=e.message}}}
 
 async function refresh(){STATE=await j('/api/state');$('#ck-dot').hidden=!STATE.checkin_due}
