@@ -40,6 +40,14 @@ const projects = [
     bg: "bg-[#DFF3EC]",
   },
   {
+    tag: "Spend memory · Python + Plaid + Claude",
+    title: "selfspend",
+    desc: "Classifies what women spend on themselves in NYC — skin, hair, nails, strength, culture, care — past the useless bank categories, and shows what the next $200 buys. No budgets, no totals.",
+    link: "/selfspend/",
+    linkLabel: "Try the demo →",
+    bg: "bg-[#F6E7E4]",
+  },
+  {
     tag: "Coming soon",
     title: "More projects",
     desc: "Data science projects, consulting case studies, and other builds. Check back soon.",
