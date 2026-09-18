@@ -40,8 +40,8 @@ const projects = [
     bg: "bg-[#DFF3EC]",
   },
   {
-    tag: "Spend memory · Python + Plaid + Claude",
-    title: "selfspend",
+    tag: "A keeper, not a budget · Python + Plaid + Claude",
+    title: "self-spend · financial keeper",
     desc: "Classifies what women spend on themselves in NYC — skin, hair, nails, strength, culture, care — past the useless bank categories, and shows what the next $200 buys. No budgets, no totals.",
     link: "/selfspend/",
     linkLabel: "Try the demo →",

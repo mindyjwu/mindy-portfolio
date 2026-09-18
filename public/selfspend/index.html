@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>selfspend demo</title>
+<title>self-spend · financial keeper</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f7f3ee;--fg:#1a1614;--muted:#7a6f68;--card:#fffdfa;--line:#e9e1d8;--accent:#b4413e;--accent-soft:#fbe7e3;--ok:#2f6b4f;--ok-soft:#e2f0e8;--chip:#efe8e0;--shadow:0 1px 2px rgba(40,30,20,.06),0 8px 24px -12px rgba(40,30,20,.18)}
@@ -7,7 +7,9 @@
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 Inter,-apple-system,system-ui,sans-serif;padding:0 16px 96px;max-width:600px;margin-inline:auto}
 h1,h2,.serif{font-family:Fraunces,Georgia,serif;font-weight:600;letter-spacing:-.01em}
-h1{font-size:30px;line-height:1.15;margin:28px 0 6px}h2{font-size:22px;margin:0 0 4px}
+h1{font-size:30px;line-height:1.15;margin:28px 0 6px}
+.brand{display:flex;align-items:baseline;gap:10px;margin-top:26px}.wordmark{font-family:Fraunces,serif;font-weight:600;font-size:18px;letter-spacing:-.01em}.tagline{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.tabs .wm{position:absolute;left:16px;top:-22px;font:600 11px/1 Fraunces,serif;color:var(--muted);letter-spacing:.02em}h2{font-size:22px;margin:0 0 4px}
 .sub{color:var(--muted);margin:0 0 18px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:12px;box-shadow:var(--shadow)}
 .cat{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
@@ -46,8 +48,9 @@ input[type=text],input[type=number],input[type=date],input[type=file]{width:100%
 </style></head><body>
 
 <section id="view-setup" hidden>
+  <div class="brand"><span class="wordmark">self-spend</span><span class="tagline">financial keeper</span></div>
   <h1>What is worth it?</h1>
-  <p class="sub">selfspend remembers what you do for yourself and, over time, what it does for you. No budgets. No totals.</p>
+  <p class="sub">A keeper, not a budget. self-spend remembers what you do for yourself and, over time, what it does for you. No totals, ever.</p>
   <div class="card"><div class="cat">Step 1 · Three things you want to feel</div>
     <p class="hint">You'll rate these once a week, 1 to 5. Pick three.</p>
     <div class="row" id="dims"></div></div>
@@ -83,7 +86,7 @@ input[type=text],input[type=number],input[type=date],input[type=file]{width:100%
 </section>
 
 <section id="view-memory" hidden>
-  <h1>Memory</h1><p class="sub">What you did for yourself, most recent first. Things, not sums.</p>
+  <h1>Memory</h1><p class="sub">The keeper. What you did for yourself, most recent first. Things, not sums.</p>
   <div id="memory" class="timeline"></div>
 </section>
 
@@ -128,7 +131,7 @@ window.fetch=function(u,o){const url=new URL(u,location.href);const p=url.pathna
  if(p==='/api/manual'){S.memory.unshift({date:b.date,merchant:b.merchant,category:'unknown',subcategory:null,amount:b.amount});S.unknowns.rows.unshift({merchant_raw:b.merchant,s:b.amount,n:1,last:b.date});return ok({id:'demo'})}
  return Promise.resolve(new Response(JSON.stringify({error:'not available in the static demo'}),{status:400}))};})();
 </script>
-<div style="position:fixed;top:0;left:0;right:0;z-index:20;background:#b4413e;color:#fff;font:600 12px/1 Inter,system-ui,sans-serif;text-align:center;padding:8px">Static demo with sample NYC data. Nothing you enter is saved. <a href="https://github.com/mindyjwu/selfspend" style="color:#fff">Source on GitHub</a></div>
+<div style="position:fixed;top:0;left:0;right:0;z-index:20;background:#b4413e;color:#fff;font:600 12px/1 Inter,system-ui,sans-serif;text-align:center;padding:8px">self-spend · financial keeper — static demo with sample NYC data. Nothing you enter is saved. <a href="https://github.com/mindyjwu/selfspend" style="color:#fff">Source on GitHub</a></div>
 <div style="height:30px"></div>
 
 <script>
