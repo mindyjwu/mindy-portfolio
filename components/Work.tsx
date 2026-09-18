@@ -48,6 +48,14 @@ const projects = [
     bg: "bg-[#F6E7E4]",
   },
   {
+    tag: "Product concept · static PWA + similarity engine",
+    title: "People Like Me",
+    desc: "A vetted beauty and body provider directory plus community, ranked by people who actually share your hair type, skin tone and eye shape. NYC demo with a working per-vertical matching engine.",
+    link: "https://mindyjwu.github.io/people-like-me/",
+    linkLabel: "Try the demo →",
+    bg: "bg-[#F3E6EC]",
+  },
+  {
     tag: "Coming soon",
     title: "More projects",
     desc: "Data science projects, consulting case studies, and other builds. Check back soon.",
