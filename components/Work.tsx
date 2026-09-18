@@ -43,8 +43,8 @@ const projects = [
     tag: "A keeper, not a budget · Python + Plaid + Claude",
     title: "self-spend · financial keeper",
     desc: "Classifies what women spend on themselves in NYC — skin, hair, nails, strength, culture, care — past the useless bank categories, and shows what the next $200 buys. No budgets, no totals.",
-    link: "/selfspend/",
-    linkLabel: "Try the demo →",
+    link: "#selfspend",
+    linkLabel: "Read the case study →",
     bg: "bg-[#F6E7E4]",
   },
   {
@@ -79,8 +79,8 @@ export default function Work() {
             {p.link && (
               <a
                 href={p.link}
-                target="_blank"
-                rel="noopener"
+                target={p.link.startsWith("#") ? undefined : "_blank"}
+                rel={p.link.startsWith("#") ? undefined : "noopener"}
                 className="font-body text-sm font-medium text-clay hover:text-clay-dark transition-colors"
               >
                 {p.linkLabel}

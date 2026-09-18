@@ -2,6 +2,7 @@
 
 const links = [
   { label: "Work", href: "#work" },
+  { label: "self-spend", href: "#selfspend" },
   { label: "About", href: "#about" },
   { label: "Contact", href: "#contact" },
 ];
@@ -28,15 +29,7 @@ export default function Nav() {
       }}
     >
       <div
-        style={{
-          maxWidth: 1100,
-          margin: "0 auto",
-          padding: "0 48px",
-          height: 56,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
+        className="mx-auto flex h-14 max-w-[1100px] items-center justify-between gap-4 px-5 sm:px-12"
       >
         {/* Logo */}
         <a
@@ -49,13 +42,14 @@ export default function Nav() {
             color: "var(--navy)",
             letterSpacing: "0.01em",
             textDecoration: "none",
+            whiteSpace: "nowrap",
           }}
         >
           Mindy Wu
         </a>
 
         {/* Links */}
-        <ul style={{ display: "flex", gap: 36, listStyle: "none", margin: 0, padding: 0 }}>
+        <ul className="m-0 flex list-none gap-4 p-0 sm:gap-9">
           {links.map(({ label, href }) => (
             <li key={href}>
               <a
@@ -68,6 +62,7 @@ export default function Nav() {
                   color: "var(--text-secondary)",
                   textDecoration: "none",
                   transition: "color 0.15s ease",
+                  whiteSpace: "nowrap",
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = "var(--blue-mid)")}
                 onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}

@@ -1,6 +1,7 @@
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import Work from "@/components/Work";
+import SelfSpend from "@/components/SelfSpend";
 import About from "@/components/About";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
@@ -13,6 +14,7 @@ export default function Home() {
       <main>
         <Hero />
         <Work />
+        <SelfSpend />
         <About />
         <Contact />
       </main>
