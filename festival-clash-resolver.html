@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#060607" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>Festival Clash Resolver</title>
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJtIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIi8+PHN0b3Agb2Zmc2V0PSIuNDUiIHN0b3AtY29sb3I9IiM5YTlkYTUiLz48c3RvcCBvZmZzZXQ9Ii42IiBzdG9wLWNvbG9yPSIjZWNlZWYyIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZDg5YTg5Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMwYjBiMGQiLz48cmVjdCB4PSIxNCIgeT0iMTIiIHdpZHRoPSIxMCIgaGVpZ2h0PSI0MCIgcng9IjMiIGZpbGw9InVybCgjbSkiLz48cmVjdCB4PSIzMCIgeT0iMjIiIHdpZHRoPSIxMCIgaGVpZ2h0PSIzMCIgcng9IjMiIGZpbGw9InVybCgjbSkiIG9wYWNpdHk9Ii44NSIvPjxyZWN0IHg9IjQ2IiB5PSIzMiIgd2lkdGg9IjgiIGhlaWdodD0iMjAiIHJ4PSIzIiBmaWxsPSJ1cmwoI20pIiBvcGFjaXR5PSIuNyIvPjwvc3ZnPg==" />
+<meta name="description" content="Offline-first festival set-clash resolver and smart route planner. Star sets, rank them, and it resolves overlaps, warns when the walk between stages is longer than the gap, and exports a schedule that works with no signal. 42 real electronic festivals, Sep 2026–2027." />
+
+<!-- Tailwind (via CDN) — utility layer. Once loaded it is browser-cached for offline use. -->
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+
+<!--
+  "Chrome & Rose" — a black / white / liquid-metal design system.
+  Self-contained (not dependent on Tailwind) so the app stays legible offline.
+  Motion: an opening reveal + slow metallic sheen; all disabled under reduced-motion.
+-->
+<style>
+  :root {
+    /* ink & ground */
+    --bg:        #060607;
+    --bg-2:      #0b0b0d;
+    --panel:     #100f12;
+    --panel-2:   #17161a;
+    --panel-3:   #1e1d22;
+    --line:      #2a2930;
+    --line-2:    #3a3942;
+    --ink:       #f6f6f8;
+    --ink-dim:   #b7b7c0;
+    --ink-faint: #74747e;
+
+    /* brushed silver */
+    --silver:    #d9dbe0;
+    --silver-2:  #a6a9b1;
+    --silver-3:  #74777f;
+    --silver-grad: linear-gradient(115deg,#ffffff 0%,#c9ccd2 20%,#8b8e97 42%,#eceef2 58%,#9a9da5 78%,#d2d5db 100%);
+
+    /* rose gold */
+    --rose:      #e9b3a4;
+    --rose-2:    #d1917f;
+    --rose-3:    #b16f5d;
+    --rose-grad: linear-gradient(115deg,#ffe6dd 0%,#f0c0b1 22%,#cf9080 46%,#ffd9cb 60%,#d89a89 82%,#f0c0b1 100%);
+
+    /* semantics — kept inside the monochrome+rose palette */
+    --high:    #eba593;   /* Must See — rose */
+    --medium:  #cfd2d8;   /* Want to See — silver */
+    --low:     #8b9096;   /* Backup — steel */
+    --warn:    #ff8a7a;   /* tight squeeze — hot rose */
+    --warn-bg: #241211;
+    --ok:      #cfd2d8;   /* comfortable — silver */
+    --tap:     48px;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px; line-height: 1.45; min-height: 100vh;
+    padding-bottom: env(safe-area-inset-bottom);
+    position: relative; overflow-x: hidden;
+  }
+
+  /* --- drifting metallic light behind everything --- */
+  .aurora { position: fixed; inset: -20% -10% -10% -10%; z-index: 0; pointer-events: none; overflow: hidden; }
+  .aurora::before, .aurora::after {
+    content: ""; position: absolute; width: 65vmax; height: 65vmax; border-radius: 50%;
+    filter: blur(60px); opacity: .16; will-change: transform;
+  }
+  .aurora::before {
+    background: radial-gradient(circle at 30% 30%, #ffffff, rgba(200,203,210,.4) 40%, transparent 65%);
+    top: -25vmax; left: -15vmax; animation: drift1 26s ease-in-out infinite alternate;
+  }
+  .aurora::after {
+    background: radial-gradient(circle at 60% 40%, #f2c3b4, rgba(209,145,127,.35) 42%, transparent 66%);
+    bottom: -28vmax; right: -18vmax; animation: drift2 32s ease-in-out infinite alternate;
+  }
+  @keyframes drift1 { from { transform: translate(0,0) scale(1); } to { transform: translate(14vmax,10vmax) scale(1.15); } }
+  @keyframes drift2 { from { transform: translate(0,0) scale(1.05); } to { transform: translate(-12vmax,-8vmax) scale(1); } }
+
+  .wrap { max-width: 1024px; margin: 0 auto; padding: 0 16px; position: relative; z-index: 1; }
+
+  /* --- metallic text --- */
+  .metal, .metal-rose {
+    background-size: 220% auto; -webkit-background-clip: text; background-clip: text;
+    color: transparent; -webkit-text-fill-color: transparent;
+  }
+  .metal { background-image: var(--silver-grad); animation: sheen 7s linear infinite; }
+  .metal-rose { background-image: var(--rose-grad); animation: sheen 8s linear infinite; }
+  @keyframes sheen { to { background-position: 220% center; } }
+
+  /* --- opening reveal --- */
+  .intro {
+    position: fixed; inset: 0; z-index: 200; display: grid; place-items: center;
+    background: radial-gradient(120% 120% at 50% 40%, #141317 0%, #060607 60%);
+    animation: introOut .9s cubic-bezier(.4,0,.2,1) 1.9s forwards;
+  }
+  .intro-inner { text-align: center; padding: 0 24px; }
+  .intro-mark {
+    font-size: clamp(2.4rem, 9vw, 4.6rem); font-weight: 900; letter-spacing: .14em; line-height: 1;
+    opacity: 0; animation: markIn 1s cubic-bezier(.2,.7,.2,1) .15s forwards, sheen 3.2s linear infinite .3s;
+  }
+  .intro-title {
+    margin-top: 14px; font-size: clamp(.9rem,3.4vw,1.15rem); font-weight: 700; letter-spacing: .42em;
+    text-transform: uppercase; color: var(--ink); opacity: 0; animation: fadeUp .8s ease .55s forwards;
+  }
+  .intro-line {
+    height: 1px; width: 0; margin: 16px auto 0; background: linear-gradient(90deg, transparent, var(--silver), var(--rose), transparent);
+    animation: lineGrow 1s cubic-bezier(.4,0,.2,1) .7s forwards;
+  }
+  .intro-sub {
+    margin-top: 14px; font-size: .72rem; letter-spacing: .3em; text-transform: uppercase; color: var(--ink-faint);
+    opacity: 0; animation: fadeUp .8s ease 1s forwards;
+  }
+  @keyframes markIn { from { opacity: 0; transform: translateY(14px) scale(.96); filter: blur(6px); } to { opacity: 1; transform: none; filter: blur(0); } }
+  @keyframes lineGrow { to { width: min(320px, 72vw); } }
+  @keyframes introOut { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+  .intro.skip { animation: introOut .45s ease forwards !important; }
+
+  /* --- entrance stagger for the shell --- */
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .app-header { animation: rise .6s cubic-bezier(.2,.7,.2,1) both; }
+  #view-setup > .card, #view-setup > .row { animation: rise .6s cubic-bezier(.2,.7,.2,1) both; }
+  #view-setup > *:nth-child(1) { animation-delay: .05s; }
+  #view-setup > *:nth-child(2) { animation-delay: .12s; }
+  #view-setup > *:nth-child(3) { animation-delay: .19s; }
+  #view-setup > *:nth-child(4) { animation-delay: .26s; }
+  .view-swap { animation: fadeUp .35s ease both; }
+
+  /* --- header / step nav --- */
+  .app-header {
+    position: sticky; top: 0; z-index: 40;
+    background: rgba(6,6,7,0.82); backdrop-filter: blur(14px) saturate(120%);
+    border-bottom: 1px solid var(--line);
+  }
+  .brand-title { font-size: 1.16rem; font-weight: 900; letter-spacing: .02em; }
+  .steps { display: flex; gap: 8px; }
+  .step-btn {
+    flex: 1; min-height: var(--tap); display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; padding: 6px 4px; background: linear-gradient(180deg, var(--panel-2), var(--panel));
+    border: 1px solid var(--line); border-radius: 14px; color: var(--ink-faint);
+    font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em;
+    cursor: pointer; transition: all .18s ease; text-align: center;
+  }
+  .step-btn .step-num {
+    display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--panel-3); color: var(--ink-dim); font-size: 0.78rem; font-weight: 800; border: 1px solid var(--line-2);
+  }
+  .step-btn.active {
+    color: var(--ink); border-color: transparent; background: linear-gradient(180deg, #26252b, #131217);
+    box-shadow: 0 0 0 1px var(--silver-3), 0 10px 26px -14px rgba(255,255,255,.5), inset 0 1px 0 rgba(255,255,255,.14);
+  }
+  .step-btn.active .step-num { background: var(--silver-grad); background-size: 200%; color: #17161a; border: none; animation: sheen 4s linear infinite; }
+  .step-btn:disabled { opacity: .38; cursor: not-allowed; }
+
+  /* --- cards --- */
+  .card {
+    position: relative; background: linear-gradient(180deg, rgba(30,29,34,.55), rgba(16,15,18,.85));
+    border: 1px solid var(--line); border-radius: 18px; padding: 18px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 16px 40px -30px rgba(0,0,0,.9);
+  }
+  .card + .card { margin-top: 16px; }
+  .section-title { font-size: 1.05rem; font-weight: 800; margin: 0 0 4px; display:flex; align-items:center; gap:8px; letter-spacing: .01em; }
+  .section-sub { color: var(--ink-dim); font-size: 0.86rem; margin: 0 0 14px; }
+  .label { display:block; font-size: 0.74rem; font-weight: 800; color: var(--ink-faint); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.14em; }
+
+  /* --- inputs --- */
+  input[type="text"], input[type="number"], textarea, select {
+    width: 100%; background: var(--panel-2); color: var(--ink); border: 1px solid var(--line-2);
+    border-radius: 12px; padding: 12px 14px; font-size: 1rem; font-family: inherit; outline: none; transition: border-color .15s, box-shadow .15s;
+  }
+  textarea { min-height: 150px; resize: vertical; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.85rem; line-height: 1.5; }
+  input:focus, textarea:focus, select:focus { border-color: var(--silver-2); box-shadow: 0 0 0 3px rgba(217,219,224,.12); }
+  select { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23a6a9b1' stroke-width='2'><path d='M4 6l4 4 4-4'/></svg>"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
+  optgroup { color: var(--ink-faint); font-weight: 800; }
+  option { color: var(--ink); }
+
+  /* --- buttons (brushed metal) --- */
+  .btn {
+    position: relative; overflow: hidden; min-height: var(--tap); display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding: 0 18px; border-radius: 12px; border: 1px solid var(--line-2);
+    background: linear-gradient(180deg, var(--panel-3), var(--panel)); color: var(--ink);
+    font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all .16s ease; text-decoration: none;
+  }
+  .btn:hover { border-color: var(--silver-3); }
+  .btn:active { transform: translateY(1px); }
+  /* glare sweep on metal buttons */
+  .btn-primary {
+    color: #141317; border: none; font-weight: 800;
+    background: var(--silver-grad); background-size: 200% auto;
+    box-shadow: 0 10px 26px -14px rgba(255,255,255,.55), inset 0 1px 0 rgba(255,255,255,.6);
+    animation: sheen 6s linear infinite;
+  }
+  .btn-primary.rose { background-image: var(--rose-grad); box-shadow: 0 10px 26px -14px rgba(233,179,164,.6), inset 0 1px 0 rgba(255,255,255,.5); }
+  .btn-primary::after {
+    content:""; position:absolute; top:0; left:-60%; width:40%; height:100%;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,.75), transparent); transform: skewX(-18deg);
+  }
+  .btn-primary:hover::after { animation: glare .8s ease; }
+  @keyframes glare { from { left:-60%; } to { left:130%; } }
+  .btn-ghost { background: transparent; }
+  .btn-block { width: 100%; }
+  .btn-sm { min-height: 38px; font-size: 0.82rem; padding: 0 12px; }
+
+  /* --- pills / badges --- */
+  .pill { display:inline-flex; align-items:center; gap:6px; padding: 3px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 800; letter-spacing: .04em; }
+  .pill-high   { background: color-mix(in srgb, var(--high) 16%, transparent);   color: var(--high);   border:1px solid color-mix(in srgb, var(--high) 45%, transparent); }
+  .pill-medium { background: color-mix(in srgb, var(--medium) 12%, transparent); color: var(--medium); border:1px solid color-mix(in srgb, var(--medium) 40%, transparent); }
+  .pill-low    { background: color-mix(in srgb, var(--low) 14%, transparent);    color: var(--low);    border:1px solid color-mix(in srgb, var(--low) 45%, transparent); }
+  .pill-clash  { background: color-mix(in srgb, var(--warn) 16%, transparent);   color: var(--warn);   border:1px solid color-mix(in srgb, var(--warn) 45%, transparent); }
+  .pill-steel  { background: var(--panel-2); color: var(--ink-dim); border:1px solid var(--line-2); }
+
+  /* --- day toggle --- */
+  .daybar { display:flex; gap:8px; flex-wrap: wrap; }
+  .day-chip { min-height: 42px; padding: 0 18px; border-radius: 999px; cursor:pointer; background: var(--panel-2); border: 1px solid var(--line-2); color: var(--ink-dim); font-weight: 800; transition: all .15s; }
+  .day-chip.active { background: var(--silver-grad); background-size: 200%; color: #141317; border-color: transparent; box-shadow: inset 0 1px 0 rgba(255,255,255,.5); animation: sheen 5s linear infinite; }
+
+  /* --- prioritization --- */
+  .stage-group { margin-bottom: 18px; }
+  .stage-head { display:flex; align-items:center; gap:10px; margin: 4px 0 10px; }
+  .stage-dot { width: 12px; height: 12px; border-radius: 4px; flex: none; box-shadow: 0 0 10px -2px currentColor; }
+  .stage-name { font-weight: 800; font-size: 0.98rem; }
+  .set-row { display:flex; align-items:center; gap: 12px; padding: 12px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 14px; margin-bottom: 8px; transition: border-color .15s, transform .12s; }
+  .set-row.starred { border-color: var(--line-2); box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
+  .set-star { width: 44px; height: 44px; flex: none; border-radius: 12px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size: 1.4rem; line-height: 1; background: var(--panel); border: 1px solid var(--line-2); color: var(--ink-faint); transition: all .15s; }
+  .set-star.on { color: #141317; border-color: transparent; background: var(--rose-grad); background-size: 200%; animation: sheen 5s linear infinite; }
+  .set-info { flex: 1; min-width: 0; }
+  .set-artist { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .set-time { color: var(--ink-dim); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+  .prio-group { display:flex; gap: 4px; flex: none; }
+  .prio-btn { width: 40px; height: 40px; border-radius: 10px; cursor:pointer; font-size: 0.68rem; font-weight: 800; background: var(--panel); border: 1px solid var(--line); color: var(--ink-faint); display:flex; align-items:center; justify-content:center; transition: all .12s; }
+  .prio-btn:disabled { opacity: .3; cursor: not-allowed; }
+  .prio-btn.sel-high   { background: var(--rose-grad);  background-size:200%; border-color: transparent; color:#2a1712; animation: sheen 5s linear infinite; }
+  .prio-btn.sel-medium { background: var(--silver-grad);background-size:200%; border-color: transparent; color:#17161a; animation: sheen 5s linear infinite; }
+  .prio-btn.sel-low    { background: #6f7278; border-color: transparent; color:#0d0d0f; }
+
+  /* --- timeline --- */
+  .timeline-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 14px; }
+  .timeline { position: relative; display: grid; gap: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; min-width: 520px; }
+  .tl-lane { position: relative; border-left: 1px dashed var(--line); }
+  .tl-lane:first-child { border-left: none; }
+  .tl-lane-head { position: sticky; top: 0; z-index: 3; text-align:center; padding: 8px 6px; font-weight: 800; font-size: 0.76rem; background: var(--panel-2); border-bottom: 1px solid var(--line); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tl-gutter-head { background: var(--panel-2); border-bottom: 1px solid var(--line); }
+  .tl-body { position: relative; }
+  .tl-gutter { position: relative; }
+  .tl-hour { position: absolute; left: 0; right: 0; height: 0; border-top: 1px solid var(--line); }
+  .tl-hour span { position: absolute; left: 4px; top: -8px; font-size: 0.66rem; color: var(--ink-faint); font-variant-numeric: tabular-nums; background: var(--panel); padding: 0 2px; }
+  .tl-block { position: absolute; left: 3px; right: 3px; border-radius: 8px; padding: 4px 6px; overflow: hidden; font-size: 0.72rem; line-height: 1.15; border: 1px solid var(--line-2); background: var(--panel-2); color: var(--ink-dim); }
+  .tl-block.starred { color: var(--ink); }
+  .tl-block .b-art { font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tl-block .b-time { font-size: 0.63rem; opacity: .85; font-variant-numeric: tabular-nums; }
+  .tl-block.clash { box-shadow: 0 0 0 2px var(--warn), 0 0 16px -4px var(--warn); }
+
+  /* --- plan / itinerary --- */
+  .plan-item { display:flex; gap: 12px; margin-bottom: 10px; }
+  .plan-rail { flex: none; width: 20px; display:flex; flex-direction:column; align-items:center; }
+  .plan-node { width: 14px; height: 14px; border-radius: 50%; margin-top: 6px; border: 3px solid var(--bg); box-shadow: 0 0 10px -1px currentColor; }
+  .plan-line { flex: 1; width: 2px; background: var(--line-2); margin-top: 2px; }
+  .plan-card { flex: 1; background: var(--panel-2); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
+  .plan-card.skip { opacity: .55; }
+  .plan-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .plan-artist { font-weight: 800; font-size: 1.02rem; }
+  .plan-meta { color: var(--ink-dim); font-size: 0.85rem; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .plan-note { font-size: 0.85rem; margin-top: 8px; color: var(--ink); }
+  .plan-note.reason { color: var(--ink-dim); }
+
+  .transit-banner { display:flex; gap: 10px; align-items:flex-start; margin: 0 0 10px 32px; background: var(--warn-bg); border: 1px solid color-mix(in srgb, var(--warn) 50%, transparent); border-radius: 12px; padding: 10px 12px; font-size: 0.85rem; color: #ffd7cf; }
+  .transit-banner.ok { background: var(--panel-2); border-color: var(--line-2); color: var(--ink-dim); }
+  .transit-banner .t-ico { font-size: 1.05rem; line-height: 1.2; }
+
+  /* --- matrix --- */
+  .matrix { overflow-x:auto; }
+  .matrix table { border-collapse: collapse; width: 100%; min-width: 380px; }
+  .matrix th, .matrix td { padding: 6px; text-align:center; }
+  .matrix th { font-size: 0.76rem; color: var(--ink-dim); font-weight: 800; }
+  .matrix th.rowh { text-align: right; padding-right: 10px; white-space: nowrap; }
+  .matrix input { width: 70px; text-align:center; padding: 8px; margin: 0 auto; }
+  .matrix .diag { color: var(--ink-faint); font-weight: 700; }
+
+  /* --- stat tiles --- */
+  .stats { display:grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 10px; }
+  .stat { background: var(--panel-2); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
+  .stat .v { font-size: 1.6rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+  .stat .k { font-size: 0.76rem; color: var(--ink-dim); text-transform: uppercase; letter-spacing: .1em; }
+
+  .empty { text-align:center; color: var(--ink-dim); padding: 30px 16px; }
+  .empty .big { font-size: 2.2rem; margin-bottom: 8px; }
+  .note {
+    font-size: .8rem; color: var(--ink-dim); background: var(--panel-2); border: 1px solid var(--line);
+    border-left: 2px solid var(--rose-3); border-radius: 10px; padding: 10px 12px; margin-top: 12px;
+  }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); background: var(--silver-grad); background-size:200%; color: #141317; padding: 12px 20px; border-radius: 12px; font-weight: 800; box-shadow: 0 18px 50px -18px rgba(0,0,0,.8); opacity: 0; transition: all .25s; z-index: 100; pointer-events:none; animation: sheen 5s linear infinite; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .hint { font-size: 0.8rem; color: var(--ink-faint); }
+  code.k { background: var(--panel-2); padding: 1px 6px; border-radius: 6px; font-size: 0.82em; color: var(--silver); }
+  .divider { height:1px; background: linear-gradient(90deg, transparent, var(--line-2), transparent); margin: 16px 0; border: none; }
+  .row { display:flex; gap: 10px; flex-wrap: wrap; }
+  .row > * { flex: 1; min-width: 0; }
+  [hidden] { display: none !important; }
+
+  @media (max-width: 520px) {
+    .set-row { flex-wrap: wrap; }
+    .set-info { flex: 1 1 60%; }
+    .set-artist { white-space: normal; }
+    .prio-group { flex: 1 1 100%; justify-content: flex-end; margin-top: 2px; }
+    .prio-btn { width: 46px; height: 42px; }
+  }
+
+  /* Respect users who prefer no motion — kill every animation and the intro splash. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .metal, .metal-rose { background-position: 0 center; }
+    .intro { display: none !important; }
+  }
+</style>
+</head>
+<body>
+<!-- ===== PORTFOLIO NAV — shared across all pages (self-contained; keep identical everywhere) ===== -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600&family=DM+Sans:wght@400;500&display=swap');
+.mpnav{position:sticky;top:0;z-index:99999;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0 1.25rem;min-height:58px;background:#F8FBFD;border-bottom:1px solid rgba(22,35,46,.12);box-sizing:border-box;font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;}
+.mpnav *{box-sizing:border-box;}
+.mpnav a{text-decoration:none;}
+.mpnav__brand{font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:600;color:#2F6690;white-space:nowrap;flex-shrink:0;}
+.mpnav__brand span{color:#16232E;}
+.mpnav__links{display:flex;align-items:center;gap:1.15rem;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.mpnav__links::-webkit-scrollbar{display:none;}
+.mpnav__links a{font-size:14px;font-weight:500;color:#3E5A6E;white-space:nowrap;padding:4px 0;transition:opacity .15s;}
+.mpnav__links a:hover{opacity:.6;}
+.mpnav__links a.ge{color:#6B3FA8;}
+.mpnav__links a.genai{color:#1A4FCC;}
+.mpnav__links a.sa{color:#1A7A4A;}
+.mpnav__links a.mw{color:#B0253F;}
+.mpnav__links a.sig{color:#946200;}
+.mpnav__links a.plm{color:#5E8A63;}
+.mpnav__links a.fcr{color:#A8604F;}
+.mpnav__links a.is-here{border-bottom:2px solid currentColor;padding-bottom:2px;}
+@media(max-width:760px){.mpnav__brand span{display:none;}.mpnav{padding:0 .85rem;gap:.6rem;}.mpnav__links{gap:1rem;}}
+</style>
+<nav class="mpnav" aria-label="Mindy's Portfolio">
+  <a class="mpnav__brand" href="index.html">Mindy<span>'s Portfolio</span></a>
+  <div class="mpnav__links">
+    <a href="index.html#bio">About</a>
+    <a class="ge" href="https://global-explorer-ivory.vercel.app" target="_blank" rel="noopener">Global Explorer ✦</a>
+    <a class="genai" href="https://gender-ai.vercel.app" target="_blank" rel="noopener">GenAI ✦</a>
+    <a class="sa" href="stock-advisor.html">Stock Advisor ✦</a>
+    <a class="mw" href="mood.html">Mood Wall ✦</a>
+    <a class="sig" href="signal.html">SIGNAL ✦</a>
+    <a class="plm" href="people-like-me.html">People Like Me ✦</a>
+    <a class="fcr is-here" href="festival-clash-resolver.html">Festival Clash Resolver ✦</a>
+  </div>
+</nav>
+<style>
+  /* Embedded under the shared portfolio nav (58px): stack the app header below it,
+     and let the opening reveal cover the nav so the black open reads clean. */
+  .app-header { top: 58px; }
+  .intro { z-index: 100000; }
+  .pf-foot { position: relative; z-index: 1; max-width: 1024px; margin: -32px auto 0; padding: 0 16px 48px; font-size: .8rem; color: var(--ink-faint); }
+  .pf-foot a { color: var(--ink-dim); text-decoration: none; border-bottom: 1px solid var(--line-2); }
+  .pf-foot a:hover { color: var(--ink); }
+</style>
+
+<div class="aurora" aria-hidden="true"></div>
+
+<!-- opening reveal -->
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="intro-inner">
+    <div class="intro-mark metal">FCR</div>
+    <div class="intro-title">Festival Clash Resolver</div>
+    <div class="intro-line"></div>
+    <div class="intro-sub">Smart Route Planner</div>
+  </div>
+</div>
+
+<!-- ============================== HEADER ============================== -->
+<header class="app-header">
+  <div class="wrap" style="padding-top:12px;padding-bottom:12px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span aria-hidden="true" style="display:inline-block;width:12px;height:26px;border-radius:3px;background:var(--silver-grad);background-size:200%;box-shadow:0 0 14px -2px rgba(255,255,255,.5);animation:sheen 5s linear infinite;"></span>
+        <div>
+          <div class="brand-title"><span class="metal">Festival Clash</span> <span class="metal-rose">Resolver</span></div>
+          <div style="font-size:0.7rem;color:var(--ink-faint);letter-spacing:.16em;text-transform:uppercase;">Smart Route Planner · offline</div>
+        </div>
+      </div>
+      <button class="btn btn-sm btn-ghost" id="resetBtn" title="Clear all data">Reset</button>
+    </div>
+    <nav class="steps">
+      <button class="step-btn" data-view="setup"><span class="step-num">1</span>Setup</button>
+      <button class="step-btn" data-view="prioritize"><span class="step-num">2</span>Prioritize</button>
+      <button class="step-btn" data-view="dashboard"><span class="step-num">3</span>Dashboard</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap" style="padding-top:18px;padding-bottom:60px;">
+
+  <!-- ============================== VIEW 1: SETUP ============================== -->
+  <section id="view-setup">
+    <div class="card">
+      <h2 class="section-title">🎚️ Festival Library</h2>
+      <p class="section-sub">Real electronic festivals across Sep 2026 – 2027 — techno, house, trance, bass, hardstyle, drum &amp; bass, melodic — ready to plan against.</p>
+
+      <label class="label" for="libFilter">Find an event</label>
+      <input type="text" id="libFilter" placeholder="Filter by name, city, month or genre — techno, Amsterdam, bass, Jul…" autocomplete="off" style="margin-bottom:10px;" />
+      <div class="row" style="align-items:stretch;">
+        <select id="sampleSelect" style="flex:2;" aria-label="Pick an event"></select>
+        <button class="btn btn-primary" id="loadSampleBtn" style="flex:1;">Load Event</button>
+      </div>
+      <div id="libCount" class="hint" style="margin-top:8px;"></div>
+      <div class="note">
+        Each event sits on its <b>real recurring calendar slot</b> with real stages and headline-tier acts. Since 2027
+        set times &amp; full lineups aren’t officially released yet, they’re <b>representative and fully editable</b> —
+        paste an official timetable below whenever one drops.
+      </div>
+
+      <hr class="divider" />
+
+      <label class="label" for="pasteArea">Paste a timetable or JSON</label>
+      <textarea id="pasteArea" spellcheck="false" placeholder="Two accepted formats:
+
+1) Pipe rows —  Day | Stage | HH:MM-HH:MM | Artist
+   1 | Mainstage | 22:00-23:30 | Martin Garrix
+   1 | RESISTANCE | 22:30-00:00 | Charlotte de Witte
+
+2) Sectioned text —
+   Day 1
+   Mainstage
+   22:00-23:30 Martin Garrix
+   RESISTANCE
+   22:30-00:00 Charlotte de Witte
+
+...or valid JSON: { &quot;name&quot;:&quot;My Fest&quot;, &quot;sets&quot;:[{&quot;day&quot;:1,&quot;stage&quot;:&quot;Main&quot;,&quot;start&quot;:&quot;22:00&quot;,&quot;end&quot;:&quot;23:00&quot;,&quot;artist&quot;:&quot;X&quot;}] }"></textarea>
+      <div class="row" style="margin-top:12px;">
+        <button class="btn btn-primary rose" id="parseBtn">Parse &amp; Load</button>
+        <button class="btn btn-ghost" id="clearPasteBtn">Clear</button>
+      </div>
+      <div id="parseMsg" class="hint" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="card" id="festMetaCard" hidden>
+      <h2 class="section-title">🎫 Event</h2>
+      <label class="label" for="festName">Name</label>
+      <input type="text" id="festName" />
+      <div id="scheduleSummary" style="margin-top:14px;"></div>
+    </div>
+
+    <div class="card" id="transitCard" hidden>
+      <h2 class="section-title">🚶 Stage Transit Matrix</h2>
+      <p class="section-sub">Walking time in minutes between stages. Editing one cell updates its mirror.</p>
+      <div class="matrix" id="matrixHost"></div>
+    </div>
+
+    <div class="row" id="setupNav" hidden style="margin-top:16px;">
+      <button class="btn btn-primary btn-block" id="toPrioritize">Next: Prioritize Artists →</button>
+    </div>
+  </section>
+
+  <!-- ============================== VIEW 2: PRIORITIZE ============================== -->
+  <section id="view-prioritize" hidden>
+    <div class="card">
+      <h2 class="section-title">⭐ Artist Prioritization</h2>
+      <p class="section-sub">Tap the star to add a set to your plan, then set its priority.</p>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:0.78rem;color:var(--ink-dim);margin-bottom:14px;">
+        <span><span class="pill pill-high">H · Must See</span></span>
+        <span><span class="pill pill-medium">M · Want to See</span></span>
+        <span><span class="pill pill-low">L · Backup</span></span>
+      </div>
+      <div class="daybar" id="prioDaybar" style="margin-bottom:16px;"></div>
+      <div id="prioList"></div>
+    </div>
+    <div class="row" style="margin-top:16px;">
+      <button class="btn btn-ghost" id="backToSetup">← Setup</button>
+      <button class="btn btn-primary" id="toDashboard" style="flex:2;">See My Dashboard →</button>
+    </div>
+  </section>
+
+  <!-- ============================== VIEW 3: DASHBOARD ============================== -->
+  <section id="view-dashboard" hidden>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+        <h2 class="section-title" style="margin:0;">🧭 Clash Resolver &amp; Route</h2>
+        <button class="btn btn-primary rose btn-sm" id="exportBtn">⬇ Save Offline Schedule</button>
+      </div>
+      <div class="daybar" id="dashDaybar" style="margin:14px 0;"></div>
+      <div class="stats" id="dashStats"></div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">📋 Your Smart Plan</h3>
+      <p class="section-sub">Recommended route with clash resolutions and transit warnings.</p>
+      <div id="planHost"></div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">📊 Day Timeline</h3>
+      <p class="section-sub">All sets by stage. Starred sets are highlighted; rose outline = clash.</p>
+      <div class="timeline-scroll"><div id="timelineHost"></div></div>
+    </div>
+
+    <div class="row" style="margin-top:16px;">
+      <button class="btn btn-ghost" id="backToPrioritize">← Prioritize</button>
+    </div>
+  </section>
+
+</main>
+<footer class="pf-foot"><a href="index.html">← Back to portfolio</a> · <a href="https://mindyjwu.github.io/festival-clash-resolver/" target="_blank" rel="noopener">Standalone app</a> · <a href="https://github.com/mindyjwu/festival-clash-resolver" target="_blank" rel="noopener">Source</a> · Offline-first, single file, no account.</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* =====================================================================
+   Festival Clash Resolver & Smart Route Planner
+   Single-file, local-first, offline. Modular vanilla JS.
+   Modules: Time · Data (library + parser) · Store · Engine · Exporter · UI
+   ===================================================================== */
+
+/* --------------------------- Time --------------------------- */
+const Time = {
+  parse(str) {
+    if (typeof str !== "string") return null;
+    const m = /^\s*(\d{1,2}):(\d{2})\s*$/.exec(str);
+    if (!m) return null;
+    const h = +m[1], min = +m[2];
+    if (h > 24 || min > 59) return null;
+    return h * 60 + min;
+  },
+  format(mins) {
+    const m = ((Math.round(mins) % 1440) + 1440) % 1440;
+    return String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
+  },
+  dur(mins) {
+    mins = Math.max(0, Math.round(mins));
+    const h = Math.floor(mins / 60), m = mins % 60;
+    return (h ? h + "h" : "") + (h && m ? " " : "") + (m || !h ? m + "m" : "");
+  }
+};
+
+/** Absolute interval in minutes since day-1 start. Sets crossing midnight get +1440. */
+function absInterval(set) {
+  const base = (set.day - 1) * 1440;
+  const s = Time.parse(set.start);
+  let e = Time.parse(set.end);
+  let start = base + s, end = base + e;
+  if (e <= s) end += 1440;
+  return { start, end, len: end - start };
+}
+function overlaps(a, b) { return a.start < b.end && b.start < a.end; }
+
+/* --------------------------- Priority + stage tones --------------------------- */
+const PRIO = {
+  high:   { key: "high",   short: "H", label: "Must See",    rank: 3, color: "#eba593" },
+  medium: { key: "medium", short: "M", label: "Want to See", rank: 2, color: "#cfd2d8" },
+  low:    { key: "low",    short: "L", label: "Backup",      rank: 1, color: "#8b9096" }
+};
+// Metallic monochrome + rose tones for differentiating stages (no rainbow).
+const STAGE_COLORS = ["#d9dbe0", "#e0b3a4", "#a6a9b1", "#c99a8c", "#8b9096", "#efc7ba", "#bfc2c8", "#b7826f"];
+
+/* --------------------------- Data: library + parser --------------------------- */
+const Data = {
+  /* Real EDM festivals & tours on their real recurring calendar slots (Sep 2026 – 2027).
+     Stage names & host cities are real; set times/lineups are representative & editable. */
+  library: {
+    festivals: [
+      {
+        id: "ade-2026", name: "Amsterdam Dance Event", city: "Amsterdam, NL", dates: "Oct 15–17, 2026", start: "2026-10-15", genre: "Techno · House",
+        stages: ["Shelter", "Warehouse Elementenstraat", "Melkweg"], walkDefault: 15,
+        transit: { "Shelter||Warehouse Elementenstraat": 18, "Shelter||Melkweg": 20, "Warehouse Elementenstraat||Melkweg": 22 },
+        sets: [
+          { day: 1, stage: "Shelter", start: "23:00", end: "00:30", artist: "Charlotte de Witte" },
+          { day: 1, stage: "Shelter", start: "00:30", end: "02:00", artist: "Amelie Lens" },
+          { day: 1, stage: "Shelter", start: "02:00", end: "04:00", artist: "Adam Beyer" },
+          { day: 1, stage: "Warehouse Elementenstraat", start: "23:30", end: "01:00", artist: "Nina Kraviz" },
+          { day: 1, stage: "Warehouse Elementenstraat", start: "01:00", end: "03:00", artist: "Richie Hawtin" },
+          { day: 1, stage: "Melkweg", start: "23:00", end: "00:30", artist: "Peggy Gou" },
+          { day: 1, stage: "Melkweg", start: "00:30", end: "02:00", artist: "Jamie Jones" }
+        ]
+      },
+      {
+        id: "edc-orlando-2026", name: "EDC Orlando", city: "Orlando, FL", dates: "Nov 13–15, 2026", start: "2026-11-13", genre: "Mainstage · Bass · House",
+        stages: ["kineticFIELD", "circuitGROUNDS", "bassPOD", "neonGARDEN"], walkDefault: 9,
+        transit: { "kineticFIELD||circuitGROUNDS": 7, "kineticFIELD||bassPOD": 12, "kineticFIELD||neonGARDEN": 10, "circuitGROUNDS||bassPOD": 8, "circuitGROUNDS||neonGARDEN": 9, "bassPOD||neonGARDEN": 11 },
+        sets: [
+          { day: 1, stage: "kineticFIELD", start: "21:00", end: "22:00", artist: "Alesso" },
+          { day: 1, stage: "kineticFIELD", start: "22:15", end: "23:30", artist: "Martin Garrix" },
+          { day: 1, stage: "kineticFIELD", start: "23:45", end: "01:15", artist: "Swedish House Mafia" },
+          { day: 1, stage: "circuitGROUNDS", start: "21:30", end: "22:45", artist: "John Summit" },
+          { day: 1, stage: "circuitGROUNDS", start: "23:00", end: "00:15", artist: "Dom Dolla" },
+          { day: 1, stage: "bassPOD", start: "22:00", end: "23:00", artist: "Subtronics" },
+          { day: 1, stage: "bassPOD", start: "23:15", end: "00:30", artist: "Excision" },
+          { day: 1, stage: "neonGARDEN", start: "22:30", end: "00:00", artist: "Charlotte de Witte" }
+        ]
+      },
+      {
+        id: "dreamstate-2026", name: "Dreamstate SoCal", city: "San Bernardino, CA", dates: "Nov 21–22, 2026", start: "2026-11-21", genre: "Trance",
+        stages: ["The Dream", "Above", "Beyond"], walkDefault: 8,
+        transit: { "The Dream||Above": 7, "The Dream||Beyond": 10, "Above||Beyond": 6 },
+        sets: [
+          { day: 1, stage: "The Dream", start: "20:30", end: "22:00", artist: "Aly & Fila" },
+          { day: 1, stage: "The Dream", start: "22:00", end: "23:30", artist: "Armin van Buuren" },
+          { day: 1, stage: "The Dream", start: "23:30", end: "01:00", artist: "Above & Beyond" },
+          { day: 1, stage: "Above", start: "21:00", end: "22:30", artist: "Ferry Corsten" },
+          { day: 1, stage: "Above", start: "22:30", end: "00:00", artist: "Paul van Dyk" },
+          { day: 1, stage: "Beyond", start: "21:30", end: "23:00", artist: "Seven Lions" },
+          { day: 1, stage: "Beyond", start: "23:00", end: "00:30", artist: "Gareth Emery" }
+        ]
+      },
+      {
+        id: "countdown-2026", name: "Countdown NYE", city: "San Bernardino, CA", dates: "Dec 31, 2026", start: "2026-12-31", genre: "Mainstage · House · Bass",
+        stages: ["kineticFIELD", "circuitGROUNDS", "bassPOD"], walkDefault: 9,
+        transit: { "kineticFIELD||circuitGROUNDS": 8, "kineticFIELD||bassPOD": 12, "circuitGROUNDS||bassPOD": 9 },
+        sets: [
+          { day: 1, stage: "kineticFIELD", start: "22:00", end: "23:15", artist: "Zedd" },
+          { day: 1, stage: "kineticFIELD", start: "23:30", end: "01:00", artist: "Kaskade" },
+          { day: 1, stage: "circuitGROUNDS", start: "22:30", end: "23:45", artist: "Fisher" },
+          { day: 1, stage: "circuitGROUNDS", start: "00:00", end: "01:30", artist: "Chris Lake" },
+          { day: 1, stage: "bassPOD", start: "23:00", end: "00:15", artist: "Rezz" },
+          { day: 1, stage: "bassPOD", start: "00:15", end: "01:30", artist: "Zeds Dead" }
+        ]
+      },
+      {
+        id: "ultra-2027", name: "Ultra Music Festival", city: "Miami, FL", dates: "Mar 26–28, 2027", start: "2027-03-26", genre: "Mainstage · Techno · Trance",
+        stages: ["Mainstage", "RESISTANCE Megastructure", "Worldwide", "A State of Trance"], walkDefault: 12,
+        transit: { "Mainstage||RESISTANCE Megastructure": 14, "Mainstage||Worldwide": 9, "Mainstage||A State of Trance": 16, "RESISTANCE Megastructure||Worldwide": 12, "RESISTANCE Megastructure||A State of Trance": 10, "Worldwide||A State of Trance": 13 },
+        sets: [
+          { day: 1, stage: "Mainstage", start: "20:00", end: "21:00", artist: "Afrojack" },
+          { day: 1, stage: "Mainstage", start: "21:15", end: "22:30", artist: "David Guetta" },
+          { day: 1, stage: "Mainstage", start: "22:45", end: "00:00", artist: "Martin Garrix" },
+          { day: 1, stage: "RESISTANCE Megastructure", start: "20:30", end: "22:00", artist: "Adam Beyer" },
+          { day: 1, stage: "RESISTANCE Megastructure", start: "22:00", end: "23:30", artist: "Charlotte de Witte" },
+          { day: 1, stage: "RESISTANCE Megastructure", start: "23:30", end: "01:00", artist: "Carl Cox" },
+          { day: 1, stage: "Worldwide", start: "21:00", end: "22:15", artist: "Dom Dolla" },
+          { day: 1, stage: "Worldwide", start: "22:30", end: "23:45", artist: "John Summit" },
+          { day: 1, stage: "A State of Trance", start: "21:30", end: "23:00", artist: "Armin van Buuren" },
+          { day: 1, stage: "A State of Trance", start: "23:00", end: "00:30", artist: "Cosmic Gate" }
+        ]
+      },
+      {
+        id: "dgtl-2027", name: "DGTL Amsterdam", city: "Amsterdam, NL", dates: "Apr 3–4, 2027", start: "2027-04-03", genre: "Techno · House",
+        stages: ["MODAR", "GAIA", "VAULT"], walkDefault: 8,
+        transit: { "MODAR||GAIA": 7, "MODAR||VAULT": 10, "GAIA||VAULT": 6 },
+        sets: [
+          { day: 1, stage: "MODAR", start: "16:00", end: "17:30", artist: "ANOTR" },
+          { day: 1, stage: "MODAR", start: "17:30", end: "19:00", artist: "Job Jobse" },
+          { day: 1, stage: "MODAR", start: "19:00", end: "21:00", artist: "Tale of Us" },
+          { day: 1, stage: "GAIA", start: "16:30", end: "18:00", artist: "Honey Dijon" },
+          { day: 1, stage: "GAIA", start: "18:00", end: "20:00", artist: "Black Coffee" },
+          { day: 1, stage: "VAULT", start: "17:00", end: "18:30", artist: "FJAAK" },
+          { day: 1, stage: "VAULT", start: "18:30", end: "20:30", artist: "I Hate Models" }
+        ]
+      },
+      {
+        id: "edc-lv-2027", name: "EDC Las Vegas", city: "Las Vegas, NV", dates: "May 15–17, 2027", start: "2027-05-15", genre: "Mainstage · Techno · Bass",
+        stages: ["kineticFIELD", "cosmicMEADOW", "circuitGROUNDS", "bassPOD", "neonGARDEN", "wasteLAND"], walkDefault: 12,
+        transit: { "kineticFIELD||cosmicMEADOW": 10, "kineticFIELD||circuitGROUNDS": 9, "kineticFIELD||bassPOD": 16, "kineticFIELD||neonGARDEN": 14, "kineticFIELD||wasteLAND": 18, "cosmicMEADOW||circuitGROUNDS": 8, "cosmicMEADOW||bassPOD": 13, "circuitGROUNDS||neonGARDEN": 11, "bassPOD||wasteLAND": 9, "neonGARDEN||wasteLAND": 10 },
+        sets: [
+          { day: 1, stage: "kineticFIELD", start: "22:00", end: "23:15", artist: "Tiësto" },
+          { day: 1, stage: "kineticFIELD", start: "23:30", end: "01:00", artist: "Swedish House Mafia" },
+          { day: 1, stage: "kineticFIELD", start: "01:15", end: "02:45", artist: "Illenium" },
+          { day: 1, stage: "cosmicMEADOW", start: "22:30", end: "23:45", artist: "Dom Dolla" },
+          { day: 1, stage: "cosmicMEADOW", start: "00:00", end: "01:30", artist: "Gryffin" },
+          { day: 1, stage: "circuitGROUNDS", start: "23:00", end: "00:30", artist: "Eric Prydz" },
+          { day: 1, stage: "circuitGROUNDS", start: "00:30", end: "02:00", artist: "deadmau5" },
+          { day: 1, stage: "bassPOD", start: "23:15", end: "00:30", artist: "Subtronics" },
+          { day: 1, stage: "bassPOD", start: "00:45", end: "02:00", artist: "Excision" },
+          { day: 1, stage: "neonGARDEN", start: "23:00", end: "00:30", artist: "Amelie Lens" },
+          { day: 1, stage: "neonGARDEN", start: "00:30", end: "02:00", artist: "Charlotte de Witte" },
+          { day: 1, stage: "wasteLAND", start: "23:30", end: "01:00", artist: "Svdden Death" },
+          { day: 2, stage: "kineticFIELD", start: "22:00", end: "23:30", artist: "Alesso" },
+          { day: 2, stage: "kineticFIELD", start: "23:45", end: "01:15", artist: "David Guetta" },
+          { day: 2, stage: "cosmicMEADOW", start: "23:00", end: "00:30", artist: "ODESZA" },
+          { day: 2, stage: "circuitGROUNDS", start: "23:30", end: "01:00", artist: "Anyma" },
+          { day: 2, stage: "bassPOD", start: "23:00", end: "00:15", artist: "Zeds Dead" },
+          { day: 2, stage: "neonGARDEN", start: "23:30", end: "01:00", artist: "Boris Brejcha" }
+        ]
+      },
+      {
+        id: "movement-2027", name: "Movement Detroit", city: "Detroit, MI", dates: "May 22–24, 2027", start: "2027-05-22", genre: "Techno",
+        stages: ["Movement", "Pyramid", "Underground", "Waterfront"], walkDefault: 9,
+        transit: { "Movement||Pyramid": 8, "Movement||Underground": 11, "Movement||Waterfront": 7, "Pyramid||Underground": 9, "Pyramid||Waterfront": 10, "Underground||Waterfront": 12 },
+        sets: [
+          { day: 1, stage: "Movement", start: "18:00", end: "19:30", artist: "Kevin Saunderson" },
+          { day: 1, stage: "Movement", start: "19:30", end: "21:00", artist: "Carl Craig" },
+          { day: 1, stage: "Movement", start: "21:00", end: "22:30", artist: "Jeff Mills" },
+          { day: 1, stage: "Pyramid", start: "18:30", end: "20:00", artist: "Maceo Plex" },
+          { day: 1, stage: "Pyramid", start: "20:00", end: "21:30", artist: "Loco Dice" },
+          { day: 1, stage: "Underground", start: "19:00", end: "20:30", artist: "DVS1" },
+          { day: 1, stage: "Underground", start: "20:30", end: "22:00", artist: "Robert Hood" },
+          { day: 1, stage: "Waterfront", start: "19:30", end: "21:00", artist: "Seth Troxler" }
+        ]
+      },
+      {
+        id: "defqon-2027", name: "Defqon.1", city: "Biddinghuizen, NL", dates: "Jun 25–27, 2027", start: "2027-06-25", genre: "Hardstyle · Hardcore",
+        stages: ["RED", "BLACK", "UV", "GOLD"], walkDefault: 11,
+        transit: { "RED||BLACK": 10, "RED||UV": 13, "RED||GOLD": 9, "BLACK||UV": 11, "BLACK||GOLD": 12, "UV||GOLD": 8 },
+        sets: [
+          { day: 1, stage: "RED", start: "20:00", end: "21:15", artist: "Headhunterz" },
+          { day: 1, stage: "RED", start: "21:15", end: "22:30", artist: "D-Block & S-te-Fan" },
+          { day: 1, stage: "RED", start: "22:30", end: "00:00", artist: "Sub Zero Project" },
+          { day: 1, stage: "BLACK", start: "20:30", end: "22:00", artist: "Angerfist" },
+          { day: 1, stage: "BLACK", start: "22:00", end: "23:30", artist: "Miss K8" },
+          { day: 1, stage: "UV", start: "21:00", end: "22:30", artist: "Warface" },
+          { day: 1, stage: "GOLD", start: "21:30", end: "23:00", artist: "Da Tweekaz" }
+        ]
+      },
+      {
+        id: "tomorrowland-2027", name: "Tomorrowland", city: "Boom, BE", dates: "Jul 23–25, 2027", start: "2027-07-23", genre: "Mainstage · Techno · Melodic",
+        stages: ["Mainstage", "Freedom", "Cave", "Core", "Atmosphere"], walkDefault: 13,
+        transit: { "Mainstage||Freedom": 12, "Mainstage||Cave": 16, "Mainstage||Core": 18, "Mainstage||Atmosphere": 14, "Freedom||Cave": 10, "Freedom||Core": 13, "Cave||Core": 9, "Core||Atmosphere": 11, "Cave||Atmosphere": 12 },
+        sets: [
+          { day: 1, stage: "Mainstage", start: "20:00", end: "21:00", artist: "Lost Frequencies" },
+          { day: 1, stage: "Mainstage", start: "21:15", end: "22:30", artist: "Dimitri Vegas & Like Mike" },
+          { day: 1, stage: "Mainstage", start: "22:45", end: "00:00", artist: "Martin Garrix" },
+          { day: 1, stage: "Freedom", start: "20:30", end: "22:00", artist: "Hardwell" },
+          { day: 1, stage: "Freedom", start: "22:00", end: "23:30", artist: "Alesso" },
+          { day: 1, stage: "Cave", start: "21:00", end: "22:30", artist: "Amelie Lens" },
+          { day: 1, stage: "Cave", start: "22:30", end: "00:00", artist: "Charlotte de Witte" },
+          { day: 1, stage: "Core", start: "21:30", end: "23:00", artist: "Tale of Us" },
+          { day: 1, stage: "Core", start: "23:00", end: "00:30", artist: "Stephan Bodzin" },
+          { day: 1, stage: "Atmosphere", start: "22:00", end: "23:30", artist: "Ben Böhmer" },
+          { day: 2, stage: "Mainstage", start: "21:00", end: "22:15", artist: "David Guetta" },
+          { day: 2, stage: "Mainstage", start: "22:30", end: "00:00", artist: "Swedish House Mafia" },
+          { day: 2, stage: "Freedom", start: "21:30", end: "23:00", artist: "Armin van Buuren" },
+          { day: 2, stage: "Cave", start: "22:00", end: "23:30", artist: "ARTBAT" },
+          { day: 2, stage: "Core", start: "22:30", end: "00:00", artist: "Solomun" }
+        ]
+      },
+      {
+        id: "creamfields-2027", name: "Creamfields", city: "Daresbury, UK", dates: "Aug 26–29, 2027", start: "2027-08-26", genre: "Mainstage · Techno · House",
+        stages: ["North", "Steel Yard", "ARC", "Horizon"], walkDefault: 11,
+        transit: { "North||Steel Yard": 10, "North||ARC": 13, "North||Horizon": 12, "Steel Yard||ARC": 9, "Steel Yard||Horizon": 11, "ARC||Horizon": 8 },
+        sets: [
+          { day: 1, stage: "North", start: "20:00", end: "21:15", artist: "Calvin Harris" },
+          { day: 1, stage: "North", start: "21:30", end: "23:00", artist: "Swedish House Mafia" },
+          { day: 1, stage: "Steel Yard", start: "20:30", end: "22:00", artist: "Eric Prydz" },
+          { day: 1, stage: "Steel Yard", start: "22:00", end: "23:30", artist: "Adam Beyer" },
+          { day: 1, stage: "ARC", start: "21:00", end: "22:30", artist: "CamelPhat" },
+          { day: 1, stage: "ARC", start: "22:30", end: "00:00", artist: "Solomun" },
+          { day: 1, stage: "Horizon", start: "21:30", end: "23:00", artist: "Fred again.." }
+        ]
+      },
+      {
+        id: "electric-zoo-2027", name: "Electric Zoo", city: "New York, NY", dates: "Sep 3–5, 2027", start: "2027-09-03", genre: "Mainstage · House · Melodic",
+        stages: ["Main Stage", "Riverside", "Sunday School"], walkDefault: 9,
+        transit: { "Main Stage||Riverside": 8, "Main Stage||Sunday School": 11, "Riverside||Sunday School": 9 },
+        sets: [
+          { day: 1, stage: "Main Stage", start: "19:00", end: "20:15", artist: "Kaskade" },
+          { day: 1, stage: "Main Stage", start: "20:30", end: "22:00", artist: "Above & Beyond" },
+          { day: 1, stage: "Riverside", start: "19:30", end: "21:00", artist: "John Summit" },
+          { day: 1, stage: "Riverside", start: "21:00", end: "22:30", artist: "Dom Dolla" },
+          { day: 1, stage: "Sunday School", start: "20:00", end: "21:30", artist: "Nora En Pure" },
+          { day: 1, stage: "Sunday School", start: "21:30", end: "23:00", artist: "Lane 8" }
+        ]
+      },
+      {
+        id: "ultra-japan-2026", name: "Ultra Japan", city: "Tokyo, JP", dates: "Sep 19–20, 2026", start: "2026-09-19", genre: "Mainstage · Techno · House",
+        stages: ["Ultra Main Stage", "RESISTANCE", "Ultra Park Stage"], walkDefault: 8,
+        transit: { "RESISTANCE||Ultra Main Stage": 9, "Ultra Main Stage||Ultra Park Stage": 7, "RESISTANCE||Ultra Park Stage": 8 },
+        sets: [
+          { day: 1, stage: "Ultra Main Stage", start: "15:00", end: "16:00", artist: "Nicky Romero" },
+          { day: 1, stage: "Ultra Main Stage", start: "16:15", end: "17:30", artist: "Alesso" },
+          { day: 1, stage: "Ultra Main Stage", start: "17:45", end: "19:00", artist: "Afrojack" },
+          { day: 1, stage: "Ultra Main Stage", start: "19:15", end: "20:45", artist: "Martin Garrix" },
+          { day: 1, stage: "RESISTANCE", start: "15:30", end: "17:00", artist: "Kölsch" },
+          { day: 1, stage: "RESISTANCE", start: "17:00", end: "18:30", artist: "Adam Beyer" },
+          { day: 1, stage: "RESISTANCE", start: "18:30", end: "20:30", artist: "Carl Cox" },
+          { day: 1, stage: "Ultra Park Stage", start: "16:00", end: "17:15", artist: "Honey Dijon" },
+          { day: 1, stage: "Ultra Park Stage", start: "17:30", end: "19:00", artist: "Peggy Gou" },
+          { day: 1, stage: "Ultra Park Stage", start: "19:00", end: "20:30", artist: "Fisher" }
+        ]
+      },
+      {
+        id: "nocturnal-2026", name: "Nocturnal Wonderland", city: "San Bernardino, CA", dates: "Sep 18–19, 2026", start: "2026-09-18", genre: "Bass · House · Techno",
+        stages: ["Labyrinth", "Sunken Garden", "Wolves' Den"], walkDefault: 9,
+        transit: { "Labyrinth||Sunken Garden": 8, "Labyrinth||Wolves' Den": 12, "Sunken Garden||Wolves' Den": 9 },
+        sets: [
+          { day: 1, stage: "Labyrinth", start: "20:00", end: "21:15", artist: "Slander" },
+          { day: 1, stage: "Labyrinth", start: "21:30", end: "22:45", artist: "Zeds Dead" },
+          { day: 1, stage: "Labyrinth", start: "23:00", end: "00:30", artist: "Excision" },
+          { day: 1, stage: "Sunken Garden", start: "20:30", end: "22:00", artist: "Chris Lake" },
+          { day: 1, stage: "Sunken Garden", start: "22:00", end: "23:30", artist: "Green Velvet" },
+          { day: 1, stage: "Sunken Garden", start: "23:30", end: "01:00", artist: "Gorgon City" },
+          { day: 1, stage: "Wolves' Den", start: "21:00", end: "22:30", artist: "Sara Landry" },
+          { day: 1, stage: "Wolves' Den", start: "22:30", end: "00:00", artist: "I Hate Models" }
+        ]
+      },
+      {
+        id: "portola-2026", name: "Portola Festival", city: "San Francisco, CA", dates: "Sep 26–27, 2026", start: "2026-09-26", genre: "Electronic · Live · Techno",
+        stages: ["Pier Stage", "Ship Stage", "Warehouse", "Crane Stage"], walkDefault: 8,
+        transit: { "Pier Stage||Ship Stage": 7, "Pier Stage||Warehouse": 10, "Crane Stage||Pier Stage": 9, "Ship Stage||Warehouse": 8, "Crane Stage||Ship Stage": 6, "Crane Stage||Warehouse": 9 },
+        sets: [
+          { day: 1, stage: "Pier Stage", start: "17:30", end: "18:30", artist: "Jungle" },
+          { day: 1, stage: "Pier Stage", start: "19:00", end: "20:15", artist: "Kaytranada" },
+          { day: 1, stage: "Pier Stage", start: "20:45", end: "22:00", artist: "Disclosure" },
+          { day: 1, stage: "Ship Stage", start: "18:00", end: "19:00", artist: "Overmono" },
+          { day: 1, stage: "Ship Stage", start: "19:30", end: "20:45", artist: "Four Tet" },
+          { day: 1, stage: "Ship Stage", start: "21:00", end: "22:30", artist: "Fred again.." },
+          { day: 1, stage: "Warehouse", start: "18:30", end: "20:00", artist: "Helena Hauff" },
+          { day: 1, stage: "Warehouse", start: "20:00", end: "21:30", artist: "Ben Klock" },
+          { day: 1, stage: "Crane Stage", start: "19:00", end: "20:30", artist: "Peggy Gou" },
+          { day: 1, stage: "Crane Stage", start: "20:30", end: "22:00", artist: "Jamie xx" }
+        ]
+      },
+      {
+        id: "escape-2026", name: "Escape Halloween", city: "San Bernardino, CA", dates: "Oct 30–31, 2026", start: "2026-10-30", genre: "Bass · House · Techno",
+        stages: ["Ghouls' Graveyard", "Slaughterhouse", "Cannibals' Tea Party", "Feeding Grounds"], walkDefault: 10,
+        transit: { "Ghouls' Graveyard||Slaughterhouse": 8, "Cannibals' Tea Party||Ghouls' Graveyard": 11, "Feeding Grounds||Ghouls' Graveyard": 13, "Cannibals' Tea Party||Slaughterhouse": 9, "Feeding Grounds||Slaughterhouse": 10, "Cannibals' Tea Party||Feeding Grounds": 8 },
+        sets: [
+          { day: 1, stage: "Ghouls' Graveyard", start: "20:00", end: "21:15", artist: "Alison Wonderland" },
+          { day: 1, stage: "Ghouls' Graveyard", start: "21:30", end: "22:45", artist: "Illenium" },
+          { day: 1, stage: "Ghouls' Graveyard", start: "23:00", end: "00:30", artist: "Marshmello" },
+          { day: 1, stage: "Slaughterhouse", start: "20:30", end: "22:00", artist: "Kai Wachi" },
+          { day: 1, stage: "Slaughterhouse", start: "22:00", end: "23:30", artist: "Svdden Death" },
+          { day: 1, stage: "Slaughterhouse", start: "23:30", end: "01:00", artist: "Subtronics" },
+          { day: 1, stage: "Cannibals' Tea Party", start: "21:00", end: "22:30", artist: "Michael Bibi" },
+          { day: 1, stage: "Cannibals' Tea Party", start: "22:30", end: "00:00", artist: "Fisher" },
+          { day: 1, stage: "Feeding Grounds", start: "21:30", end: "23:00", artist: "Indira Paganotto" },
+          { day: 1, stage: "Feeding Grounds", start: "23:00", end: "00:30", artist: "Amelie Lens" }
+        ]
+      },
+      {
+        id: "wonderfruit-2026", name: "Wonderfruit", city: "Pattaya, TH", dates: "Dec 10–14, 2026", start: "2026-12-10", genre: "House · Techno · Live",
+        stages: ["The Quarry", "Polygon", "Solar Stage", "Ziggurat"], walkDefault: 10,
+        transit: { "Polygon||The Quarry": 12, "Solar Stage||The Quarry": 9, "The Quarry||Ziggurat": 11, "Polygon||Solar Stage": 10, "Polygon||Ziggurat": 8, "Solar Stage||Ziggurat": 9 },
+        sets: [
+          { day: 1, stage: "The Quarry", start: "20:00", end: "21:30", artist: "Sasha" },
+          { day: 1, stage: "The Quarry", start: "21:30", end: "23:00", artist: "Âme" },
+          { day: 1, stage: "The Quarry", start: "23:00", end: "01:00", artist: "Dixon" },
+          { day: 1, stage: "Polygon", start: "20:30", end: "22:00", artist: "Yotto" },
+          { day: 1, stage: "Polygon", start: "22:00", end: "23:30", artist: "Lane 8" },
+          { day: 1, stage: "Solar Stage", start: "21:00", end: "22:30", artist: "Bonobo" },
+          { day: 1, stage: "Solar Stage", start: "22:30", end: "00:00", artist: "Jon Hopkins" },
+          { day: 1, stage: "Ziggurat", start: "22:00", end: "00:00", artist: "Seth Troxler" }
+        ]
+      },
+      {
+        id: "dwp-2026", name: "Djakarta Warehouse Project", city: "Jakarta, ID", dates: "Dec 12–13, 2026", start: "2026-12-12", genre: "Mainstage · Techno · Bass",
+        stages: ["Garudha Land", "Cosmic Station", "Neon Jungle"], walkDefault: 9,
+        transit: { "Cosmic Station||Garudha Land": 10, "Garudha Land||Neon Jungle": 8, "Cosmic Station||Neon Jungle": 9 },
+        sets: [
+          { day: 1, stage: "Garudha Land", start: "19:00", end: "20:00", artist: "Vintage Culture" },
+          { day: 1, stage: "Garudha Land", start: "20:15", end: "21:30", artist: "Alan Walker" },
+          { day: 1, stage: "Garudha Land", start: "21:45", end: "23:00", artist: "Tiësto" },
+          { day: 1, stage: "Garudha Land", start: "23:15", end: "00:45", artist: "Martin Garrix" },
+          { day: 1, stage: "Cosmic Station", start: "19:30", end: "21:00", artist: "Boris Brejcha" },
+          { day: 1, stage: "Cosmic Station", start: "21:00", end: "22:30", artist: "Anyma" },
+          { day: 1, stage: "Cosmic Station", start: "22:30", end: "00:00", artist: "Charlotte de Witte" },
+          { day: 1, stage: "Neon Jungle", start: "20:00", end: "21:15", artist: "Peekaboo" },
+          { day: 1, stage: "Neon Jungle", start: "21:30", end: "22:45", artist: "Zeds Dead" },
+          { day: 1, stage: "Neon Jungle", start: "23:00", end: "00:15", artist: "Excision" }
+        ]
+      },
+      {
+        id: "asot-2027", name: "A State of Trance Festival", city: "Utrecht, NL", dates: "Feb 20, 2027", start: "2027-02-20", genre: "Trance",
+        stages: ["Mainstage", "Who's Afraid Of 138?!", "Progressive"], walkDefault: 6,
+        transit: { "Mainstage||Who's Afraid Of 138?!": 6, "Mainstage||Progressive": 7, "Progressive||Who's Afraid Of 138?!": 5 },
+        sets: [
+          { day: 1, stage: "Mainstage", start: "20:00", end: "21:00", artist: "Andrew Rayel" },
+          { day: 1, stage: "Mainstage", start: "21:00", end: "22:30", artist: "Armin van Buuren" },
+          { day: 1, stage: "Mainstage", start: "22:30", end: "23:45", artist: "Ferry Corsten" },
+          { day: 1, stage: "Mainstage", start: "23:45", end: "01:00", artist: "Vini Vici" },
+          { day: 1, stage: "Who's Afraid Of 138?!", start: "20:30", end: "22:00", artist: "Aly & Fila" },
+          { day: 1, stage: "Who's Afraid Of 138?!", start: "22:00", end: "23:30", artist: "Giuseppe Ottaviani" },
+          { day: 1, stage: "Who's Afraid Of 138?!", start: "23:30", end: "01:00", artist: "MaRLo" },
+          { day: 1, stage: "Progressive", start: "21:00", end: "22:30", artist: "Andrew Bayer" },
+          { day: 1, stage: "Progressive", start: "22:30", end: "00:00", artist: "Ilan Bluestone" }
+        ]
+      },
+      {
+        id: "edc-mexico-2027", name: "EDC Mexico", city: "Mexico City, MX", dates: "Feb 26–28, 2027", start: "2027-02-26", genre: "Mainstage · Techno · Bass",
+        stages: ["kineticFIELD", "circuitGROUNDS", "wasteLAND", "neonGARDEN"], walkDefault: 10,
+        transit: { "circuitGROUNDS||kineticFIELD": 8, "kineticFIELD||wasteLAND": 14, "kineticFIELD||neonGARDEN": 11, "circuitGROUNDS||wasteLAND": 10, "circuitGROUNDS||neonGARDEN": 9, "neonGARDEN||wasteLAND": 12 },
+        sets: [
+          { day: 1, stage: "kineticFIELD", start: "20:00", end: "21:15", artist: "Afrojack" },
+          { day: 1, stage: "kineticFIELD", start: "21:30", end: "22:45", artist: "Alesso" },
+          { day: 1, stage: "kineticFIELD", start: "23:00", end: "00:30", artist: "David Guetta" },
+          { day: 1, stage: "circuitGROUNDS", start: "20:30", end: "22:00", artist: "Eric Prydz" },
+          { day: 1, stage: "circuitGROUNDS", start: "22:00", end: "23:30", artist: "Kaskade" },
+          { day: 1, stage: "wasteLAND", start: "21:00", end: "22:15", artist: "Wooli" },
+          { day: 1, stage: "wasteLAND", start: "22:30", end: "23:45", artist: "Subtronics" },
+          { day: 1, stage: "neonGARDEN", start: "21:30", end: "23:00", artist: "Marco Carola" },
+          { day: 1, stage: "neonGARDEN", start: "23:00", end: "00:30", artist: "Amelie Lens" }
+        ]
+      },
+      {
+        id: "crssd-2027", name: "CRSSD Festival", city: "San Diego, CA", dates: "Mar 6–7, 2027", start: "2027-03-06", genre: "House · Techno",
+        stages: ["Ocean View", "The Palms", "City Steps"], walkDefault: 8,
+        transit: { "Ocean View||The Palms": 7, "City Steps||Ocean View": 10, "City Steps||The Palms": 8 },
+        sets: [
+          { day: 1, stage: "Ocean View", start: "17:00", end: "18:00", artist: "Eli & Fur" },
+          { day: 1, stage: "Ocean View", start: "18:15", end: "19:30", artist: "Bicep" },
+          { day: 1, stage: "Ocean View", start: "19:45", end: "21:30", artist: "RÜFÜS DU SOL" },
+          { day: 1, stage: "The Palms", start: "17:30", end: "19:00", artist: "Chris Stussy" },
+          { day: 1, stage: "The Palms", start: "19:00", end: "20:30", artist: "Michael Bibi" },
+          { day: 1, stage: "The Palms", start: "20:30", end: "22:00", artist: "Jamie Jones" },
+          { day: 1, stage: "City Steps", start: "18:00", end: "19:30", artist: "Kobosil" },
+          { day: 1, stage: "City Steps", start: "19:30", end: "21:00", artist: "Reinier Zonneveld" },
+          { day: 1, stage: "City Steps", start: "21:00", end: "22:30", artist: "Adam Beyer" }
+        ]
+      },
+      {
+        id: "beyond-2027", name: "Beyond Wonderland SoCal", city: "San Bernardino, CA", dates: "Mar 19–20, 2027", start: "2027-03-19", genre: "Bass · House · Melodic",
+        stages: ["Queen's Domain", "Upside Down", "Caterpillar's Garden", "Cheshire Woods"], walkDefault: 10,
+        transit: { "Queen's Domain||Upside Down": 9, "Caterpillar's Garden||Queen's Domain": 12, "Cheshire Woods||Queen's Domain": 11, "Caterpillar's Garden||Upside Down": 8, "Cheshire Woods||Upside Down": 10, "Caterpillar's Garden||Cheshire Woods": 7 },
+        sets: [
+          { day: 1, stage: "Queen's Domain", start: "20:00", end: "21:15", artist: "Gryffin" },
+          { day: 1, stage: "Queen's Domain", start: "21:30", end: "22:45", artist: "Illenium" },
+          { day: 1, stage: "Queen's Domain", start: "23:00", end: "00:30", artist: "Zedd" },
+          { day: 1, stage: "Upside Down", start: "20:30", end: "22:00", artist: "Level Up" },
+          { day: 1, stage: "Upside Down", start: "22:00", end: "23:30", artist: "Sullivan King" },
+          { day: 1, stage: "Upside Down", start: "23:30", end: "01:00", artist: "Svdden Death" },
+          { day: 1, stage: "Caterpillar's Garden", start: "21:00", end: "22:30", artist: "Claptone" },
+          { day: 1, stage: "Caterpillar's Garden", start: "22:30", end: "00:00", artist: "Chris Lake" },
+          { day: 1, stage: "Cheshire Woods", start: "21:30", end: "23:00", artist: "Nora En Pure" },
+          { day: 1, stage: "Cheshire Woods", start: "23:00", end: "00:30", artist: "Lane 8" }
+        ]
+      },
+      {
+        id: "tml-winter-2027", name: "Tomorrowland Winter", city: "Alpe d'Huez, FR", dates: "Mar 20–27, 2027", start: "2027-03-20", genre: "Mainstage · Techno · Melodic",
+        stages: ["Mainstage", "The Cage", "Frozen Lotus", "Crystal Garden"], walkDefault: 12,
+        transit: { "Mainstage||The Cage": 10, "Frozen Lotus||Mainstage": 15, "Crystal Garden||Mainstage": 12, "Frozen Lotus||The Cage": 11, "Crystal Garden||The Cage": 9, "Crystal Garden||Frozen Lotus": 13 },
+        sets: [
+          { day: 1, stage: "Mainstage", start: "16:00", end: "17:00", artist: "Lost Frequencies" },
+          { day: 1, stage: "Mainstage", start: "17:15", end: "18:30", artist: "Steve Aoki" },
+          { day: 1, stage: "Mainstage", start: "18:45", end: "20:00", artist: "Dimitri Vegas & Like Mike" },
+          { day: 1, stage: "The Cage", start: "16:30", end: "18:00", artist: "Kölsch" },
+          { day: 1, stage: "The Cage", start: "18:00", end: "19:30", artist: "Joris Voorn" },
+          { day: 1, stage: "Frozen Lotus", start: "17:00", end: "18:30", artist: "Nora En Pure" },
+          { day: 1, stage: "Frozen Lotus", start: "18:30", end: "20:00", artist: "Ben Böhmer" },
+          { day: 1, stage: "Crystal Garden", start: "17:30", end: "19:00", artist: "Sub Zero Project" }
+        ]
+      },
+      {
+        id: "snowbombing-2027", name: "Snowbombing", city: "Mayrhofen, AT", dates: "Apr 5–10, 2027", start: "2027-04-05", genre: "House · Drum & Bass · Disco",
+        stages: ["Forest Stage", "Racket Club", "Arctic Disco"], walkDefault: 12,
+        transit: { "Forest Stage||Racket Club": 14, "Arctic Disco||Forest Stage": 18, "Arctic Disco||Racket Club": 10 },
+        sets: [
+          { day: 1, stage: "Forest Stage", start: "20:00", end: "21:30", artist: "Patrick Topping" },
+          { day: 1, stage: "Forest Stage", start: "21:30", end: "23:00", artist: "Fatboy Slim" },
+          { day: 1, stage: "Racket Club", start: "21:00", end: "22:30", artist: "Hybrid Minds" },
+          { day: 1, stage: "Racket Club", start: "22:30", end: "00:00", artist: "Andy C" },
+          { day: 1, stage: "Arctic Disco", start: "20:30", end: "22:00", artist: "Horse Meat Disco" },
+          { day: 1, stage: "Arctic Disco", start: "22:00", end: "23:30", artist: "Purple Disco Machine" }
+        ]
+      },
+      {
+        id: "coachella-2027", name: "Coachella (electronic tents)", city: "Indio, CA", dates: "Apr 9–11, 2027", start: "2027-04-09", genre: "Electronic · Techno · Live",
+        stages: ["Sahara", "Yuma", "Quasar", "Do LaB"], walkDefault: 12,
+        transit: { "Sahara||Yuma": 10, "Quasar||Sahara": 14, "Do LaB||Sahara": 9, "Quasar||Yuma": 8, "Do LaB||Yuma": 12, "Do LaB||Quasar": 15 },
+        sets: [
+          { day: 1, stage: "Sahara", start: "19:30", end: "20:30", artist: "Dom Dolla" },
+          { day: 1, stage: "Sahara", start: "21:00", end: "22:15", artist: "Flume" },
+          { day: 1, stage: "Sahara", start: "22:45", end: "00:00", artist: "Skrillex" },
+          { day: 1, stage: "Yuma", start: "19:00", end: "20:30", artist: "Bicep" },
+          { day: 1, stage: "Yuma", start: "20:30", end: "22:00", artist: "Charlotte de Witte" },
+          { day: 1, stage: "Yuma", start: "22:00", end: "23:30", artist: "Carl Cox" },
+          { day: 1, stage: "Quasar", start: "20:00", end: "22:00", artist: "Eric Prydz" },
+          { day: 1, stage: "Quasar", start: "22:00", end: "00:00", artist: "Anyma" },
+          { day: 1, stage: "Do LaB", start: "19:30", end: "21:00", artist: "CloZee" },
+          { day: 1, stage: "Do LaB", start: "21:00", end: "22:30", artist: "Tipper" }
+        ]
+      },
+      {
+        id: "time-warp-2027", name: "Time Warp", city: "Mannheim, DE", dates: "Apr 10, 2027", start: "2027-04-10", genre: "Techno",
+        stages: ["Floor 1", "Floor 2", "Floor 3", "Floor 4"], walkDefault: 6,
+        transit: { "Floor 1||Floor 2": 5, "Floor 1||Floor 3": 8, "Floor 1||Floor 4": 10, "Floor 2||Floor 3": 5, "Floor 2||Floor 4": 8, "Floor 3||Floor 4": 5 },
+        sets: [
+          { day: 1, stage: "Floor 1", start: "22:00", end: "23:30", artist: "Dixon" },
+          { day: 1, stage: "Floor 1", start: "23:30", end: "01:00", artist: "Solomun" },
+          { day: 1, stage: "Floor 1", start: "01:00", end: "03:00", artist: "Sven Väth" },
+          { day: 1, stage: "Floor 2", start: "22:30", end: "00:00", artist: "Amelie Lens" },
+          { day: 1, stage: "Floor 2", start: "00:00", end: "02:00", artist: "Adam Beyer" },
+          { day: 1, stage: "Floor 2", start: "02:00", end: "04:00", artist: "Charlotte de Witte" },
+          { day: 1, stage: "Floor 3", start: "23:00", end: "00:30", artist: "Marcel Dettmann" },
+          { day: 1, stage: "Floor 3", start: "00:30", end: "02:30", artist: "Ben Klock" },
+          { day: 1, stage: "Floor 4", start: "23:30", end: "01:00", artist: "Kobosil" },
+          { day: 1, stage: "Floor 4", start: "01:00", end: "03:00", artist: "999999999" }
+        ]
+      },
+      {
+        id: "sonar-2027", name: "Sónar", city: "Barcelona, ES", dates: "Jun 17–19, 2027", start: "2027-06-17", genre: "Electronic · Techno · Experimental",
+        stages: ["SonarClub", "SonarPub", "SonarLab", "SonarPark"], walkDefault: 8,
+        transit: { "SonarClub||SonarPub": 7, "SonarClub||SonarLab": 10, "SonarClub||SonarPark": 9, "SonarLab||SonarPub": 6, "SonarPark||SonarPub": 8, "SonarLab||SonarPark": 7 },
+        sets: [
+          { day: 1, stage: "SonarClub", start: "22:00", end: "23:30", artist: "Jamie xx" },
+          { day: 1, stage: "SonarClub", start: "23:30", end: "01:00", artist: "Four Tet" },
+          { day: 1, stage: "SonarClub", start: "01:00", end: "03:00", artist: "Peggy Gou" },
+          { day: 1, stage: "SonarPub", start: "22:30", end: "00:00", artist: "Charlotte de Witte" },
+          { day: 1, stage: "SonarPub", start: "00:00", end: "02:00", artist: "Amelie Lens" },
+          { day: 1, stage: "SonarLab", start: "23:00", end: "00:30", artist: "Helena Hauff" },
+          { day: 1, stage: "SonarLab", start: "00:30", end: "02:30", artist: "Nina Kraviz" },
+          { day: 1, stage: "SonarPark", start: "23:30", end: "01:00", artist: "Overmono" },
+          { day: 1, stage: "SonarPark", start: "01:00", end: "03:00", artist: "Floating Points" }
+        ]
+      },
+      {
+        id: "electric-forest-2027", name: "Electric Forest", city: "Rothbury, MI", dates: "Jun 24–27, 2027", start: "2027-06-24", genre: "Bass · Live · House",
+        stages: ["Ranch Arena", "Sherwood Court", "Tripolee", "The Observatory"], walkDefault: 12,
+        transit: { "Ranch Arena||Sherwood Court": 12, "Ranch Arena||Tripolee": 9, "Ranch Arena||The Observatory": 15, "Sherwood Court||Tripolee": 8, "Sherwood Court||The Observatory": 10, "The Observatory||Tripolee": 11 },
+        sets: [
+          { day: 1, stage: "Ranch Arena", start: "20:00", end: "21:15", artist: "GRiZ" },
+          { day: 1, stage: "Ranch Arena", start: "21:45", end: "23:00", artist: "ODESZA" },
+          { day: 1, stage: "Ranch Arena", start: "23:30", end: "01:00", artist: "Excision" },
+          { day: 1, stage: "Sherwood Court", start: "20:30", end: "22:00", artist: "Subtronics" },
+          { day: 1, stage: "Sherwood Court", start: "22:00", end: "23:30", artist: "Liquid Stranger" },
+          { day: 1, stage: "Sherwood Court", start: "23:30", end: "01:00", artist: "Zeds Dead" },
+          { day: 1, stage: "Tripolee", start: "21:00", end: "22:30", artist: "John Summit" },
+          { day: 1, stage: "Tripolee", start: "22:30", end: "00:00", artist: "Chris Lake" },
+          { day: 1, stage: "The Observatory", start: "21:30", end: "23:00", artist: "Tipper" },
+          { day: 1, stage: "The Observatory", start: "23:00", end: "00:30", artist: "Of The Trees" }
+        ]
+      },
+      {
+        id: "awakenings-2027", name: "Awakenings Summer Festival", city: "Hilvarenbeek, NL", dates: "Jul 2–4, 2027", start: "2027-07-02", genre: "Techno",
+        stages: ["Area V", "Area W", "Area X", "Area Y"], walkDefault: 10,
+        transit: { "Area V||Area W": 9, "Area V||Area X": 12, "Area V||Area Y": 15, "Area W||Area X": 8, "Area W||Area Y": 11, "Area X||Area Y": 9 },
+        sets: [
+          { day: 1, stage: "Area V", start: "14:00", end: "15:30", artist: "Enrico Sangiuliano" },
+          { day: 1, stage: "Area V", start: "15:30", end: "17:00", artist: "Reinier Zonneveld" },
+          { day: 1, stage: "Area V", start: "17:00", end: "19:00", artist: "Amelie Lens" },
+          { day: 1, stage: "Area V", start: "19:00", end: "21:00", artist: "Adam Beyer" },
+          { day: 1, stage: "Area V", start: "21:00", end: "23:00", artist: "Charlotte de Witte" },
+          { day: 1, stage: "Area W", start: "14:30", end: "16:00", artist: "Joris Voorn" },
+          { day: 1, stage: "Area W", start: "16:00", end: "17:30", artist: "Kölsch" },
+          { day: 1, stage: "Area W", start: "17:30", end: "19:30", artist: "Maceo Plex" },
+          { day: 1, stage: "Area W", start: "19:30", end: "21:30", artist: "Tale of Us" },
+          { day: 1, stage: "Area X", start: "15:00", end: "16:30", artist: "Indira Paganotto" },
+          { day: 1, stage: "Area X", start: "16:30", end: "18:00", artist: "Klangkuenstler" },
+          { day: 1, stage: "Area X", start: "18:00", end: "20:00", artist: "I Hate Models" },
+          { day: 1, stage: "Area X", start: "20:00", end: "22:00", artist: "999999999" },
+          { day: 1, stage: "Area Y", start: "16:00", end: "17:30", artist: "Dax J" },
+          { day: 1, stage: "Area Y", start: "17:30", end: "19:30", artist: "Ben Klock" },
+          { day: 1, stage: "Area Y", start: "19:30", end: "21:30", artist: "Marcel Dettmann" }
+        ]
+      },
+      {
+        id: "kappa-2027", name: "Kappa FuturFestival", city: "Turin, IT", dates: "Jul 3–4, 2027", start: "2027-07-03", genre: "Techno · House",
+        stages: ["Jäger Stage", "Kappa Stage", "Futur Stage"], walkDefault: 8,
+        transit: { "Jäger Stage||Kappa Stage": 7, "Futur Stage||Jäger Stage": 10, "Futur Stage||Kappa Stage": 8 },
+        sets: [
+          { day: 1, stage: "Jäger Stage", start: "16:00", end: "17:30", artist: "The Martinez Brothers" },
+          { day: 1, stage: "Jäger Stage", start: "17:30", end: "19:00", artist: "Jamie Jones" },
+          { day: 1, stage: "Jäger Stage", start: "19:00", end: "21:00", artist: "Marco Carola" },
+          { day: 1, stage: "Jäger Stage", start: "21:00", end: "23:00", artist: "Carl Cox" },
+          { day: 1, stage: "Kappa Stage", start: "16:30", end: "18:00", artist: "Kölsch" },
+          { day: 1, stage: "Kappa Stage", start: "18:00", end: "19:30", artist: "Joris Voorn" },
+          { day: 1, stage: "Kappa Stage", start: "19:30", end: "21:30", artist: "Adam Beyer" },
+          { day: 1, stage: "Kappa Stage", start: "21:30", end: "23:30", artist: "Charlotte de Witte" },
+          { day: 1, stage: "Futur Stage", start: "17:00", end: "18:30", artist: "Chris Stussy" },
+          { day: 1, stage: "Futur Stage", start: "18:30", end: "20:00", artist: "Seth Troxler" },
+          { day: 1, stage: "Futur Stage", start: "20:00", end: "22:00", artist: "Black Coffee" }
+        ]
+      },
+      {
+        id: "exit-2027", name: "EXIT Festival", city: "Novi Sad, RS", dates: "Jul 8–11, 2027", start: "2027-07-08", genre: "Techno · Mainstage · Mixed",
+        stages: ["mts Dance Arena", "Main Stage", "No Sleep Novi Sad"], walkDefault: 10,
+        transit: { "Main Stage||mts Dance Arena": 12, "No Sleep Novi Sad||mts Dance Arena": 8, "Main Stage||No Sleep Novi Sad": 11 },
+        sets: [
+          { day: 1, stage: "mts Dance Arena", start: "23:00", end: "00:30", artist: "Indira Paganotto" },
+          { day: 1, stage: "mts Dance Arena", start: "00:30", end: "02:00", artist: "Amelie Lens" },
+          { day: 1, stage: "mts Dance Arena", start: "02:00", end: "04:00", artist: "Carl Cox" },
+          { day: 1, stage: "Main Stage", start: "22:00", end: "23:15", artist: "Kaskade" },
+          { day: 1, stage: "Main Stage", start: "23:30", end: "01:00", artist: "Skrillex" },
+          { day: 1, stage: "No Sleep Novi Sad", start: "23:30", end: "01:00", artist: "Trym" },
+          { day: 1, stage: "No Sleep Novi Sad", start: "01:00", end: "03:00", artist: "Sara Landry" }
+        ]
+      },
+      {
+        id: "ultra-europe-2027", name: "Ultra Europe", city: "Split, HR", dates: "Jul 9–11, 2027", start: "2027-07-09", genre: "Mainstage · Techno · House",
+        stages: ["Mainstage", "RESISTANCE", "Ultra Worldwide"], walkDefault: 9,
+        transit: { "Mainstage||RESISTANCE": 10, "Mainstage||Ultra Worldwide": 8, "RESISTANCE||Ultra Worldwide": 9 },
+        sets: [
+          { day: 1, stage: "Mainstage", start: "20:30", end: "21:30", artist: "W&W" },
+          { day: 1, stage: "Mainstage", start: "21:45", end: "23:00", artist: "Alesso" },
+          { day: 1, stage: "Mainstage", start: "23:15", end: "00:45", artist: "Armin van Buuren" },
+          { day: 1, stage: "Mainstage", start: "01:00", end: "02:30", artist: "Hardwell" },
+          { day: 1, stage: "RESISTANCE", start: "21:00", end: "22:30", artist: "Kölsch" },
+          { day: 1, stage: "RESISTANCE", start: "22:30", end: "00:00", artist: "Adam Beyer" },
+          { day: 1, stage: "RESISTANCE", start: "00:00", end: "02:00", artist: "Carl Cox" },
+          { day: 1, stage: "Ultra Worldwide", start: "21:30", end: "23:00", artist: "Dom Dolla" },
+          { day: 1, stage: "Ultra Worldwide", start: "23:00", end: "00:30", artist: "Fisher" }
+        ]
+      },
+      {
+        id: "parookaville-2027", name: "Parookaville", city: "Weeze, DE", dates: "Jul 16–18, 2027", start: "2027-07-16", genre: "Mainstage · Hardstyle · Techno",
+        stages: ["Mainstage", "Bill's Factory", "Warehouse", "Cloud Factory"], walkDefault: 10,
+        transit: { "Bill's Factory||Mainstage": 9, "Mainstage||Warehouse": 12, "Cloud Factory||Mainstage": 8, "Bill's Factory||Warehouse": 10, "Bill's Factory||Cloud Factory": 11, "Cloud Factory||Warehouse": 9 },
+        sets: [
+          { day: 1, stage: "Mainstage", start: "20:00", end: "21:00", artist: "Timmy Trumpet" },
+          { day: 1, stage: "Mainstage", start: "21:15", end: "22:30", artist: "Steve Aoki" },
+          { day: 1, stage: "Mainstage", start: "22:45", end: "00:00", artist: "Hardwell" },
+          { day: 1, stage: "Mainstage", start: "00:15", end: "01:30", artist: "Martin Garrix" },
+          { day: 1, stage: "Bill's Factory", start: "20:30", end: "22:00", artist: "Brennan Heart" },
+          { day: 1, stage: "Bill's Factory", start: "22:00", end: "23:30", artist: "Sub Zero Project" },
+          { day: 1, stage: "Bill's Factory", start: "23:30", end: "01:00", artist: "Headhunterz" },
+          { day: 1, stage: "Warehouse", start: "21:00", end: "22:30", artist: "Reinier Zonneveld" },
+          { day: 1, stage: "Warehouse", start: "22:30", end: "00:00", artist: "Amelie Lens" },
+          { day: 1, stage: "Cloud Factory", start: "21:30", end: "23:00", artist: "Oliver Heldens" },
+          { day: 1, stage: "Cloud Factory", start: "23:00", end: "00:30", artist: "MEDUZA" }
+        ]
+      },
+      {
+        id: "let-it-roll-2027", name: "Let It Roll", city: "Milovice, CZ", dates: "Aug 5–7, 2027", start: "2027-08-05", genre: "Drum & Bass",
+        stages: ["Main Stage", "Factory", "Beats", "Sunset Hill"], walkDefault: 10,
+        transit: { "Factory||Main Stage": 9, "Beats||Main Stage": 12, "Main Stage||Sunset Hill": 14, "Beats||Factory": 8, "Factory||Sunset Hill": 11, "Beats||Sunset Hill": 9 },
+        sets: [
+          { day: 1, stage: "Main Stage", start: "22:00", end: "23:00", artist: "Wilkinson" },
+          { day: 1, stage: "Main Stage", start: "23:00", end: "00:30", artist: "Sub Focus" },
+          { day: 1, stage: "Main Stage", start: "00:30", end: "02:00", artist: "Andy C" },
+          { day: 1, stage: "Main Stage", start: "02:00", end: "03:30", artist: "Chase & Status" },
+          { day: 1, stage: "Factory", start: "22:30", end: "00:00", artist: "A.M.C" },
+          { day: 1, stage: "Factory", start: "00:00", end: "01:30", artist: "Bou" },
+          { day: 1, stage: "Factory", start: "01:30", end: "03:00", artist: "Hedex" },
+          { day: 1, stage: "Beats", start: "23:00", end: "00:30", artist: "Camo & Krooked" },
+          { day: 1, stage: "Beats", start: "00:30", end: "02:00", artist: "Dimension" },
+          { day: 1, stage: "Sunset Hill", start: "23:30", end: "01:00", artist: "Hybrid Minds" },
+          { day: 1, stage: "Sunset Hill", start: "01:00", end: "02:30", artist: "Koven" }
+        ]
+      },
+      {
+        id: "untold-2027", name: "UNTOLD", city: "Cluj-Napoca, RO", dates: "Aug 5–8, 2027", start: "2027-08-05", genre: "Mainstage · Techno · Drum & Bass",
+        stages: ["Main Stage", "Galaxy Stage", "Alchemy Stage", "Fortune Stage"], walkDefault: 12,
+        transit: { "Galaxy Stage||Main Stage": 12, "Alchemy Stage||Main Stage": 10, "Fortune Stage||Main Stage": 14, "Alchemy Stage||Galaxy Stage": 9, "Fortune Stage||Galaxy Stage": 11, "Alchemy Stage||Fortune Stage": 8 },
+        sets: [
+          { day: 1, stage: "Main Stage", start: "22:00", end: "23:15", artist: "Alan Walker" },
+          { day: 1, stage: "Main Stage", start: "23:30", end: "00:45", artist: "Armin van Buuren" },
+          { day: 1, stage: "Main Stage", start: "01:00", end: "02:30", artist: "Martin Garrix" },
+          { day: 1, stage: "Galaxy Stage", start: "22:30", end: "00:00", artist: "Boris Brejcha" },
+          { day: 1, stage: "Galaxy Stage", start: "00:00", end: "01:30", artist: "Anyma" },
+          { day: 1, stage: "Galaxy Stage", start: "01:30", end: "03:00", artist: "Charlotte de Witte" },
+          { day: 1, stage: "Alchemy Stage", start: "23:00", end: "00:30", artist: "Solomun" },
+          { day: 1, stage: "Alchemy Stage", start: "00:30", end: "02:00", artist: "Black Coffee" },
+          { day: 1, stage: "Fortune Stage", start: "23:30", end: "01:00", artist: "Sub Focus" },
+          { day: 1, stage: "Fortune Stage", start: "01:00", end: "02:30", artist: "Andy C" }
+        ]
+      },
+      {
+        id: "dekmantel-2027", name: "Dekmantel Festival", city: "Amsterdam, NL", dates: "Aug 5–8, 2027", start: "2027-08-06", genre: "Techno · House · Left-field",
+        stages: ["Main Stage", "UFO I", "UFO II", "The Loop", "Greenhouse"], walkDefault: 7,
+        transit: { "Main Stage||UFO I": 6, "Main Stage||UFO II": 8, "Main Stage||The Loop": 9, "Greenhouse||Main Stage": 7, "UFO I||UFO II": 3, "The Loop||UFO I": 8, "The Loop||UFO II": 7, "Greenhouse||The Loop": 6, "Greenhouse||UFO I": 9 },
+        sets: [
+          { day: 1, stage: "Main Stage", start: "15:00", end: "16:30", artist: "Palms Trax" },
+          { day: 1, stage: "Main Stage", start: "16:30", end: "18:00", artist: "Helena Hauff" },
+          { day: 1, stage: "Main Stage", start: "18:00", end: "20:00", artist: "Jeff Mills" },
+          { day: 1, stage: "Main Stage", start: "20:00", end: "22:00", artist: "Ben UFO" },
+          { day: 1, stage: "UFO I", start: "15:30", end: "17:00", artist: "DVS1" },
+          { day: 1, stage: "UFO I", start: "17:00", end: "19:00", artist: "Marcel Dettmann" },
+          { day: 1, stage: "UFO I", start: "19:00", end: "21:00", artist: "Ben Klock" },
+          { day: 1, stage: "UFO II", start: "16:00", end: "17:30", artist: "Objekt" },
+          { day: 1, stage: "UFO II", start: "17:30", end: "19:30", artist: "Blawan" },
+          { day: 1, stage: "UFO II", start: "19:30", end: "21:30", artist: "Surgeon" },
+          { day: 1, stage: "The Loop", start: "16:30", end: "18:00", artist: "Hunee" },
+          { day: 1, stage: "The Loop", start: "18:00", end: "20:00", artist: "Antal" },
+          { day: 1, stage: "Greenhouse", start: "17:00", end: "18:30", artist: "Floating Points" },
+          { day: 1, stage: "Greenhouse", start: "18:30", end: "20:30", artist: "Four Tet" }
+        ]
+      },
+      {
+        id: "hard-summer-2027", name: "HARD Summer", city: "Los Angeles, CA", dates: "Aug 7–8, 2027", start: "2027-08-07", genre: "Bass · House · Techno",
+        stages: ["HARD Stage", "HARDER Stage", "Green Stage", "Pink Stage"], walkDefault: 10,
+        transit: { "HARD Stage||HARDER Stage": 12, "Green Stage||HARD Stage": 9, "HARD Stage||Pink Stage": 11, "Green Stage||HARDER Stage": 8, "HARDER Stage||Pink Stage": 10, "Green Stage||Pink Stage": 7 },
+        sets: [
+          { day: 1, stage: "HARD Stage", start: "19:30", end: "20:30", artist: "Diplo" },
+          { day: 1, stage: "HARD Stage", start: "21:00", end: "22:15", artist: "Zeds Dead" },
+          { day: 1, stage: "HARD Stage", start: "22:45", end: "00:00", artist: "Skrillex" },
+          { day: 1, stage: "HARDER Stage", start: "20:00", end: "21:30", artist: "Dom Dolla" },
+          { day: 1, stage: "HARDER Stage", start: "21:30", end: "23:00", artist: "John Summit" },
+          { day: 1, stage: "HARDER Stage", start: "23:00", end: "00:30", artist: "Fisher" },
+          { day: 1, stage: "Green Stage", start: "20:30", end: "22:00", artist: "Subtronics" },
+          { day: 1, stage: "Green Stage", start: "22:00", end: "23:30", artist: "Excision" },
+          { day: 1, stage: "Pink Stage", start: "21:00", end: "22:30", artist: "Sara Landry" },
+          { day: 1, stage: "Pink Stage", start: "22:30", end: "00:00", artist: "Anyma" }
+        ]
+      },
+      {
+        id: "elements-2027", name: "Elements Festival", city: "Long Pond, PA", dates: "Aug 13–16, 2027", start: "2027-08-13", genre: "House · Techno · Bass · Melodic",
+        stages: ["Earth", "Air", "Fire", "Water"], walkDefault: 10,
+        transit: { "Air||Earth": 9, "Earth||Fire": 12, "Earth||Water": 11, "Air||Fire": 8, "Air||Water": 10, "Fire||Water": 9 },
+        sets: [
+          { day: 1, stage: "Earth", start: "21:00", end: "22:30", artist: "Lane 8" },
+          { day: 1, stage: "Earth", start: "22:30", end: "00:00", artist: "Above & Beyond" },
+          { day: 1, stage: "Air", start: "21:30", end: "23:00", artist: "Bicep" },
+          { day: 1, stage: "Air", start: "23:00", end: "00:30", artist: "Four Tet" },
+          { day: 1, stage: "Fire", start: "22:00", end: "23:30", artist: "Subtronics" },
+          { day: 1, stage: "Fire", start: "23:30", end: "01:00", artist: "Liquid Stranger" },
+          { day: 1, stage: "Water", start: "22:30", end: "00:00", artist: "Chris Lake" },
+          { day: 1, stage: "Water", start: "00:00", end: "01:30", artist: "Michael Bibi" }
+        ]
+      },
+      {
+        id: "mysteryland-2027", name: "Mysteryland", city: "Haarlemmermeer, NL", dates: "Aug 27–29, 2027", start: "2027-08-27", genre: "Mainstage · Hardstyle · House · Techno",
+        stages: ["Main Stage", "Q-dance", "The Boat", "Tunnel"], walkDefault: 11,
+        transit: { "Main Stage||Q-dance": 12, "Main Stage||The Boat": 9, "Main Stage||Tunnel": 10, "Q-dance||The Boat": 8, "Q-dance||Tunnel": 11, "The Boat||Tunnel": 7 },
+        sets: [
+          { day: 1, stage: "Main Stage", start: "17:00", end: "18:15", artist: "Lost Frequencies" },
+          { day: 1, stage: "Main Stage", start: "18:30", end: "19:45", artist: "Oliver Heldens" },
+          { day: 1, stage: "Main Stage", start: "20:00", end: "21:15", artist: "Afrojack" },
+          { day: 1, stage: "Main Stage", start: "21:30", end: "23:00", artist: "Hardwell" },
+          { day: 1, stage: "Q-dance", start: "17:30", end: "19:00", artist: "Coone" },
+          { day: 1, stage: "Q-dance", start: "19:00", end: "20:30", artist: "D-Block & S-te-Fan" },
+          { day: 1, stage: "Q-dance", start: "20:30", end: "22:00", artist: "Headhunterz" },
+          { day: 1, stage: "The Boat", start: "18:00", end: "19:30", artist: "Chris Stussy" },
+          { day: 1, stage: "The Boat", start: "19:30", end: "21:00", artist: "Joris Voorn" },
+          { day: 1, stage: "The Boat", start: "21:00", end: "22:30", artist: "Kölsch" },
+          { day: 1, stage: "Tunnel", start: "18:30", end: "20:00", artist: "Klangkuenstler" },
+          { day: 1, stage: "Tunnel", start: "20:00", end: "22:00", artist: "Sara Landry" }
+        ]
+      },
+      {
+        id: "arc-2027", name: "ARC Music Festival", city: "Chicago, IL", dates: "Sep 4–6, 2027", start: "2027-09-04", genre: "House · Techno",
+        stages: ["The Grid", "Expo", "Elrow"], walkDefault: 8,
+        transit: { "Expo||The Grid": 9, "Elrow||The Grid": 7, "Elrow||Expo": 8 },
+        sets: [
+          { day: 1, stage: "The Grid", start: "18:00", end: "19:30", artist: "Kölsch" },
+          { day: 1, stage: "The Grid", start: "19:30", end: "21:00", artist: "Adam Beyer" },
+          { day: 1, stage: "The Grid", start: "21:00", end: "22:30", artist: "Charlotte de Witte" },
+          { day: 1, stage: "Expo", start: "18:30", end: "20:00", artist: "Green Velvet" },
+          { day: 1, stage: "Expo", start: "20:00", end: "21:30", artist: "Honey Dijon" },
+          { day: 1, stage: "Expo", start: "21:30", end: "23:00", artist: "Black Coffee" },
+          { day: 1, stage: "Elrow", start: "19:00", end: "20:30", artist: "Patrick Topping" },
+          { day: 1, stage: "Elrow", start: "20:30", end: "22:00", artist: "Fisher" }
+        ]
+      },
+      {
+        id: "imagine-2027", name: "Imagine Music Festival", city: "Rome, GA", dates: "Sep 17–19, 2027", start: "2027-09-17", genre: "Bass · House · Trance",
+        stages: ["Oceania", "Amazonia", "Aeros", "Disco Inferno"], walkDefault: 10,
+        transit: { "Amazonia||Oceania": 10, "Aeros||Oceania": 12, "Disco Inferno||Oceania": 8, "Aeros||Amazonia": 9, "Amazonia||Disco Inferno": 11, "Aeros||Disco Inferno": 10 },
+        sets: [
+          { day: 1, stage: "Oceania", start: "20:00", end: "21:15", artist: "Said The Sky" },
+          { day: 1, stage: "Oceania", start: "21:30", end: "22:45", artist: "Illenium" },
+          { day: 1, stage: "Oceania", start: "23:00", end: "00:30", artist: "Excision" },
+          { day: 1, stage: "Amazonia", start: "20:30", end: "22:00", artist: "Level Up" },
+          { day: 1, stage: "Amazonia", start: "22:00", end: "23:30", artist: "Wooli" },
+          { day: 1, stage: "Amazonia", start: "23:30", end: "01:00", artist: "Subtronics" },
+          { day: 1, stage: "Aeros", start: "21:00", end: "22:30", artist: "Gareth Emery" },
+          { day: 1, stage: "Aeros", start: "22:30", end: "00:00", artist: "Above & Beyond" },
+          { day: 1, stage: "Disco Inferno", start: "21:30", end: "23:00", artist: "Gorgon City" },
+          { day: 1, stage: "Disco Inferno", start: "23:00", end: "00:30", artist: "Chris Lake" }
+        ]
+      },
+      {
+        id: "lost-lands-2027", name: "Lost Lands", city: "Thornville, OH", dates: "Sep 24–26, 2027", start: "2027-09-24", genre: "Bass · Dubstep",
+        stages: ["Prehistoric Paradox", "Wompy Woods", "Cave of Souls", "Subsidia"], walkDefault: 12,
+        transit: { "Prehistoric Paradox||Wompy Woods": 12, "Cave of Souls||Prehistoric Paradox": 15, "Prehistoric Paradox||Subsidia": 10, "Cave of Souls||Wompy Woods": 9, "Subsidia||Wompy Woods": 11, "Cave of Souls||Subsidia": 8 },
+        sets: [
+          { day: 1, stage: "Prehistoric Paradox", start: "20:00", end: "21:15", artist: "Sullivan King" },
+          { day: 1, stage: "Prehistoric Paradox", start: "21:30", end: "22:45", artist: "Svdden Death" },
+          { day: 1, stage: "Prehistoric Paradox", start: "23:00", end: "00:15", artist: "Subtronics" },
+          { day: 1, stage: "Prehistoric Paradox", start: "00:30", end: "02:00", artist: "Excision" },
+          { day: 1, stage: "Wompy Woods", start: "20:30", end: "22:00", artist: "Space Laces" },
+          { day: 1, stage: "Wompy Woods", start: "22:00", end: "23:30", artist: "Marauda" },
+          { day: 1, stage: "Wompy Woods", start: "23:30", end: "01:00", artist: "Kai Wachi" },
+          { day: 1, stage: "Cave of Souls", start: "21:00", end: "22:30", artist: "Peekaboo" },
+          { day: 1, stage: "Cave of Souls", start: "22:30", end: "00:00", artist: "LSDREAM" },
+          { day: 1, stage: "Subsidia", start: "21:30", end: "23:00", artist: "Level Up" },
+          { day: 1, stage: "Subsidia", start: "23:00", end: "00:30", artist: "Wooli" }
+        ]
+      },
+    ],
+    tours: [
+      {
+        id: "afterlife-2027", name: "Afterlife (Tale of Us) — Tour Night", city: "Arena / one room", dates: "2027 tour", genre: "Melodic Techno", kind: "tour",
+        stages: ["Main Room"], walkDefault: 0, transit: {},
+        sets: [
+          { day: 1, stage: "Main Room", start: "21:00", end: "22:00", artist: "Mathame" },
+          { day: 1, stage: "Main Room", start: "22:00", end: "23:30", artist: "Anyma" },
+          { day: 1, stage: "Main Room", start: "23:30", end: "01:30", artist: "Tale of Us" }
+        ]
+      },
+      {
+        id: "warehouse-night", name: "Warehouse Night (Club) — 4 rooms", city: "Club, multi-room", dates: "template", genre: "House · Techno", kind: "tour",
+        stages: ["Room 1", "Room 2", "Room 3", "Room 4"], walkDefault: 3,
+        transit: { "Room 1||Room 2": 2, "Room 1||Room 3": 4, "Room 1||Room 4": 5, "Room 2||Room 3": 3, "Room 2||Room 4": 4, "Room 3||Room 4": 2 },
+        sets: [
+          { day: 1, stage: "Room 1", start: "23:00", end: "00:30", artist: "Chris Stussy" },
+          { day: 1, stage: "Room 1", start: "00:30", end: "02:00", artist: "Michael Bibi" },
+          { day: 1, stage: "Room 2", start: "23:30", end: "01:00", artist: "Sara Landry" },
+          { day: 1, stage: "Room 2", start: "01:00", end: "03:00", artist: "999999999" },
+          { day: 1, stage: "Room 3", start: "23:00", end: "01:00", artist: "Palms Trax" },
+          { day: 1, stage: "Room 4", start: "00:00", end: "02:00", artist: "Ben UFO" }
+        ]
+      }
+    ],
+    demo: [
+      {
+        id: "gramercy", name: "Gramercy Music Festival (demo, fictional)", city: "Demo", dates: "sample", genre: "Demo", kind: "demo",
+        stages: ["Main Stage", "The Tent", "The Warehouse"], walkDefault: 8,
+        transit: { "Main Stage||The Tent": 5, "Main Stage||The Warehouse": 12, "The Tent||The Warehouse": 8 },
+        sets: [
+          { day: 1, stage: "Main Stage", start: "15:30", end: "16:30", artist: "Neon Cascade" },
+          { day: 1, stage: "Main Stage", start: "17:00", end: "18:15", artist: "Wildfire Theory" },
+          { day: 1, stage: "Main Stage", start: "19:00", end: "20:30", artist: "Sable & The Storm" },
+          { day: 1, stage: "Main Stage", start: "21:00", end: "22:30", artist: "Aurora Kane" },
+          { day: 1, stage: "The Tent", start: "15:45", end: "16:45", artist: "The Midnight Foxes" },
+          { day: 1, stage: "The Tent", start: "17:00", end: "18:00", artist: "Glasshouse" },
+          { day: 1, stage: "The Tent", start: "20:00", end: "21:15", artist: "Lunar Tide" },
+          { day: 1, stage: "The Warehouse", start: "16:00", end: "17:00", artist: "Basslines Anonymous" },
+          { day: 1, stage: "The Warehouse", start: "23:45", end: "01:00", artist: "Nightshift" }
+        ]
+      }
+    ]
+  },
+
+  /** Flat id → entry index across all library groups. */
+  byId: {},
+
+  /** Parse pasted content (JSON / pipe rows / sectioned text). */
+  parse(raw) {
+    const text = (raw || "").trim();
+    if (!text) throw new Error("Nothing to parse — paste a timetable or JSON first.");
+
+    if (text[0] === "{" || text[0] === "[") {
+      let json;
+      try { json = JSON.parse(text); }
+      catch (e) { throw new Error("That looks like JSON but it's invalid: " + e.message); }
+      const rawSets = Array.isArray(json) ? json : json.sets;
+      if (!Array.isArray(rawSets)) throw new Error('JSON must be an array of sets, or an object with a "sets" array.');
+      const sets = rawSets.map((s, i) => Data._normSet(s, i));
+      return Data._assemble(sets, (json && json.name) || "Imported Festival", json && json.transit);
+    }
+
+    const sets = [];
+    let curDay = 1, curStage = null;
+    const timeRange = /(\d{1,2}:\d{2})\s*[–-]\s*(\d{1,2}:\d{2})/;
+    for (let raw2 of text.split(/\r?\n/)) {
+      const line = raw2.trim();
+      if (!line || /^[#>]+$/.test(line)) continue;
+
+      if (line.includes("|")) {
+        const f = line.split("|").map(x => x.trim());
+        const tIdx = f.findIndex(x => timeRange.test(x));
+        if (tIdx === -1) continue;
+        const tm = timeRange.exec(f[tIdx]);
+        const before = f.slice(0, tIdx), after = f.slice(tIdx + 1).filter(Boolean);
+        let day = curDay, stage = curStage, artist = after.join(" ").trim();
+        for (const b of before) {
+          const dm = /^(?:day\s*)?(\d{1,2})$/i.exec(b);
+          if (dm && +dm[1] <= 14) day = +dm[1]; else stage = b;
+        }
+        if (!artist && before.length) artist = before[before.length - 1];
+        if (!stage) stage = "Stage 1";
+        curDay = day; curStage = stage;
+        sets.push(Data._normSet({ day, stage, start: tm[1], end: tm[2], artist: artist || "Unknown Artist" }, sets.length));
+        continue;
+      }
+      const dm = /^day\s*(\d{1,2})\b/i.exec(line);
+      if (dm) { curDay = +dm[1]; continue; }
+      const tm = timeRange.exec(line);
+      if (tm) {
+        const artist = line.replace(timeRange, "").replace(/^[\s·:–-]+|[\s·:–-]+$/g, "").trim() || "Unknown Artist";
+        if (!curStage) curStage = "Stage 1";
+        sets.push(Data._normSet({ day: curDay, stage: curStage, start: tm[1], end: tm[2], artist }, sets.length));
+        continue;
+      }
+      curStage = line.replace(/[:#]+$/, "").trim();
+    }
+    if (!sets.length) throw new Error("No sets found. Check the format — each set needs a HH:MM-HH:MM time range.");
+    return Data._assemble(sets, "Imported Festival");
+  },
+
+  _normSet(s, i) {
+    const start = String(s.start == null ? "" : s.start).trim();
+    const end = String(s.end == null ? "" : s.end).trim();
+    if (Time.parse(start) == null || Time.parse(end) == null)
+      throw new Error(`Set #${i + 1} ("${s.artist || "?"}") has an invalid time: ${start}–${end}. Use HH:MM.`);
+    return {
+      id: "s" + i + "_" + Math.random().toString(36).slice(2, 7),
+      day: Math.max(1, parseInt(s.day, 10) || 1),
+      stage: String(s.stage || "Stage 1").trim(),
+      start, end, artist: String(s.artist || "Unknown Artist").trim()
+    };
+  },
+
+  _assemble(sets, name, transit) {
+    const stages = [];
+    for (const s of sets) if (!stages.includes(s.stage)) stages.push(s.stage);
+    return { festival: { name, stages, sets, transit: transit || {} } };
+  }
+};
+// index library by id
+["festivals", "tours", "demo"].forEach(g => Data.library[g].forEach(e => { Data.byId[e.id] = e; }));
+
+/* --------------------------- Store --------------------------- */
+const Store = {
+  KEY: "fcr_state_v1",
+  save(state) {
+    try {
+      localStorage.setItem(Store.KEY, JSON.stringify({
+        festival: state.festival, transit: state.transit, priorities: state.priorities,
+        activeDay: state.activeDay, view: state.view
+      }));
+    } catch (e) {}
+  },
+  load() { try { const r = localStorage.getItem(Store.KEY); return r ? JSON.parse(r) : null; } catch (e) { return null; } },
+  clear() { try { localStorage.removeItem(Store.KEY); } catch (e) {} }
+};
+
+/* --------------------------- Engine --------------------------- */
+const Engine = {
+  transitKey(a, b) { return [a, b].sort().join("||"); },
+  getTransit(state, a, b) {
+    if (a === b) return 0;
+    const v = state.transit[Engine.transitKey(a, b)];
+    return (v == null || isNaN(v)) ? 0 : +v;
+  },
+  daySets(state, day) {
+    return state.festival.sets.filter(s => s.day === day).map(s => {
+      const p = state.priorities[s.id] || {};
+      return { ...s, iv: absInterval(s), starred: !!p.starred, level: p.level || null };
+    }).sort((a, b) => a.iv.start - b.iv.start || a.iv.end - b.iv.end);
+  },
+  rankOf(set) { return set.starred ? (PRIO[set.level] ? PRIO[set.level].rank : 2) : 0; },
+  cluster(sets) {
+    const sorted = [...sets].sort((a, b) => a.iv.start - b.iv.start);
+    const clusters = []; let cur = null, curMaxEnd = -Infinity;
+    for (const s of sorted) {
+      if (cur && s.iv.start < curMaxEnd) { cur.push(s); curMaxEnd = Math.max(curMaxEnd, s.iv.end); }
+      else { cur = [s]; clusters.push(cur); curMaxEnd = s.iv.end; }
+    }
+    return clusters;
+  },
+
+  buildPlan(state, day) {
+    const all = Engine.daySets(state, day);
+    const starred = all.filter(s => s.starred);
+    const clusters = Engine.cluster(starred);
+    const attend = [], skip = []; let clashCount = 0;
+
+    for (const cl of clusters) {
+      if (cl.length === 1) { attend.push({ set: cl[0], segment: null, kind: "solo", reason: "No conflicts." }); continue; }
+      clashCount++;
+      const maxRank = Math.max(...cl.map(Engine.rankOf));
+      const winners = cl.filter(s => Engine.rankOf(s) === maxRank);
+      const losers = cl.filter(s => Engine.rankOf(s) < maxRank);
+
+      for (const l of losers) {
+        const beat = winners.filter(w => overlaps(w.iv, l.iv))[0] || winners[0];
+        skip.push({ set: l, reason: `Clashes with ${beat.artist} (${PRIO[beat.level] ? PRIO[beat.level].label : "starred"}). Skipping the lower priority.` });
+      }
+      // Re-cluster winners by ACTUAL overlap: lone winner = full pick; overlapping equals = split.
+      for (const grp of Engine.cluster(winners)) {
+        if (grp.length === 1) {
+          const w = grp[0];
+          const beat = losers.filter(l => overlaps(w.iv, l.iv)).map(l => l.artist);
+          attend.push({ set: w, segment: null, kind: "winner", reason: beat.length ? `Highest priority here — beats ${beat.join(", ")}.` : `Highest priority in this clash window.` });
+        } else {
+          for (const seg of Engine._splitSegments(state, grp)) attend.push(seg);
+        }
+      }
+    }
+
+    attend.sort((a, b) => Engine._itemStart(a) - Engine._itemStart(b));
+
+    const transit = [];
+    for (let i = 0; i < attend.length - 1; i++) {
+      const A = attend[i], B = attend[i + 1];
+      if (A.set.stage === B.set.stage) continue;
+      const aEnd = Engine._itemEnd(A), bStart = Engine._itemStart(B);
+      const need = Engine.getTransit(state, A.set.stage, B.set.stage);
+      const gap = bStart - aEnd, miss = Math.max(0, need - gap);
+      const t = { fromId: A.set.id, toId: B.set.id, need, gap, missMin: miss, ok: miss <= 0, fromArtist: A.set.artist, toArtist: B.set.artist, fromStage: A.set.stage, toStage: B.set.stage };
+      t.text = t.ok
+        ? `${need}-min walk from ${A.set.stage} to ${B.set.stage}. You have ${Time.dur(gap)} — comfortable.`
+        : `Tight Squeeze: ${A.set.stage} → ${B.set.stage} takes ${need} min but you only have ${Time.dur(Math.max(0, gap))}. You'll miss the first ${Time.dur(miss)} of ${B.set.artist}.`;
+      transit.push(t);
+    }
+    return { attend, skip, transit, clashCount, all, starredCount: starred.length };
+  },
+
+  _itemStart(item) { return item.segment ? item.segment.start : item.set.iv.start; },
+  _itemEnd(item) { return item.segment ? item.segment.end : item.set.iv.end; },
+
+  _splitSegments(state, winners) {
+    const ws = [...winners].sort((a, b) => a.iv.start - b.iv.start);
+    const bounds = ws.map(w => ({ set: w, from: w.iv.start, to: w.iv.end }));
+    for (let i = 0; i < bounds.length - 1; i++) {
+      const A = bounds[i], B = bounds[i + 1];
+      const oStart = Math.max(A.set.iv.start, B.set.iv.start), oEnd = Math.min(A.set.iv.end, B.set.iv.end);
+      if (oStart < oEnd) { const mid = Math.round((oStart + oEnd) / 2); A.to = Math.min(A.to, mid); B.from = Math.max(B.from, mid); }
+    }
+    return bounds.map((b, i) => {
+      const walk = i > 0 ? Engine.getTransit(state, bounds[i - 1].set.stage, b.set.stage) : 0;
+      let reason;
+      if (bounds.length === 2 && i === 0) reason = `Equal priority — split the sets. Catch the first half of ${b.set.artist}.`;
+      else if (i > 0) reason = `Then head to ${b.set.stage}${walk ? " (" + walk + "-min walk)" : ""} for ${b.set.artist}.`;
+      else reason = `Equal priority — start here, then rotate through the others.`;
+      return { set: b.set, segment: { start: b.from, end: Math.max(b.from, b.to) }, kind: "split", walk, reason };
+    });
+  }
+};
+
+/* --------------------------- State --------------------------- */
+let state = { festival: null, transit: {}, priorities: {}, activeDay: 1, view: "setup" };
+
+/* --------------------------- UI --------------------------- */
+const UI = {
+  el(id) { return document.getElementById(id); },
+  esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); },
+  stageColor(stage) {
+    const stages = state.festival ? state.festival.stages : [];
+    const i = stages.indexOf(stage);
+    return STAGE_COLORS[(i < 0 ? 0 : i) % STAGE_COLORS.length];
+  },
+  days() {
+    if (!state.festival) return [1];
+    return [...new Set(state.festival.sets.map(s => s.day))].sort((a, b) => a - b);
+  },
+  toast(msg) { const t = UI.el("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(UI._tt); UI._tt = setTimeout(() => t.classList.remove("show"), 2200); },
+
+  setView(v) {
+    state.view = v;
+    ["setup", "prioritize", "dashboard"].forEach(name => { UI.el("view-" + name).hidden = (name !== v); });
+    document.querySelectorAll(".step-btn").forEach(b => {
+      b.classList.toggle("active", b.dataset.view === v);
+      b.disabled = (b.dataset.view !== "setup" && !state.festival);
+    });
+    const sec = UI.el("view-" + v);
+    if (v === "prioritize") UI.renderPrioritize();
+    if (v === "dashboard") UI.renderDashboard();
+    // subtle swap motion (respected reduced-motion via CSS)
+    sec.classList.remove("view-swap"); void sec.offsetWidth; sec.classList.add("view-swap");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    Store.save(state);
+  },
+
+  renderSetup() {
+    const has = !!state.festival;
+    UI.el("festMetaCard").hidden = !has;
+    UI.el("transitCard").hidden = !has;
+    UI.el("setupNav").hidden = !has;
+    if (!has) return;
+    UI.el("festName").value = state.festival.name || "";
+    const days = UI.days();
+    const byDay = days.map(d => {
+      const n = state.festival.sets.filter(s => s.day === d).length;
+      return `<span class="pill pill-steel">Day ${d}: ${n} sets</span>`;
+    }).join(" ");
+    const f = state.festival;
+    const meta = [f.dates, f.city, f.genre].filter(Boolean).map(UI.esc).join(" · ");
+    UI.el("scheduleSummary").innerHTML = `
+      ${meta ? `<p class="hint" style="margin:-6px 0 12px;color:var(--ink-dim)">${meta}</p>` : ""}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">${byDay}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${state.festival.stages.map(st => `<span class="pill" style="background:${UI.stageColor(st)}1f;color:${UI.stageColor(st)};border:1px solid ${UI.stageColor(st)}55;">${UI.esc(st)}</span>`).join(" ")}
+      </div>
+      <p class="hint" style="margin-top:10px;">${state.festival.sets.length} sets · ${state.festival.stages.length} stages · ${days.length} day(s)</p>`;
+    UI.renderMatrix();
+  },
+
+  renderMatrix() {
+    const stages = state.festival.stages;
+    let html = "<table><thead><tr><th></th>";
+    for (const s of stages) html += `<th title="${UI.esc(s)}">${UI.esc(UI._abbr(s))}</th>`;
+    html += "</tr></thead><tbody>";
+    for (let i = 0; i < stages.length; i++) {
+      html += `<tr><th class="rowh" title="${UI.esc(stages[i])}">${UI.esc(stages[i])}</th>`;
+      for (let j = 0; j < stages.length; j++) {
+        if (i === j) { html += `<td class="diag">—</td>`; continue; }
+        const val = Engine.getTransit(state, stages[i], stages[j]);
+        html += `<td><input type="number" min="0" max="180" value="${val}" data-a="${UI.esc(stages[i])}" data-b="${UI.esc(stages[j])}" class="mx-cell" inputmode="numeric" /></td>`;
+      }
+      html += "</tr>";
+    }
+    html += "</tbody></table>";
+    UI.el("matrixHost").innerHTML = html;
+    UI.el("matrixHost").querySelectorAll(".mx-cell").forEach(inp => {
+      inp.addEventListener("input", () => {
+        const a = inp.dataset.a, b = inp.dataset.b;
+        const v = Math.max(0, Math.min(180, parseInt(inp.value, 10) || 0));
+        state.transit[Engine.transitKey(a, b)] = v;
+        const mirror = UI.el("matrixHost").querySelector(`.mx-cell[data-a="${CSS.escape(b)}"][data-b="${CSS.escape(a)}"]`);
+        if (mirror && mirror.value != v) mirror.value = v;
+        Store.save(state);
+      });
+    });
+  },
+  _abbr(s) { const w = s.replace(/^The\s+/i, "").split(/\s+/); return w.length > 1 ? w.map(x => x[0]).join("").toUpperCase() : s.slice(0, 6); },
+
+  renderDaybar(hostId, onPick) {
+    const host = UI.el(hostId); host.innerHTML = "";
+    for (const d of UI.days()) {
+      const b = document.createElement("button");
+      b.className = "day-chip" + (d === state.activeDay ? " active" : "");
+      b.textContent = "Day " + d;
+      b.onclick = () => { state.activeDay = d; onPick(); Store.save(state); };
+      host.appendChild(b);
+    }
+  },
+
+  renderPrioritize() {
+    if (!UI.days().includes(state.activeDay)) state.activeDay = UI.days()[0];
+    UI.renderDaybar("prioDaybar", UI.renderPrioritize);
+    const host = UI.el("prioList"), day = state.activeDay;
+    const stages = state.festival.stages.filter(st => state.festival.sets.some(s => s.day === day && s.stage === st));
+    if (!stages.length) { host.innerHTML = `<div class="empty">No sets on this day.</div>`; return; }
+    let html = "";
+    for (const st of stages) {
+      const color = UI.stageColor(st);
+      const sets = Engine.daySets(state, day).filter(s => s.stage === st);
+      html += `<div class="stage-group"><div class="stage-head"><span class="stage-dot" style="background:${color};color:${color}"></span><span class="stage-name">${UI.esc(st)}</span></div>`;
+      for (const s of sets) {
+        const p = state.priorities[s.id] || {}, on = p.starred;
+        html += `<div class="set-row ${on ? "starred" : ""}">
+          <div class="set-star ${on ? "on" : ""}" data-star="${s.id}" role="button" tabindex="0" aria-label="Star ${UI.esc(s.artist)}">${on ? "★" : "☆"}</div>
+          <div class="set-info"><div class="set-artist">${UI.esc(s.artist)}</div>
+          <div class="set-time">${UI.esc(s.start)}–${UI.esc(s.end)} · ${Time.dur(s.iv.len)}</div></div>
+          <div class="prio-group">
+            ${["high", "medium", "low"].map(lv => `<button class="prio-btn ${on && p.level === lv ? "sel-" + lv : ""}" data-prio="${s.id}" data-level="${lv}" ${on ? "" : "disabled"} title="${PRIO[lv].label}">${PRIO[lv].short}</button>`).join("")}
+          </div></div>`;
+      }
+      html += `</div>`;
+    }
+    host.innerHTML = html;
+    host.querySelectorAll("[data-star]").forEach(node => {
+      const toggle = () => UI.toggleStar(node.dataset.star);
+      node.addEventListener("click", toggle);
+      node.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } });
+    });
+    host.querySelectorAll("[data-prio]").forEach(btn => btn.addEventListener("click", () => UI.setPriority(btn.dataset.prio, btn.dataset.level)));
+  },
+  toggleStar(id) {
+    const p = state.priorities[id] || {};
+    if (p.starred) delete state.priorities[id];
+    else state.priorities[id] = { starred: true, level: p.level || "medium" };
+    Store.save(state); UI.renderPrioritize();
+  },
+  setPriority(id, level) { const p = state.priorities[id]; if (!p || !p.starred) return; p.level = level; Store.save(state); UI.renderPrioritize(); },
+
+  renderDashboard() {
+    if (!UI.days().includes(state.activeDay)) state.activeDay = UI.days()[0];
+    UI.renderDaybar("dashDaybar", UI.renderDashboard);
+    const plan = Engine.buildPlan(state, state.activeDay);
+    const tight = plan.transit.filter(t => !t.ok).length;
+    UI.el("dashStats").innerHTML = `
+      ${UI._stat(plan.starredCount, "Starred")}
+      ${UI._stat(plan.clashCount, "Clashes")}
+      ${UI._stat(plan.attend.length, "In your plan")}
+      ${UI._stat(tight, "Transit warnings", tight ? "var(--warn)" : "var(--ok)")}`;
+    UI.renderPlan(plan); UI.renderTimeline(plan);
+  },
+  _stat(v, k, color) { return `<div class="stat"><div class="v" ${color ? `style="color:${color}"` : ""}>${v}</div><div class="k">${k}</div></div>`; },
+
+  renderPlan(plan) {
+    const host = UI.el("planHost");
+    if (!plan.starredCount) { host.innerHTML = `<div class="empty"><div class="big">⭐</div>No starred sets for this day.<br><span class="hint">Go to <b>Prioritize</b> and star the artists you want to see.</span></div>`; return; }
+    let html = "";
+    plan.attend.forEach((item, idx) => {
+      const s = item.set, color = UI.stageColor(s.stage);
+      const lv = s.level && PRIO[s.level] ? PRIO[s.level] : null, isLast = idx === plan.attend.length - 1;
+      const timeLabel = item.segment
+        ? `${Time.format(item.segment.start)}–${Time.format(item.segment.end)} <span class="hint">(of ${UI.esc(s.start)}–${UI.esc(s.end)})</span>`
+        : `${UI.esc(s.start)}–${UI.esc(s.end)}`;
+      const kindPill = item.kind === "split" ? `<span class="pill pill-clash">SPLIT SET</span>` : item.kind === "winner" ? `<span class="pill pill-clash">CLASH · PICKED</span>` : "";
+      html += `<div class="plan-item"><div class="plan-rail"><div class="plan-node" style="background:${color};color:${color}"></div>${isLast ? "" : `<div class="plan-line"></div>`}</div>
+        <div class="plan-card"><div class="plan-top"><div><div class="plan-artist">${UI.esc(s.artist)}</div>
+        <div class="plan-meta">${timeLabel} · ${UI.esc(s.stage)}</div></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">${lv ? `<span class="pill pill-${lv.key}">${lv.label}</span>` : ""}${kindPill}</div></div>
+        <div class="plan-note reason">${UI.esc(item.reason)}</div></div></div>`;
+      const t = plan.transit.find(x => x.fromId === s.id && (plan.attend[idx + 1] && x.toId === plan.attend[idx + 1].set.id));
+      if (t) html += `<div class="transit-banner ${t.ok ? "ok" : ""}"><span class="t-ico">${t.ok ? "✅" : "🚨"}</span><span>${UI.esc(t.text)}</span></div>`;
+    });
+    if (plan.skip.length) {
+      html += `<hr class="divider" /><div class="label">Skipped (resolved clashes)</div>`;
+      for (const sk of plan.skip) {
+        const s = sk.set, lv = s.level && PRIO[s.level] ? PRIO[s.level] : null;
+        html += `<div class="plan-item"><div class="plan-rail"><div class="plan-node" style="background:var(--ink-faint);color:var(--ink-faint)"></div></div>
+          <div class="plan-card skip"><div class="plan-top"><div><div class="plan-artist">${UI.esc(s.artist)}</div>
+          <div class="plan-meta">${UI.esc(s.start)}–${UI.esc(s.end)} · ${UI.esc(s.stage)}</div></div>
+          ${lv ? `<span class="pill pill-${lv.key}">${lv.label}</span>` : ""}</div>
+          <div class="plan-note reason">${UI.esc(sk.reason)}</div></div></div>`;
+      }
+    }
+    host.innerHTML = html;
+  },
+
+  renderTimeline(plan) {
+    const host = UI.el("timelineHost"), day = state.activeDay, sets = Engine.daySets(state, day);
+    if (!sets.length) { host.innerHTML = `<div class="empty">No sets on this day.</div>`; return; }
+    const stages = state.festival.stages.filter(st => sets.some(s => s.stage === st));
+    const minStart = Math.min(...sets.map(s => s.iv.start)), maxEnd = Math.max(...sets.map(s => s.iv.end));
+    const span = Math.max(60, maxEnd - minStart), PX = 1.15, bodyH = span * PX, HEAD = 34;
+    const clashIds = new Set();
+    for (let i = 0; i < sets.length; i++) for (let j = i + 1; j < sets.length; j++) if (overlaps(sets[i].iv, sets[j].iv)) { clashIds.add(sets[i].id); clashIds.add(sets[j].id); }
+    const cols = `64px repeat(${stages.length}, minmax(120px, 1fr))`;
+    let html = `<div class="timeline" style="grid-template-columns:${cols}">`;
+    html += `<div class="tl-gutter-head" style="height:${HEAD}px"></div>`;
+    for (const st of stages) html += `<div class="tl-lane-head" style="color:${UI.stageColor(st)}">${UI.esc(st)}</div>`;
+    html += `<div class="tl-gutter" style="height:${bodyH}px">`;
+    const firstHour = Math.ceil(minStart / 60) * 60;
+    for (let m = firstHour; m <= maxEnd; m += 60) html += `<div class="tl-hour" style="top:${(m - minStart) * PX}px"><span>${Time.format(m)}</span></div>`;
+    html += `</div>`;
+    for (const st of stages) {
+      html += `<div class="tl-lane tl-body" style="height:${bodyH}px">`;
+      for (let m = firstHour; m <= maxEnd; m += 60) html += `<div class="tl-hour" style="top:${(m - minStart) * PX}px"></div>`;
+      for (const s of sets.filter(x => x.stage === st)) {
+        const top = (s.iv.start - minStart) * PX, h = Math.max(20, s.iv.len * PX - 3), color = UI.stageColor(st), isClash = clashIds.has(s.id);
+        const style = s.starred ? `top:${top}px;height:${h}px;background:${color}22;border-color:${color};` : `top:${top}px;height:${h}px;`;
+        html += `<div class="tl-block ${s.starred ? "starred" : ""} ${isClash && s.starred ? "clash" : ""}" style="${style}">
+          <div class="b-art">${s.starred ? "★ " : ""}${UI.esc(s.artist)}</div><div class="b-time">${UI.esc(s.start)}–${UI.esc(s.end)}</div></div>`;
+      }
+      html += `</div>`;
+    }
+    html += `</div>`;
+    host.innerHTML = html;
+  }
+};
+
+/* --------------------------- Exporter (metallic, self-contained) --------------------------- */
+const Exporter = {
+  build() {
+    const days = UI.days(), fest = state.festival, css = Exporter._css();
+    let body = `<header class="hd"><div class="ttl">${UI.esc(fest.name || "My Festival")}</div>
+      <div class="sub">Personal schedule · generated ${new Date().toLocaleDateString()} · works offline</div></header>`;
+    for (const day of days) {
+      const plan = Engine.buildPlan(state, day);
+      if (!plan.starredCount) continue;
+      const tight = plan.transit.filter(t => !t.ok).length;
+      body += `<section class="day"><h2 class="dayh">Day ${day}</h2>
+        <div class="stats"><div class="st"><b>${plan.attend.length}</b><span>sets planned</span></div>
+        <div class="st"><b>${plan.clashCount}</b><span>clashes resolved</span></div>
+        <div class="st"><b class="${tight ? "warn" : "ok"}">${tight}</b><span>transit warnings</span></div></div>`;
+      plan.attend.forEach((item, idx) => {
+        const s = item.set, color = Exporter._stageColor(fest, s.stage), lv = s.level && PRIO[s.level] ? PRIO[s.level] : null;
+        const timeLabel = item.segment ? `${Time.format(item.segment.start)}–${Time.format(item.segment.end)} <span class="dim">(of ${UI.esc(s.start)}–${UI.esc(s.end)})</span>` : `${UI.esc(s.start)}–${UI.esc(s.end)}`;
+        const tag = item.kind === "split" ? `<span class="tag clash">SPLIT</span>` : item.kind === "winner" ? `<span class="tag clash">PICKED</span>` : "";
+        body += `<div class="item" style="border-left-color:${color}"><div class="itop"><div><div class="art">${UI.esc(s.artist)}</div>
+          <div class="meta">${timeLabel} · ${UI.esc(s.stage)}</div></div>
+          <div class="tags">${lv ? `<span class="tag" style="color:${lv.color};border-color:${lv.color}">${lv.label}</span>` : ""}${tag}</div></div>
+          <div class="reason">${UI.esc(item.reason)}</div></div>`;
+        const t = plan.transit.find(x => x.fromId === s.id && (plan.attend[idx + 1] && x.toId === plan.attend[idx + 1].set.id));
+        if (t) body += `<div class="banner ${t.ok ? "ok" : "bad"}">${t.ok ? "✅" : "🚨"} ${UI.esc(t.text)}</div>`;
+      });
+      if (plan.skip.length) {
+        body += `<div class="skiph">Skipped clashes</div>`;
+        for (const sk of plan.skip) body += `<div class="item skip"><div class="art">${UI.esc(sk.set.artist)}</div>
+          <div class="meta">${UI.esc(sk.set.start)}–${UI.esc(sk.set.end)} · ${UI.esc(sk.set.stage)}</div>
+          <div class="reason">${UI.esc(sk.reason)}</div></div>`;
+      }
+      body += `</section>`;
+    }
+    body += `<footer class="ft">Made with Festival Clash Resolver · save this page to your home screen for offline access 📲</footer>`;
+    return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#060607">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>${UI.esc(fest.name || "My Festival")} — My Schedule</title>
+<style>${css}</style></head><body><div class="wrap">${body}</div></body></html>`;
+  },
+  _stageColor(fest, stage) { const i = fest.stages.indexOf(stage); return STAGE_COLORS[(i < 0 ? 0 : i) % STAGE_COLORS.length]; },
+  _css() {
+    return `
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#060607;color:#f6f6f8;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.45;padding:0 0 40px}
+.wrap{max-width:680px;margin:0 auto;padding:16px}
+.hd{padding:20px 4px 16px}
+.ttl{font-size:1.6rem;font-weight:900;letter-spacing:.01em;background:linear-gradient(115deg,#fff 0%,#c9ccd2 22%,#8b8e97 44%,#eceef2 58%,#d89a89 82%,#f0c0b1 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:#b7b7c0;font-size:.82rem;margin-top:4px}
+.day{margin-top:20px}
+.dayh{font-size:1.1rem;font-weight:800;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #2a2930}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.st{background:#17161a;border:1px solid #2a2930;border-radius:12px;padding:10px 12px}
+.st b{display:block;font-size:1.4rem}.st span{font-size:.72rem;color:#b7b7c0;text-transform:uppercase;letter-spacing:.06em}
+.st .warn{color:#ff8a7a}.st .ok{color:#cfd2d8}
+.item{background:#17161a;border:1px solid #2a2930;border-left:4px solid #d9dbe0;border-radius:12px;padding:12px 14px;margin-bottom:8px}
+.item.skip{opacity:.6;border-left-color:#74747e}
+.itop{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.art{font-weight:800;font-size:1.02rem}
+.meta{color:#b7b7c0;font-size:.85rem;margin-top:2px;font-variant-numeric:tabular-nums}
+.dim{color:#74747e;font-size:.8em}
+.tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.tag{font-size:.68rem;font-weight:800;padding:3px 9px;border-radius:999px;border:1px solid #3a3942;color:#b7b7c0;white-space:nowrap}
+.tag.clash{color:#ff8a7a;border-color:#ff8a7a}
+.reason{color:#b7b7c0;font-size:.85rem;margin-top:8px}
+.banner{border-radius:10px;padding:9px 12px;font-size:.84rem;margin:0 0 8px 14px}
+.banner.bad{background:#241211;border:1px solid #ff8a7a88;color:#ffd7cf}
+.banner.ok{background:#17161a;border:1px solid #3a3942;color:#b7b7c0}
+.skiph{font-size:.75rem;font-weight:800;color:#74747e;text-transform:uppercase;letter-spacing:.08em;margin:14px 0 8px}
+.ft{margin-top:24px;text-align:center;color:#74747e;font-size:.8rem;padding:16px}`;
+  },
+  download() {
+    if (!state.festival) { UI.toast("Load an event first."); return; }
+    if (!Object.values(state.priorities).some(p => p && p.starred)) { UI.toast("Star some artists first ⭐"); return; }
+    const blob = new Blob([Exporter.build()], { type: "text/html" }), url = URL.createObjectURL(blob), a = document.createElement("a");
+    a.href = url; a.download = "my_festival_schedule.html";
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1500);
+    UI.toast("Saved my_festival_schedule.html");
+  }
+};
+
+/* --------------------------- Wiring / init --------------------------- */
+function loadFestival(fest) {
+  state.festival = fest;
+  // Normalize authored transit keys to the canonical sorted form so lookups always hit,
+  // regardless of the order a stage pair was written in.
+  const norm = {};
+  for (const k in (fest.transit || {})) { const [a, b] = k.split("||"); if (a && b) norm[Engine.transitKey(a, b)] = fest.transit[k]; }
+  state.transit = Object.assign({}, norm, state.transit);
+  const wd = fest.walkDefault != null ? fest.walkDefault : 5;
+  for (let i = 0; i < fest.stages.length; i++)
+    for (let j = i + 1; j < fest.stages.length; j++) {
+      const k = Engine.transitKey(fest.stages[i], fest.stages[j]);
+      if (state.transit[k] == null) state.transit[k] = wd;
+    }
+  Store.save(state); UI.renderSetup();
+}
+
+function loadLibraryEntry(entry) {
+  const clone = JSON.parse(JSON.stringify(entry));
+  clone.sets = clone.sets.map((set, i) => ({ ...set, id: entry.id + "_" + i }));
+  state.priorities = {}; state.transit = {};
+  loadFestival(clone);
+}
+
+function resetAll() {
+  if (!confirm("Clear the loaded schedule, priorities and transit times?")) return;
+  Store.clear();
+  state = { festival: null, transit: {}, priorities: {}, activeDay: 1, view: "setup" };
+  UI.el("pasteArea").value = ""; UI.el("parseMsg").textContent = "";
+  UI.renderSetup(); UI.setView("setup"); UI.toast("Reset complete");
+}
+
+function dismissIntro(fast) {
+  const intro = UI.el("intro");
+  if (!intro || intro.dataset.gone) return;
+  intro.dataset.gone = "1";
+  if (fast) intro.classList.add("skip");
+  setTimeout(() => { intro.hidden = true; }, fast ? 460 : 1000);
+}
+
+function init() {
+  // Build the library dropdown: grouped, sorted by date, filterable by name/city/month/genre.
+  const sel = UI.el("sampleSelect"), filterEl = UI.el("libFilter");
+  const groups = [["festivals", "Festivals · 2026–2027"], ["tours", "Tours & Club Nights"], ["demo", "Demo"]];
+  const totalSets = Object.values(Data.byId).reduce((n, e) => n + e.sets.length, 0);
+  function buildLibrary(q) {
+    q = (q || "").trim().toLowerCase();
+    const prev = sel.value;
+    sel.innerHTML = "";
+    let shown = 0, total = 0;
+    for (const [key, label] of groups) {
+      const entries = [...Data.library[key]].sort((a, b) => (a.start || "").localeCompare(b.start || ""));
+      const og = document.createElement("optgroup"); og.label = label;
+      for (const e of entries) {
+        total++;
+        const hay = [e.name, e.city, e.dates, e.genre, e.start].join(" ").toLowerCase();
+        if (q && !hay.includes(q)) continue;
+        const opt = document.createElement("option");
+        opt.value = e.id;
+        opt.textContent = e.kind ? e.name : `${e.name} · ${e.dates} · ${e.city}`;
+        og.appendChild(opt); shown++;
+      }
+      if (og.children.length) sel.appendChild(og);
+    }
+    if (prev && [...sel.options].some(o => o.value === prev)) sel.value = prev;
+    UI.el("libCount").textContent = q
+      ? `${shown} of ${total} events match “${q}”`
+      : `${total} events · ${totalSets} sets · sorted by date`;
+  }
+  buildLibrary("");
+  if (sel.options.length) sel.selectedIndex = 0;   // earliest upcoming event by default
+  filterEl.addEventListener("input", () => buildLibrary(filterEl.value));
+
+  const saved = Store.load();
+  if (saved && saved.festival) { state = Object.assign(state, saved); state.priorities = state.priorities || {}; state.transit = state.transit || {}; }
+
+  UI.el("loadSampleBtn").addEventListener("click", () => {
+    const entry = Data.byId[sel.value];
+    if (!entry) { UI.toast("Pick an event first."); return; }
+    loadLibraryEntry(entry);
+    UI.el("parseMsg").innerHTML = `<span style="color:var(--ok)">✓ Loaded “${UI.esc(entry.name)}”.</span>`;
+    UI.toast("Event loaded 🎉");
+  });
+
+  UI.el("parseBtn").addEventListener("click", () => {
+    try {
+      const { festival } = Data.parse(UI.el("pasteArea").value);
+      state.priorities = {}; state.transit = {};
+      loadFestival(festival);
+      UI.el("parseMsg").innerHTML = `<span style="color:var(--ok)">✓ Parsed ${festival.sets.length} sets across ${festival.stages.length} stage(s).</span>`;
+      UI.toast("Schedule parsed 🎉");
+    } catch (e) { UI.el("parseMsg").innerHTML = `<span style="color:var(--warn)">⚠ ${UI.esc(e.message)}</span>`; }
+  });
+
+  UI.el("clearPasteBtn").addEventListener("click", () => { UI.el("pasteArea").value = ""; UI.el("parseMsg").textContent = ""; });
+  UI.el("festName").addEventListener("input", e => { if (state.festival) { state.festival.name = e.target.value; Store.save(state); } });
+  UI.el("resetBtn").addEventListener("click", resetAll);
+
+  document.querySelectorAll(".step-btn").forEach(b => b.addEventListener("click", () => { if (!b.disabled) UI.setView(b.dataset.view); }));
+  UI.el("toPrioritize").addEventListener("click", () => UI.setView("prioritize"));
+  UI.el("backToSetup").addEventListener("click", () => UI.setView("setup"));
+  UI.el("toDashboard").addEventListener("click", () => UI.setView("dashboard"));
+  UI.el("backToPrioritize").addEventListener("click", () => UI.setView("prioritize"));
+  UI.el("exportBtn").addEventListener("click", () => Exporter.download());
+
+  // Opening reveal: honor reduced-motion, allow click-to-skip, self-clear as fallback.
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce) { UI.el("intro").hidden = true; UI.el("intro").dataset.gone = "1"; }
+  else {
+    UI.el("intro").addEventListener("click", () => dismissIntro(true));
+    setTimeout(() => dismissIntro(false), 2750);
+  }
+
+  UI.renderSetup();
+  UI.setView(state.festival ? (state.view || "setup") : "setup");
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
