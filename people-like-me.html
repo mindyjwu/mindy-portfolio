@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>People Like Me</title>
+<meta name="description" content="A vetted beauty and body provider directory plus community, ranked by people who share your hair type, skin tone and eye shape. NYC demo.">
+<meta name="theme-color" content="#FBF1C4">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMiIgZmlsbD0iI0YyQ0Y1QiIvPjxwYXRoIGQ9Ik0yNTYgOTJjLTg4IDQwLTE1MiAxMTgtMTUyIDIxNCAwIDU4IDM0IDEwOCA4OCAxMjIgNDAtNjAgOTYtOTYgMTcyLTExNC03MCA0MC0xMTggOTItMTM4IDE1NiA4NCA2IDE2MC01MiAxNzgtMTM4IDIwLTk2LTQwLTE5MC0xNDgtMjQweiIgZmlsbD0iIzVFOEE2MyIvPjxwYXRoIGQ9Ik0xOTggMjkyYzI2LTQ0IDYyLTgwIDExMC0xMDQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0YyQ0Y1QiIgc3Ryb2tlLXdpZHRoPSIxNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+Cg==">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#FBF1C4;--surface:#FFFBEA;--surface2:#F4E7AE;--ink:#2B2A1E;--muted:#6F6A50;--line:#EADCA0;
+  --accent:#5E8A63;--accent-ink:#FFFFFF;--accent-soft:#E3ECD6;
+  --sun:#F2CF5B;--sun-soft:#F7E6A0;
+  --good:#4C7A51;--good-soft:#E0EBD5;--warn:#9A6A00;--warn-soft:#F7E2A3;
+  --ring:#E6D791;--shadow:0 1px 2px rgba(60,50,20,.06),0 8px 24px rgba(60,50,20,.08);
+  --radius:14px;--nav-h:64px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#2A3A30;--surface:#34473B;--surface2:#3F5446;--ink:#F1EFDF;--muted:#B5C1AC;--line:#4A5F50;
+  --accent:#E6D67A;--accent-ink:#2A3A30;--accent-soft:#4A5638;
+  --sun:#F0DA7C;--sun-soft:#55603A;
+  --good:#B3D8A3;--good-soft:#3E5A44;--warn:#F0C86A;--warn-soft:#5A4E2A;--ring:#4E6354;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.28);
+}}
+:root[data-theme="dark"]{
+  --bg:#2A3A30;--surface:#34473B;--surface2:#3F5446;--ink:#F1EFDF;--muted:#B5C1AC;--line:#4A5F50;
+  --accent:#E6D67A;--accent-ink:#2A3A30;--accent-soft:#4A5638;
+  --sun:#F0DA7C;--sun-soft:#55603A;
+  --good:#B3D8A3;--good-soft:#3E5A44;--warn:#F0C86A;--warn-soft:#5A4E2A;--ring:#4E6354;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.45;min-height:100dvh}
+button{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+.serif{font-family:"DM Serif Display",Georgia,"Times New Roman",serif;font-weight:400}
+
+/* ---------- Shell ---------- */
+.app{display:grid;grid-template-columns:minmax(0,1fr);min-height:100dvh}
+body{overflow-x:hidden}
+.side{display:none}
+.main{padding:0 16px calc(var(--nav-h) + 24px);max-width:720px;width:100%;min-width:0;margin:0 auto}
+.topbar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0 10px;margin-bottom:6px}
+.brand{font-family:"DM Serif Display",Georgia,serif;font-size:22px;letter-spacing:-.01em;text-decoration:none;color:var(--ink)}
+.brand em{font-style:italic;color:var(--accent)}
+.youpill{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 10px 6px 6px;font-size:12px;color:var(--muted);cursor:pointer;max-width:55%;min-width:0}
+.youpill .av{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--sun));flex:none}
+.youpill span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--nav-h);background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom);z-index:6}
+.tabbar button{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:var(--muted);cursor:pointer}
+.tabbar button svg,.side nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tabbar button.on{color:var(--accent)}
+
+@media (min-width:900px){
+  .app{grid-template-columns:260px minmax(0,1fr)}
+  .side{display:flex;flex-direction:column;gap:18px;position:sticky;top:0;height:100dvh;padding:28px 22px;border-right:1px solid var(--line);background:var(--surface)}
+  .side .brand{font-size:26px;display:flex;align-items:center;gap:10px}
+  .side .brand::before{content:"";width:26px;height:26px;background:var(--sun);border-radius:60% 40% 55% 45%/50% 60% 40% 50%;flex:none}
+  .side nav{display:flex;flex-direction:column;gap:2px}
+  .side nav button{display:flex;align-items:center;gap:12px;background:none;border:0;padding:10px 12px;border-radius:10px;font-size:14.5px;color:var(--muted);cursor:pointer;text-align:left}
+  .side nav button:hover{background:var(--surface2);color:var(--ink)}
+  .side nav button.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+  .side .facetcard{margin-top:auto;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--bg)}
+  .side .facetcard .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .side .facetcard .chips{display:flex;flex-wrap:wrap;gap:4px}
+  .side .facetcard .chips span{font-size:11.5px;padding:3px 7px;border-radius:5px;background:var(--surface2);color:var(--ink)}
+  .side .facetcard button{margin-top:10px;width:100%;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px;font-size:13px;cursor:pointer}
+  .side .foot{font-size:11.5px;color:var(--muted);line-height:1.4}
+  .main{padding:0 40px 60px}
+  .topbar{padding-top:26px}
+  .topbar .brand,.topbar .youpill{display:none}
+  .tabbar{display:none}
+}
+
+/* ---------- Type ---------- */
+h1{font-family:"DM Serif Display",Georgia,serif;font-weight:400;font-size:30px;line-height:1.08;margin:6px 0 4px;letter-spacing:-.01em;text-wrap:balance}
+h2{font-family:"DM Serif Display",Georgia,serif;font-weight:400;font-size:21px;line-height:1.15;margin:22px 0 8px}
+.sub{color:var(--muted);font-size:13.5px;margin:0 0 14px;max-width:60ch}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);display:inline-flex;align-items:center;gap:8px}
+.eyebrow::before{content:"";width:14px;height:14px;background:var(--sun);border-radius:60% 40% 55% 45%/50% 60% 40% 50%}
+
+/* ---------- Controls ---------- */
+.seg{display:flex;gap:4px;background:var(--surface2);padding:4px;border-radius:12px;margin:0 0 12px}
+.seg button{flex:1;min-width:0;border:0;background:none;padding:8px 4px;border-radius:9px;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seg button.on{background:var(--sun-soft);color:var(--ink);font-weight:600;box-shadow:var(--shadow)}
+.search{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:0 12px;margin-bottom:12px}
+.search svg{width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round}
+.search input{flex:1;border:0;background:none;padding:12px 0;font:inherit;font-size:15px;color:var(--ink);min-width:0}
+.search input::placeholder{color:var(--muted)}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:14px}
+.switch .l{font-weight:600;font-size:14px}
+.switch .d{font-size:12px;color:var(--muted);margin-top:1px}
+.tog{position:relative;width:44px;height:26px;flex:none;border-radius:999px;background:var(--ring);border:0;cursor:pointer;transition:background .2s}
+.tog::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.tog[aria-checked="true"]{background:var(--accent)}
+.tog[aria-checked="true"]::after{transform:translateX(18px)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--ink)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ghost{background:none}
+.btn:hover{border-color:var(--accent)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.chipgrid{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-size:13px;cursor:pointer;color:var(--ink)}
+.chip.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.chip.small{padding:4px 9px;font-size:12px}
+
+/* ---------- Cards ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:10px;display:grid;grid-template-columns:44px minmax(0,1fr) 48px;min-width:0;gap:12px;cursor:pointer;transition:border-color .15s,transform .15s;text-align:left;width:100%}
+.card:hover{border-color:var(--accent)}
+.card:active{transform:scale(.995)}
+.av{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-family:"DM Serif Display",Georgia,serif;font-size:18px;color:#fff;flex:none}
+.av.big{width:64px;height:64px;font-size:26px;border-radius:16px}
+.card .name{font-weight:600;font-size:15.5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.card .meta{color:var(--muted);font-size:12.5px;margin-top:1px}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.tag{font-size:11.5px;padding:3px 8px;border-radius:6px;background:var(--surface2);color:var(--muted)}
+.stats{display:flex;gap:14px;margin-top:9px;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+.stats b{color:var(--ink);font-family:"IBM Plex Mono",monospace;font-weight:500}
+.card .moved,.moved{grid-column:2/-1;background:var(--warn-soft);color:var(--warn);font-size:12px;padding:6px 10px;border-radius:8px;margin-top:8px;display:flex;gap:6px;align-items:center}
+.badge{font-family:"IBM Plex Mono",monospace;font-size:10.5px;padding:2px 6px;border-radius:5px;background:var(--good-soft);color:var(--good);font-weight:500;white-space:nowrap}
+.badge.warn{background:var(--warn-soft);color:var(--warn)}
+.badge.muted{background:var(--surface2);color:var(--muted)}
+
+/* match ring */
+.ring{width:48px;height:48px;position:relative;flex:none}
+.ring svg{width:48px;height:48px;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:4}
+.ring .bg{stroke:var(--ring)}
+.ring .fg{stroke:var(--muted);stroke-linecap:round;transition:stroke-dashoffset .4s}
+.ring.hi .fg{stroke:var(--good)}
+.ring.mid .fg{stroke:var(--sun)}
+.ring .v{position:absolute;inset:0;display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500}
+.ring.hi .v{color:var(--good)}.ring.mid .v{color:var(--warn)}
+
+/* ---------- Provider page ---------- */
+.back{background:none;border:0;color:var(--accent);font-size:14px;padding:0;cursor:pointer;margin:6px 0 12px;display:inline-flex;align-items:center;gap:4px}
+.phead{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:14px;align-items:center}
+.phead h1{margin:0;font-size:26px}
+.snap{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.snap span{font-family:"IBM Plex Mono",monospace;font-size:11px;background:var(--surface2);color:var(--muted);padding:2px 6px;border-radius:4px}
+.snap span.hit{background:var(--good-soft);color:var(--good)}
+.snap .pct{background:none;padding-left:2px}
+.review{padding:12px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px;transition:opacity .2s}
+.review .av{width:32px;height:32px;border-radius:9px;font-size:13px}
+.review .who{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+.review .who b{color:var(--ink);font-weight:600}
+.review p{margin:6px 0 0;font-size:14.5px}
+.dim{opacity:.42}
+.legend{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 4px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--good-soft);border:1px solid var(--good);vertical-align:-1px;margin-right:4px}
+
+/* ---------- Feed ---------- */
+.composer{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px;margin-bottom:14px}
+.composer textarea{width:100%;border:0;background:none;resize:vertical;min-height:58px;font:inherit;font-size:15px;color:var(--ink);padding:0}
+.composer textarea::placeholder{color:var(--muted)}
+.composer .foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
+.composer .foot .snap{margin:0}
+.post{padding:14px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:36px minmax(0,1fr);gap:12px;transition:opacity .2s}
+.post .av{width:36px;height:36px;border-radius:10px;font-size:14px}
+.post .who{font-size:12.5px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.post .who b{color:var(--ink);font-weight:600}
+.post p{margin:6px 0 0;font-size:14.5px}
+.post .pv{color:var(--accent);font-weight:600;cursor:pointer;background:none;border:0;padding:0;font-size:inherit}
+.post .pv:hover{text-decoration:underline}
+.post .foot{font-size:12px;color:var(--muted);margin-top:8px;display:flex;gap:14px}
+
+/* ---------- Upkeep ---------- */
+.up{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;display:grid;grid-template-columns:4px minmax(0,1fr) auto;gap:12px;align-items:center}
+.up .stripe{height:100%;border-radius:2px;background:var(--line)}
+.up.soon .stripe{background:var(--warn)}.up.over .stripe{background:var(--accent)}
+.up .n{font-weight:600}
+.up .m{color:var(--muted);font-size:12.5px}
+.up .due{font-family:"IBM Plex Mono",monospace;font-size:12px;padding:5px 9px;border-radius:7px;background:var(--surface2);color:var(--muted);white-space:nowrap}
+.up.soon .due{background:var(--warn-soft);color:var(--warn)}
+.up.over .due{background:var(--accent-soft);color:var(--accent)}
+
+/* ---------- Me ---------- */
+.facet{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+.facet .h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px}
+.facet .h b{font-size:14px;font-weight:600}
+.facet .h span{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--accent)}
+.facet .hint{font-size:12px;color:var(--muted);margin-top:8px}
+.note{font-size:13px;color:var(--muted);background:var(--surface2);padding:12px 14px;border-radius:12px;margin-top:12px;line-height:1.5}
+.note b{color:var(--ink)}
+.empty{padding:30px 10px;text-align:center;color:var(--muted);font-size:14px}
+.toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + 16px);transform:translateX(-50%);background:var(--ink);color:var(--sun);padding:10px 16px;border-radius:999px;font-size:13.5px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s;z-index:9}
+.toast.show{opacity:1}
+@media (min-width:900px){.toast{bottom:28px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.side .foot a{color:var(--accent)}
+.topbar .brand{display:flex;align-items:center;gap:8px}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <a class="brand" href="./">People <em>Like</em> Me</a>
+    <nav aria-label="Sections">
+      <button data-tab="find" class="on"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Find</button>
+      <button data-tab="ask"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg>Ask</button>
+      <button data-tab="upkeep"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Upkeep</button>
+      <button data-tab="me"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Me</button>
+    </nav>
+    <div class="facetcard"><div class="k">Your facets</div><div class="chips" id="side-facets"></div><button data-tab="me">Edit</button></div>
+    <div class="foot"><a href="index.html">← Back to portfolio</a><br>NYC demo. Every provider, member and review is invented. <a href="https://mindyjwu.github.io/people-like-me/playbook.html">Read the playbook</a> · <a href="https://github.com/mindyjwu/people-like-me">Source</a></div>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <a class="brand" href="./">People <em>Like</em> Me</a>
+      <button class="youpill" data-tab="me" aria-label="Edit your facets"><div class="av"></div><span id="you-summary"></span></button>
+    </div>
+    <div id="screen"></div>
+  </main>
+</div>
+<nav class="tabbar" aria-label="Sections">
+  <button data-tab="find" class="on"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Find</button>
+  <button data-tab="ask"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg>Ask</button>
+  <button data-tab="upkeep"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Upkeep</button>
+  <button data-tab="me"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Me</button>
+</nav>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+
+<script>
+// People Like Me — example data. Every provider, member and review here is invented for the demo.
+window.PLM_DATA = (() => {
+  const HAIR = ['1a','1b','1c','2a','2b','2c','3a','3b','3c','4a','4b','4c'];
+  const TEX = ['fine','medium','coarse'];
+  const CHEM = ['virgin','color-treated','relaxed','keratin'];
+  const SKIN = ['I','II','III','IV','V','VI'];
+  const UNDER = ['cool','neutral','warm','olive'];
+  const EYE = ['monolid','hooded','almond','round','deep-set','downturned'];
+  const HOOD = ['Williamsburg','Greenpoint','LES','SoHo','West Village','Chelsea','UES','UWS'];
+  const BUDGET = ['$','$$','$$$'];
+
+  const FACETS = [
+    { k:'hair',   label:'Hair type',          opts:HAIR,   hint:'Andre Walker scale, 1a straight to 4c coily.' },
+    { k:'tex',    label:'Hair texture',       opts:TEX,    hint:'Strand thickness, not density.' },
+    { k:'chem',   label:'Chemical history',   opts:CHEM,   hint:'What is on your hair right now.' },
+    { k:'skin',   label:'Skin tone',          opts:SKIN,   hint:'Fitzpatrick I (very fair) to VI (deep).' },
+    { k:'under',  label:'Undertone',          opts:UNDER,  hint:'Vein test: blue is cool, green is warm, both is neutral.' },
+    { k:'eye',    label:'Eye shape',          opts:EYE,    hint:'The highest-signal facet for lash and brow work.' },
+    { k:'hood',   label:'Neighborhood',       opts:HOOD,   hint:'Where you actually want to go.' },
+    { k:'budget', label:'Budget band',        opts:BUDGET, hint:'$ under 80, $$ 80 to 200, $$$ over 200 per visit.' },
+  ];
+
+  // Which facets decide the outcome, per vertical.
+  const WEIGHTS = {
+    colorist: { hair:.35, tex:.25, chem:.25, hood:.10, budget:.05 },
+    nails:    { hood:.40, budget:.30, skin:.20, under:.10 },
+    brows:    { eye:.45, skin:.20, hood:.20, budget:.15 },
+  };
+  const VERTICALS = { colorist:'Colorists', nails:'Nail techs', brows:'Brow & lash' };
+  const SINGULAR = { colorist:'colorist', nails:'nail tech', brows:'brow or lash tech' };
+
+  const DEFAULT_YOU = { hair:'2a', tex:'fine', chem:'color-treated', skin:'III', under:'warm', eye:'monolid', hood:'Williamsburg', budget:'$$' };
+
+  const PROVIDERS = [
+    { id:'p1', vert:'colorist', name:'Dani Okafor', studio:'Suite 4, Greenpoint', hood:'Greenpoint', budget:'$$$', lic:true, exp:{hair:['3c','4a','4b','4c'],chem:['virgin','color-treated'],tex:['coarse','medium']}, tags:['gloss on 4C','lived-in color on coily hair','silk press'], moved:'Was at Bushwick Color Bar until Aug 2026', book:'Booksy' },
+    { id:'p2', vert:'colorist', name:'Mei Lin Chou', studio:'Lin Studio, LES', hood:'LES', budget:'$$$', lic:true, exp:{hair:['1b','1c','2a','2b'],chem:['virgin','color-treated','keratin'],tex:['fine','medium']}, tags:['lived-in balayage on level 2 Asian hair','fine-hair toning','cool ash without brass'], book:'Square' },
+    { id:'p3', vert:'colorist', name:'Sasha Reyes', studio:'Warren St Collective, Williamsburg', hood:'Williamsburg', budget:'$$', lic:true, exp:{hair:['2a','2b','2c','3a'],chem:['color-treated','relaxed'],tex:['fine','medium','coarse']}, tags:['money-piece + gloss','wavy hair cutting','warm brunette'], book:'Fresha' },
+    { id:'p4', vert:'colorist', name:'Priya Nair', studio:'Chair rental, UES', hood:'UES', budget:'$$', lic:false, exp:{hair:['1a','1b','2a'],chem:['virgin','keratin'],tex:['coarse','medium']}, tags:['gray coverage on dark hair','keratin-safe color','South Asian hair'], book:'Instagram DM' },
+    { id:'p5', vert:'nails', name:'Jules Tran', studio:'Home studio, Williamsburg', hood:'Williamsburg', budget:'$$', lic:true, exp:{skin:['II','III','IV'],under:['warm','olive']}, tags:['builder gel','sheer nudes for olive undertones','no e-file damage'], book:'Booksy' },
+    { id:'p6', vert:'nails', name:'Renata Silva', studio:'Bowery Nails, LES', hood:'LES', budget:'$', lic:true, exp:{skin:['IV','V','VI'],under:['warm','neutral']}, tags:['chrome + cat-eye','deep-skin nude matching','structured manicure'], book:'Square' },
+    { id:'p7', vert:'nails', name:'Hana Kim', studio:'Studio K, SoHo', hood:'SoHo', budget:'$$$', lic:true, exp:{skin:['I','II','III'],under:['cool','neutral']}, tags:['Korean gel art','short-nail shaping','milky pinks'], moved:'Moved from Chelsea in Jul 2026', book:'Fresha' },
+    { id:'p8', vert:'brows', name:'Aya Nakamura', studio:'Brow room, SoHo', hood:'SoHo', budget:'$$$', lic:true, exp:{eye:['monolid','hooded'],skin:['II','III','IV']}, tags:['lash lift on straight lashes','monolid mapping','brow lamination for sparse brows'], book:'Booksy' },
+    { id:'p9', vert:'brows', name:'Tasha Bell', studio:'Greenpoint Ave', hood:'Greenpoint', budget:'$$', lic:true, exp:{eye:['almond','round','downturned'],skin:['IV','V','VI']}, tags:['wispy hybrids','henna brows on deep skin','threading'], book:'Square' },
+    { id:'p10', vert:'brows', name:'Cora Whitfield', studio:'W 4th St, West Village', hood:'West Village', budget:'$$', lic:true, exp:{eye:['hooded','deep-set'],skin:['I','II','III']}, tags:['hooded-eye lash mapping','microblading on light brows','tint only'], book:'Fresha' },
+  ];
+
+  const MEMBERS = {
+    m1:{ name:'Renée',    f:{hair:'4b',tex:'coarse',chem:'color-treated',skin:'V', under:'warm',   eye:'almond',    hood:'Greenpoint',  budget:'$$$'} },
+    m2:{ name:'Grace',    f:{hair:'2a',tex:'fine',  chem:'color-treated',skin:'III',under:'warm',   eye:'monolid',   hood:'LES',         budget:'$$$'} },
+    m3:{ name:'Ines',     f:{hair:'2c',tex:'medium',chem:'virgin',       skin:'IV', under:'olive',  eye:'hooded',    hood:'Williamsburg',budget:'$$'} },
+    m4:{ name:'Priyanka', f:{hair:'1b',tex:'coarse',chem:'keratin',      skin:'IV', under:'warm',   eye:'round',     hood:'UES',         budget:'$$'} },
+    m5:{ name:'Ji-woo',   f:{hair:'1a',tex:'fine',  chem:'color-treated',skin:'II', under:'cool',   eye:'monolid',   hood:'SoHo',        budget:'$$$'} },
+    m6:{ name:'Amara',    f:{hair:'4c',tex:'coarse',chem:'virgin',       skin:'VI', under:'neutral',eye:'downturned',hood:'Greenpoint',  budget:'$$'} },
+    m7:{ name:'Lena',     f:{hair:'2b',tex:'fine',  chem:'color-treated',skin:'II', under:'cool',   eye:'hooded',    hood:'West Village',budget:'$$'} },
+  };
+
+  const REVIEWS = [
+    { p:'p1', m:'m1', v:true,  rebook:true,  price:260, when:'Aug 2026', t:'Gloss and trim. First colorist who did not try to "soften" my texture. Toned exactly to the swatch.' },
+    { p:'p1', m:'m6', v:true,  rebook:true,  price:180, when:'Jul 2026', t:'Silk press without heat damage. Back to curls in one wash.' },
+    { p:'p1', m:'m3', v:false, rebook:false, price:240, when:'Jun 2026', t:'Great at what she does, but my 2c waves are not her lane. Ended up brassier than I wanted.' },
+    { p:'p2', m:'m2', v:true,  rebook:true,  price:420, when:'Aug 2026', t:'Lived-in balayage that stayed ash for eight weeks on fine hair. Zero breakage.' },
+    { p:'p2', m:'m5', v:true,  rebook:true,  price:380, when:'Jul 2026', t:'Understands level 2 lift on Asian hair. No orange stage, no drama.' },
+    { p:'p2', m:'m1', v:false, rebook:false, price:400, when:'May 2026', t:'Lovely studio, but she said herself she does not do much with 4b. Honest, so I left.' },
+    { p:'p3', m:'m3', v:true,  rebook:true,  price:210, when:'Sep 2026', t:'Money piece and gloss. Understood wavy hair and cut it dry.' },
+    { p:'p3', m:'m2', v:true,  rebook:true,  price:190, when:'Aug 2026', t:'Solid gloss, close to home, cheaper than LES. Not as precise on ash as Mei but most of the way there.' },
+    { p:'p3', m:'m7', v:true,  rebook:false, price:200, when:'Jun 2026', t:'Fine. Nothing wrong, just not worth switching from my old colorist.' },
+    { p:'p4', m:'m4', v:true,  rebook:true,  price:150, when:'Aug 2026', t:'Only person who covers my grays without turning them red. Keratin-safe.' },
+    { p:'p5', m:'m3', v:true,  rebook:true,  price:85,  when:'Sep 2026', t:'Sheer nude that matches an olive undertone. Builder gel lasted four weeks.' },
+    { p:'p5', m:'m2', v:true,  rebook:true,  price:90,  when:'Aug 2026', t:'No e-file on the natural nail, which is rare. Walkable from the L.' },
+    { p:'p6', m:'m1', v:true,  rebook:true,  price:60,  when:'Aug 2026', t:'Deep-skin nude matching is a real skill and she has it. Best value in LES.' },
+    { p:'p6', m:'m6', v:true,  rebook:true,  price:65,  when:'Jul 2026', t:'Structured mani, chrome held three weeks.' },
+    { p:'p7', m:'m5', v:true,  rebook:true,  price:140, when:'Sep 2026', t:'Korean gel art on short nails. Milky pink, perfect for a cool undertone.' },
+    { p:'p7', m:'m7', v:false, rebook:true,  price:130, when:'Jun 2026', t:'Pricey, but the shaping on short nails is unmatched.' },
+    { p:'p8', m:'m5', v:true,  rebook:true,  price:160, when:'Aug 2026', t:'Lash lift on straight monolid lashes finally held a curl. Mapping is the difference.' },
+    { p:'p8', m:'m2', v:true,  rebook:true,  price:150, when:'Jul 2026', t:'Brow lamination on sparse brows. She did not over-fluff them.' },
+    { p:'p8', m:'m1', v:true,  rebook:false, price:160, when:'May 2026', t:'Good technician, but her lash maps are built for monolids and my almond eyes read heavy.' },
+    { p:'p9', m:'m6', v:true,  rebook:true,  price:95,  when:'Sep 2026', t:'Henna brows on deep skin without the ashy cast. Wispy hybrids look natural.' },
+    { p:'p9', m:'m1', v:true,  rebook:true,  price:110, when:'Aug 2026', t:'Threading is fast and clean. Hybrids lasted three weeks.' },
+    { p:'p10', m:'m7', v:true, rebook:true,  price:120, when:'Aug 2026', t:'Hooded-eye mapping so the lashes show when my eyes are open. First time anyone got it.' },
+    { p:'p10', m:'m3', v:true, rebook:true,  price:115, when:'Jul 2026', t:'Tint only, no drama, understood hooded lids.' },
+  ];
+
+  const POSTS = [
+    { id:'q1', m:'m1', when:'2h',  vert:'colorist', kind:'move', pv:'p1',  replies:6,  t:'Dani Okafor moved from Bushwick Color Bar to a suite in Greenpoint. Same prices, no more walk-in chaos. Updated her profile.' },
+    { id:'q2', m:'m2', when:'5h',  vert:'colorist', replies:9,  t:'2a fine color-treated in LES: does anyone have a gloss that stays ash past week six? Mei Lin is perfect but $420 every eight weeks adds up.' },
+    { id:'q3', m:'m5', when:'1d',  vert:'brows',    pv:'p8',  replies:4,  t:'Monolid lash-lift people: Aya Nakamura at the SoHo brow room is the only one who has held a curl on my straight lashes. Mapping is the whole thing.' },
+    { id:'q4', m:'m6', when:'1d',  vert:'nails',    pv:'p6',  replies:3,  t:'4c virgin, VI neutral, Greenpoint: Renata Silva has the best deep-skin nude match I have had in NYC. $65.' },
+    { id:'q5', m:'m3', when:'2d',  vert:'colorist', pv:'p3',  replies:11, t:'Heads up for wavy 2c hair: Dani is incredible on coils but my gloss came out brass. Not her lane, she said so herself. Sasha Reyes in Williamsburg was the fix.' },
+    { id:'q6', m:'m7', when:'3d',  vert:'brows',    pv:'p10', replies:5,  t:'Hooded eyes: Cora Whitfield on W 4th maps so the lashes actually show when your eyes are open. $120 well spent.' },
+  ];
+
+  const UPKEEP = [
+    { n:'Brow tint + lamination', m:'Aya Nakamura · every 6 weeks', due:'in 4 days',   state:'soon', pv:'p8' },
+    { n:'Gloss refresh',          m:'Mei Lin Chou · every 8 weeks', due:'12 days over', state:'over', pv:'p2' },
+    { n:'Builder gel fill',       m:'Jules Tran · every 4 weeks',   due:'in 11 days',  state:'ok',   pv:'p5' },
+    { n:'Tretinoin refill',       m:'Derm · every 3 months',        due:'in 2 weeks',  state:'ok' },
+    { n:'Dentist cleaning',       m:'Every 6 months',               due:'in 5 weeks',  state:'ok' },
+    { n:'Annual labs',            m:'Ferritin, vitamin D, thyroid', due:'in 9 weeks',  state:'ok' },
+  ];
+
+  return { HAIR, TEX, SKIN, BUDGET, FACETS, WEIGHTS, VERTICALS, SINGULAR, DEFAULT_YOU, PROVIDERS, MEMBERS, REVIEWS, POSTS, UPKEEP };
+})();
+
+</script>
+<script>
+/* People Like Me — facet-segmented provider directory + community (demo). No build step. */
+(() => {
+  const D = window.PLM_DATA;
+  const $ = (s, r = document) => r.querySelector(s);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+
+  // ---------- State ----------
+  const S = { tab:'find', vert:'colorist', plm:true, open:null, feedVert:'all', q:'', follows:new Set(['p2','p8']), posts:[...D.POSTS], you:{ ...D.DEFAULT_YOU } };
+  try { const saved = JSON.parse(localStorage.getItem('plm.you') || 'null'); if (saved) S.you = { ...D.DEFAULT_YOU, ...saved }; } catch (e) {}
+  const save = () => { try { localStorage.setItem('plm.you', JSON.stringify(S.you)); } catch (e) {} };
+
+  // ---------- Similarity engine ----------
+  const ORD = { hair:D.HAIR, skin:D.SKIN, budget:D.BUDGET, tex:D.TEX };
+  function fs(k, a, b) {
+    if (a === b) return 1;
+    const o = ORD[k]; if (!o) return 0;
+    const d = Math.abs(o.indexOf(a) - o.indexOf(b));
+    if (d === 1) return k === 'hair' ? .7 : .5;
+    if (d === 2 && k === 'hair') return .3;
+    return 0;
+  }
+  const sim = (vert, a, b) => Object.entries(D.WEIGHTS[vert]).reduce((s, [k, w]) => s + w * fs(k, a[k], b[k]), 0);
+  // A provider's "experienced with" lists become a proxy facet set: the closest value they cover.
+  function proxy(p) {
+    const o = { ...S.you };
+    for (const k of Object.keys(D.WEIGHTS[p.vert])) {
+      if (p.exp[k]) o[k] = p.exp[k].includes(S.you[k]) ? S.you[k] : p.exp[k].reduce((b, v) => fs(k, v, S.you[k]) > fs(k, b, S.you[k]) ? v : b, p.exp[k][0]);
+      else if (k === 'hood') o.hood = p.hood;
+      else if (k === 'budget') o.budget = p.budget;
+    }
+    return o;
+  }
+  const score = p => sim(p.vert, S.you, proxy(p));
+  const LIKE = .6; // reviewer similarity threshold for "people like you"
+  function likeYou(p) {
+    const rs = D.REVIEWS.filter(r => r.p === p.id);
+    const lk = rs.filter(r => sim(p.vert, S.you, D.MEMBERS[r.m].f) >= LIKE);
+    return { n:rs.length, lk:lk.length, rb:lk.filter(r => r.rebook).length };
+  }
+
+  // ---------- Small renderers ----------
+  const HUES = { p1:'#7A8F5A', p2:'#5E8A63', p3:'#C4A244', p4:'#6E8F7C', p5:'#9AA24A', p6:'#4F7D6A', p7:'#B99A3A', p8:'#6B9A70', p9:'#D2B14E', p10:'#7F9B62' };
+  const hue = id => HUES[id] || `hsl(${80 + [...id].reduce((a, c) => a + c.charCodeAt(0), 0) % 90} 38% 42%)`;
+  const initials = n => n.split(' ').map(w => w[0]).slice(0, 2).join('');
+  const av = (id, name, cls = '') => `<div class="av ${cls}" style="background:${hue(id)}">${initials(name)}</div>`;
+  function ring(s) {
+    const pct = Math.round(s * 100), c = pct >= 75 ? 'hi' : pct >= 45 ? 'mid' : '';
+    const C = 2 * Math.PI * 20;
+    return `<div class="ring ${c}" title="${pct}% like you"><svg viewBox="0 0 48 48"><circle class="bg" cx="24" cy="24" r="20"/><circle class="fg" cx="24" cy="24" r="20" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - s)).toFixed(1)}"/></svg><div class="v">${pct}%</div></div>`;
+  }
+  const snap = (vert, f, s) => `<div class="snap">${Object.keys(D.WEIGHTS[vert]).map(k => `<span class="${f[k] === S.you[k] ? 'hit' : ''}">${esc(f[k])}</span>`).join('')}${s != null ? `<span class="pct">${Math.round(s * 100)}% like you</span>` : ''}</div>`;
+  const lic = p => p.lic ? '<span class="badge">NYS license ✓</span>' : '<span class="badge warn">license pending</span>';
+  const youSummary = () => `${S.you.hair} · ${S.you.tex} · ${S.you.chem} · ${S.you.skin} ${S.you.under} · ${S.you.eye} · ${S.you.hood}`;
+
+  // ---------- Screens ----------
+  function find() {
+    if (S.open) return provider(S.open);
+    const q = S.q.trim().toLowerCase();
+    let list = D.PROVIDERS.filter(p => p.vert === S.vert)
+      .filter(p => !q || [p.name, p.studio, p.hood, ...p.tags].join(' ').toLowerCase().includes(q))
+      .map(p => ({ p, s: score(p) }));
+    list.sort(S.plm ? (a, b) => b.s - a.s : (a, b) => a.p.name.localeCompare(b.p.name));
+    const w = Object.keys(D.WEIGHTS[S.vert]).map(k => D.FACETS.find(f => f.k === k).label.toLowerCase());
+    return `
+      <div class="eyebrow">NYC · ${D.PROVIDERS.filter(p => p.vert === S.vert).length} vetted</div>
+      <h1>Find a ${D.SINGULAR[S.vert]}</h1>
+      <p class="sub">Ranked for your ${w.slice(0, -1).join(', ')} and ${w.slice(-1)}. Providers tag what they are experienced with; they never see your facets.</p>
+      <div class="seg" role="tablist">${Object.entries(D.VERTICALS).map(([v, l]) => `<button role="tab" aria-selected="${v === S.vert}" class="${v === S.vert ? 'on' : ''}" data-vert="${v}">${l}</button>`).join('')}</div>
+      <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" type="search" placeholder="Search names, studios, specialties" value="${esc(S.q)}" autocomplete="off"></label>
+      <div class="switch"><div><div class="l">People like me</div><div class="d">${S.plm ? 'Sorted by similarity, nothing hidden' : 'Alphabetical'}</div></div><button class="tog" role="switch" aria-checked="${S.plm}" aria-label="People like me" data-plm></button></div>
+      ${list.length ? list.map(({ p, s }) => { const ly = likeYou(p); return `
+        <button class="card" data-open="${p.id}">
+          ${av(p.id, p.name)}
+          <div>
+            <div class="name">${esc(p.name)} ${lic(p)}${S.follows.has(p.id) ? '<span class="badge muted">following</span>' : ''}</div>
+            <div class="meta">${esc(p.studio)} · ${p.budget}</div>
+            <div class="tags">${p.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
+            <div class="stats"><span><b>${ly.lk}</b> of <b>${ly.n}</b> reviews from people like you</span><span><b>${ly.lk ? Math.round(ly.rb / ly.lk * 100) + '%' : '–'}</b> would rebook</span></div>
+          </div>
+          ${ring(s)}
+          ${p.moved ? `<div class="moved">↪ ${esc(p.moved)}</div>` : ''}
+        </button>`; }).join('') : '<div class="empty">No one matches that search yet. Ask the community on the Ask tab.</div>'}
+      <div class="note"><b>Why this works:</b> one directory serves every segment. Segmentation is a lens over shared listings, weighted per vertical, so no segment ever lands in an empty room.</div>`;
+  }
+
+  function provider(id) {
+    const p = D.PROVIDERS.find(x => x.id === id); if (!p) { S.open = null; return find(); }
+    const s = score(p), keys = Object.keys(D.WEIGHTS[p.vert]);
+    const rs = D.REVIEWS.filter(r => r.p === id).map(r => ({ r, m: D.MEMBERS[r.m], s: sim(p.vert, S.you, D.MEMBERS[r.m].f) })).sort((a, b) => b.s - a.s);
+    const ly = likeYou(p), fol = S.follows.has(id);
+    return `
+      <button class="back" data-back>← ${D.VERTICALS[p.vert]}</button>
+      <div class="phead">${av(p.id, p.name, 'big')}<div><h1>${esc(p.name)}</h1><div class="meta" style="color:var(--muted);font-size:13px;margin-top:2px">${esc(p.studio)} · ${p.budget} · ${lic(p)}</div></div>${ring(s)}</div>
+      ${p.moved ? `<div class="moved" style="margin-top:12px">↪ ${esc(p.moved)}. ${fol ? 'You will hear about the next move.' : 'Follow to hear about the next move.'}</div>` : ''}
+      <div class="tags" style="margin-top:12px">${p.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
+      <div class="actions">
+        <button class="btn ${fol ? '' : 'primary'}" data-follow="${p.id}">${fol ? '✓ Following' : 'Follow'}</button>
+        <button class="btn" data-toast="Booking opens in ${esc(p.book)}. The directory never owns the calendar.">Book via ${esc(p.book)} ↗</button>
+        <button class="btn ghost" data-ask="${p.id}">Ask about ${esc(p.name.split(' ')[0])}</button>
+      </div>
+      <div class="stats" style="margin-top:0"><span><b>${ly.lk}</b> of <b>${ly.n}</b> reviews from people like you</span><span><b>${ly.lk ? Math.round(ly.rb / ly.lk * 100) + '%' : '–'}</b> would rebook</span></div>
+      <h2>Reviews, people like you first</h2>
+      <p class="sub">Sorted by how much each reviewer shares your ${keys.map(k => D.FACETS.find(f => f.k === k).label.toLowerCase()).join(', ')}. Others are dimmed, never hidden.</p>
+      <div class="legend"><span><i></i>matches your facet</span><span>verified = tied to a real transaction in the spend tracker</span></div>
+      ${rs.map(({ r, m, s }) => `
+        <div class="review ${s < LIKE ? 'dim' : ''}">
+          ${av('m' + m.name, m.name)}
+          <div>
+            <div class="who"><span><b>${esc(m.name)}</b> · ${r.when} · $${r.price} · ${r.rebook ? 'would rebook' : 'would not rebook'}</span>${r.v ? '<span class="badge">verified spend</span>' : '<span class="badge muted">unverified</span>'}</div>
+            ${snap(p.vert, m.f, s)}
+            <p>${esc(r.t)}</p>
+          </div>
+        </div>`).join('')}`;
+  }
+
+  function ask() {
+    const list = S.posts.filter(p => S.feedVert === 'all' || p.vert === S.feedVert)
+      .map(p => ({ p, m: p.m === 'you' ? { name:'You', f:p.f } : D.MEMBERS[p.m], s: sim(p.vert, S.you, p.m === 'you' ? p.f : D.MEMBERS[p.m].f) }));
+    if (S.plm) list.sort((a, b) => b.s - a.s);
+    const target = S.feedVert === 'all' ? S.vert : S.feedVert;
+    return `
+      <div class="eyebrow">One feed · every segment</div>
+      <h1>Ask people like you</h1>
+      <p class="sub">Every post carries a frozen snapshot of the author's facets, so answers come from the right people even after your hair changes.</p>
+      <div class="composer">
+        <textarea id="q-text" placeholder="${esc(S.you.hair)} ${esc(S.you.tex)} ${esc(S.you.chem)} in ${esc(S.you.hood)}: who does your…"></textarea>
+        <div class="foot">${snap(target, S.you)}<button class="btn primary" data-post="${target}">Post</button></div>
+      </div>
+      <div class="chipgrid" style="margin-bottom:12px"><button class="chip small ${S.feedVert === 'all' ? 'on' : ''}" data-feed="all">All</button>${Object.entries(D.VERTICALS).map(([v, l]) => `<button class="chip small ${S.feedVert === v ? 'on' : ''}" data-feed="${v}">${l}</button>`).join('')}</div>
+      <div class="switch"><div><div class="l">People like me first</div><div class="d">Distant segments dim instead of disappearing</div></div><button class="tog" role="switch" aria-checked="${S.plm}" aria-label="People like me first" data-plm></button></div>
+      ${list.map(({ p, m, s }) => { const pv = p.pv ? D.PROVIDERS.find(x => x.id === p.pv) : null; const text = pv ? esc(p.t).replace(esc(pv.name), `<button class="pv" data-open="${pv.id}">${esc(pv.name)}</button>`) : esc(p.t); return `
+        <div class="post ${s < .4 ? 'dim' : ''}">
+          ${av('m' + m.name, m.name)}
+          <div>
+            <div class="who"><b>${esc(m.name)}</b> · ${p.when} · ${D.VERTICALS[p.vert]} ${p.kind === 'move' ? '<span class="badge warn">provider moved</span>' : ''}</div>
+            ${snap(p.vert, m.f, s)}
+            <p>${text}</p>
+            <div class="foot"><span>${p.replies} ${p.replies === 1 ? 'reply' : 'replies'}</span>${pv ? `<span>linked to ${esc(pv.name)}'s page</span>` : ''}</div>
+          </div>
+        </div>`; }).join('')}`;
+  }
+
+  function upkeep() {
+    return `
+      <div class="eyebrow">Ops for body</div>
+      <h1>Upkeep</h1>
+      <p class="sub">Recurring maintenance pulled from bookings and spend. Rebook in one tap when the provider is on the directory.</p>
+      ${D.UPKEEP.map(o => `<div class="up ${o.state}"><div class="stripe"></div><div><div class="n">${esc(o.n)}</div><div class="m">${esc(o.m)}</div></div>${o.pv ? `<button class="due" data-open="${o.pv}" title="Open provider">${esc(o.due)} →</button>` : `<span class="due">${esc(o.due)}</span>`}</div>`).join('')}
+      <div class="note">Later layers land here: labs and biomarkers on the same timeline, and the spend tracker correlating what you paid with what actually changed.</div>`;
+  }
+
+  function me() {
+    return `
+      <div class="eyebrow">Your facets · stored on this device only</div>
+      <h1>People like you</h1>
+      <p class="sub">Each facet changes who counts as "like you" across the whole app. All optional. Providers never see them and can never filter by them.</p>
+      ${D.FACETS.map(f => `
+        <div class="facet"><div class="h"><b>${f.label}</b><span>${esc(S.you[f.k])}</span></div>
+        <div class="chipgrid" role="radiogroup" aria-label="${f.label}">${f.opts.map(o => `<button class="chip small ${S.you[f.k] === o ? 'on' : ''}" role="radio" aria-checked="${S.you[f.k] === o}" data-facet="${f.k}" data-val="${esc(o)}">${esc(o)}</button>`).join('')}</div>
+        <div class="hint">${f.hint}</div></div>`).join('')}
+      <div class="actions"><button class="btn" data-reset>Reset to the demo profile</button></div>
+      <div class="note"><b>Try it:</b> set hair to 4c and texture to coarse, then open Find. Dani Okafor jumps to the top and Mei Lin Chou's reviews dim. Set eye shape to hooded and Cora Whitfield wins brow &amp; lash.</div>`;
+  }
+
+  // ---------- Render ----------
+  const SCREENS = { find, ask, upkeep, me };
+  function render() {
+    $('#screen').innerHTML = SCREENS[S.tab]();
+    document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === S.tab));
+    $('#you-summary').textContent = youSummary();
+    $('#side-facets').innerHTML = D.FACETS.map(f => `<span>${esc(S.you[f.k])}</span>`).join('');
+    document.title = `People Like Me · ${{ find:'Find', ask:'Ask', upkeep:'Upkeep', me:'Me' }[S.tab]}`;
+  }
+  let toastT;
+  function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200); }
+  const scrollTop = () => window.scrollTo({ top:0 });
+
+  // ---------- Events ----------
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-tab],[data-vert],[data-feed],[data-open],[data-back],[data-plm],[data-follow],[data-post],[data-facet],[data-reset],[data-toast],[data-ask]');
+    if (!t) return;
+    const d = t.dataset;
+    if (d.tab) { S.tab = d.tab; S.open = null; scrollTop(); }
+    else if (d.vert) { S.vert = d.vert; S.q = ''; }
+    else if (d.feed) { S.feedVert = d.feed; }
+    else if (d.open) { S.open = d.open; S.tab = 'find'; scrollTop(); }
+    else if ('back' in d) { S.open = null; }
+    else if ('plm' in d) { S.plm = !S.plm; }
+    else if (d.follow) { S.follows.has(d.follow) ? S.follows.delete(d.follow) : S.follows.add(d.follow); toast(S.follows.has(d.follow) ? 'Following. You will hear when they move.' : 'Unfollowed.'); }
+    else if (d.ask) { const p = D.PROVIDERS.find(x => x.id === d.ask); S.tab = 'ask'; S.feedVert = p.vert; S.open = null; render(); $('#q-text').value = `Has anyone with ${S.you[Object.keys(D.WEIGHTS[p.vert])[0]]} ${D.FACETS.find(f => f.k === Object.keys(D.WEIGHTS[p.vert])[0]).label.toLowerCase()} been to ${p.name}? `; $('#q-text').focus(); return; }
+    else if (d.post) { const ta = $('#q-text'); const q = ta.value.trim(); if (!q) { ta.focus(); return; } S.posts.unshift({ id:'you' + Date.now(), m:'you', f:{ ...S.you }, when:'now', vert:d.post, replies:0, t:q }); toast('Posted with your facet snapshot.'); }
+    else if (d.facet) { S.you[d.facet] = d.val; save(); }
+    else if ('reset' in d) { S.you = { ...D.DEFAULT_YOU }; save(); toast('Back to the demo profile.'); }
+    else if (d.toast) { toast(d.toast); return; }
+    render();
+  });
+  document.addEventListener('input', e => { if (e.target.id === 'q') { S.q = e.target.value; const pos = e.target.selectionStart; render(); const el = $('#q'); el.focus(); el.setSelectionRange(pos, pos); } });
+
+  render();
+  
+})();
+
+</script>
+</body>
+</html>
