@@ -259,25 +259,19 @@ tbody tr[aria-selected="true"]{background:var(--accent-soft)}
    All data below is FICTIONAL and generated in-memory. No auth, no database.
    ========================================================================= */
 
-/* ---------- offices (7 care homes + group HQ) ---------- */
+/* ---------- offices (2 care homes in Hsinchu + operations HQ) ---------- */
+/* v2.0 prototype: currently Hsinchu only. Future phases: Taichung (Phase 2), Changhua (Phase 3) */
 const OFFICES = [
-  {id:'O1', zh:'台北中山院',  en:'Taipei Zhongshan',   code:'TPE-ZS', city:{zh:'台北市',en:'Taipei'},      beds:96},
-  {id:'O2', zh:'新北板橋院',  en:'New Taipei Banqiao', code:'NTP-BQ', city:{zh:'新北市',en:'New Taipei'},  beds:120},
-  {id:'O3', zh:'桃園中壢院',  en:'Taoyuan Zhongli',    code:'TYN-ZL', city:{zh:'桃園市',en:'Taoyuan'},     beds:84},
-  {id:'O4', zh:'台中西屯院',  en:'Taichung Xitun',     code:'TXG-XT', city:{zh:'台中市',en:'Taichung'},    beds:110},
-  {id:'O5', zh:'彰化員林院',  en:'Changhua Yuanlin',   code:'CHW-YL', city:{zh:'彰化縣',en:'Changhua'},    beds:72},
-  {id:'O6', zh:'台南永康院',  en:'Tainan Yongkang',    code:'TNN-YK', city:{zh:'台南市',en:'Tainan'},      beds:88},
-  {id:'O7', zh:'高雄左營院',  en:'Kaohsiung Zuoying',  code:'KHH-ZY', city:{zh:'高雄市',en:'Kaohsiung'},   beds:104}
+  {id:'O1', zh:'竹北照護院',  en:'Hsinchu Zhuibei',  code:'HC-01', city:{zh:'新竹縣竹北市',en:'Hsinchu Zhuibei'},  beds:64},
+  {id:'O2', zh:'竹東照護院',  en:'Hsinchu Zhudong',  code:'HC-02', city:{zh:'新竹縣竹東鎮',en:'Hsinchu Zhudong'},  beds:56}
 ];
-const HQ = {id:'HQ', zh:'集團總部', en:'Group HQ', code:'HQ', city:{zh:'台北市',en:'Taipei'}, beds:0};
+const HQ = {id:'HQ', zh:'新竹營運中心', en:'Hsinchu Operations Center', code:'HQ', city:{zh:'新竹縣',en:'Hsinchu'}, beds:0};
 const ALL_UNITS = [HQ].concat(OFFICES);
 const unit = id => ALL_UNITS.find(o=>o.id===id) || HQ;
 
-/* ---------- v2.0: multi-company structure ---------- */
+/* ---------- v2.0: company structure (currently single entity; Phase 2–3: multi-region) ---------- */
 const COMPANIES = [
-  {id:'C1', zh:'誠馨北區公司', en:'Kanghe North', hq:'HQ', offices:['O1','O2','O3']},
-  {id:'C2', zh:'誠馨中部公司', en:'Kanghe Central', hq:'HQ', offices:['O4','O5']},
-  {id:'C3', zh:'誠馨南部公司', en:'Kanghe South', hq:'HQ', offices:['O6','O7']}
+  {id:'C1', zh:'康禾長照 · 新竹區', en:'Kanghe Care • Hsinchu Region', hq:'HQ', offices:['O1','O2']}
 ];
 const companyOf = officeId => COMPANIES.find(c=>c.offices.includes(officeId));
 const companyOffices = companyId => (COMPANIES.find(c=>c.id===companyId)?.offices||[]).map(id=>OFFICES.find(o=>o.id===id));
@@ -301,67 +295,38 @@ const DEPTS = {
   ops:{zh:'行政部',en:'Administration'}
 };
 
-/* ---------- employees (fictional) ---------- */
-/* [id, zhName, enName, unit, titleKey, deptKey, hireDate, ext, mobile, band, salary, type, managerId] */
+/* ---------- employees (demo personnel for Hsinchu operations) ---------- */
+/* [id, title, unit, titleKey, deptKey, hireDate, ext, band, salary, type, managerId] */
 const RAW = [
- ['E1001','何季衡','Ho Chi-heng','HQ','ceo','exec','2009-03-02','101','0912-***-201','M5',186000,'full',null],
- ['E1002','紀文婷','Chi Wen-ting','HQ','coo','exec','2012-07-16','102','0912-***-202','M4',152000,'full','E1001'],
- ['E1003','林佩瑜','Lin Pei-yu','HQ','hrd','hr','2014-01-06','120','0912-***-203','M3',108000,'full','E1002'],
- ['E1004','范振宇','Fan Chen-yu','HQ','fin','fin','2015-09-01','130','0912-***-204','M3',112000,'full','E1002'],
- ['E1005','陳志明','Chen Chih-ming','HQ','it','isd','2018-04-23','140','0912-***-205','P3',78000,'full','E1002'],
- ['E1006','沈書瑜','Shen Shu-yu','HQ','hrs','hr','2021-02-15','121','0912-***-206','P2',54000,'full','E1003'],
+ ['E1001','執行長','HQ','ceo','exec','2018-01-15','101','M5',185000,'full',null],
+ ['E1002','營運長','HQ','coo','exec','2017-03-20','102','M4',152000,'full','E1001'],
+ ['E1003','人資部經理','HQ','hrd','hr','2019-06-10','120','M3',108000,'full','E1002'],
+ ['E1004','財務部經理','HQ','fin','fin','2020-02-14','130','M3',112000,'full','E1002'],
+ ['E1005','資訊管理員','HQ','it','isd','2021-08-01','140','P3',78000,'full','E1002'],
+ ['E1006','人資專員','HQ','hrs','hr','2022-05-18','121','P2',54000,'full','E1003'],
 
- ['E2101','高淑貞','Kao Shu-chen','O1','dir','exec','2013-05-20','201','0912-***-211','M3',124000,'full','E1002'],
- ['E2102','邱柏勳','Chiu Po-hsun','O1','hn','nur','2016-08-01','202','0912-***-212','P3',76000,'full','E2101'],
- ['E2103','蘇筱涵','Su Hsiao-han','O1','rn','nur','2019-03-11','203','0912-***-213','P2',58000,'full','E2102'],
- ['E2104','潘冠廷','Pan Kuan-ting','O1','ca','care','2020-11-02','204','0912-***-214','G2',38000,'full','E2102'],
- ['E2105','賴姿吟','Lai Tzu-yin','O1','sw','soc','2021-06-14','205','0912-***-215','P2',52000,'full','E2101'],
- ['E2106','呂承翰','Lu Cheng-han','O1','adm','ops','2022-09-05','206','0912-***-216','G3',42000,'full','E2101'],
+ ['E2101','院長','O1','dir','exec','2017-09-11','201','M3',125000,'full','E1002'],
+ ['E2102','護理長','O1','hn','nur','2018-11-05','202','P3',76000,'full','E2101'],
+ ['E2103','護理師','O1','rn','nur','2020-01-23','203','P2',58000,'full','E2102'],
+ ['E2104','照服員','O1','ca','care','2021-04-16','204','G2',38000,'full','E2102'],
+ ['E2105','社工師','O1','sw','soc','2021-10-20','205','P2',52000,'full','E2101'],
+ ['E2106','行政專員','O1','adm','ops','2022-12-06','206','G3',42000,'full','E2101'],
+ ['E2107','照服員','O1','ca','care','2023-03-14','207','G2',37500,'part','E2102'],
+ ['E2108','護理師','O1','rn','nur','2023-07-21','208','P2',57000,'full','E2102'],
 
- ['E2201','曾淑娟','Tseng Shu-chuan','O2','dir','exec','2011-10-17','301','0912-***-221','M3',128000,'full','E1002'],
- ['E2202','廖偉綸','Liao Wei-lun','O2','hn','nur','2015-02-09','302','0912-***-222','P3',79000,'full','E2201'],
- ['E2203','江怡君','Chiang Yi-chun','O2','rn','nur','2018-07-23','303','0912-***-223','P2',60000,'full','E2202'],
- ['E2204','石俊良','Shih Chun-liang','O2','ca','care','2019-12-16','304','0912-***-224','G2',39500,'full','E2202'],
- ['E2205','方雅琪','Fang Ya-chi','O2','ot','rehab','2020-04-06','305','0912-***-225','P2',63000,'full','E2201'],
- ['E2206','田孟儒','Tien Meng-ju','O2','ca','care','2023-01-09','306','0912-***-226','G2',37000,'part','E2202'],
- ['E2207','白宗霖','Pai Tsung-lin','O2','drv','ops','2021-08-30','307','0912-***-227','G1',34000,'full','E2201'],
-
- ['E2301','洪世昌','Hung Shih-chang','O3','dir','exec','2014-03-24','401','0912-***-231','M2',118000,'full','E1002'],
- ['E2302','余靜宜','Yu Ching-yi','O3','hn','nur','2017-05-15','402','0912-***-232','P3',74000,'full','E2301'],
- ['E2303','卓明道','Cho Ming-tao','O3','rn','nur','2020-09-14','403','0912-***-233','P2',57000,'full','E2302'],
- ['E2304','涂佳穎','Tu Chia-ying','O3','ca','care','2022-02-21','404','0912-***-234','G2',37500,'full','E2302'],
- ['E2305','巫昭儀','Wu Chao-yi','O3','die','care','2021-11-08','405','0912-***-235','P2',55000,'full','E2301'],
-
- ['E2401','王淑芬','Wang Shu-fen','O4','dir','exec','2012-06-11','501','0912-***-241','M3',126000,'full','E1002'],
- ['E2402','蔡宗翰','Tsai Tsung-han','O4','hn','nur','2016-01-25','502','0912-***-242','P3',77000,'full','E2401'],
- ['E2403','鄭雅文','Cheng Ya-wen','O4','rn','nur','2018-10-08','503','0912-***-243','P2',59000,'full','E2402'],
- ['E2404','許文彬','Hsu Wen-pin','O4','ca','care','2019-05-27','504','0912-***-244','G2',39000,'full','E2402'],
- ['E2405','謝佩君','Hsieh Pei-chun','O4','sw','soc','2020-08-17','505','0912-***-245','P2',53000,'full','E2401'],
- ['E2406','藍志偉','Lan Chih-wei','O4','ot','rehab','2021-03-15','506','0912-***-246','P2',62000,'full','E2401'],
- ['E2407','龔美惠','Kung Mei-hui','O4','ca','care','2023-04-10','507','0912-***-247','G2',36500,'part','E2402'],
- ['E2408','施惠珍','Shih Hui-chen','O4','adm','ops','2022-07-04','508','0912-***-248','G3',41000,'full','E2401'],
-
- ['E2501','劉建宏','Liu Chien-hung','O5','dir','exec','2015-04-13','601','0912-***-251','M2',115000,'full','E1002'],
- ['E2502','吳雅婷','Wu Ya-ting','O5','hn','nur','2018-02-05','602','0912-***-252','P3',73000,'full','E2501'],
- ['E2503','黃俊傑','Huang Chun-chieh','O5','ca','care','2020-06-22','603','0912-***-253','G2',36800,'full','E2502'],
- ['E2504','李美玲','Li Mei-ling','O5','rn','nur','2021-09-13','604','0912-***-254','P2',56000,'full','E2502'],
-
- ['E2601','張家豪','Chang Chia-hao','O6','dir','exec','2013-11-04','701','0912-***-261','M2',119000,'full','E1002'],
- ['E2602','陳玉琴','Chen Yu-chin','O6','hn','nur','2017-08-28','702','0912-***-262','P3',75000,'full','E2601'],
- ['E2603','葉宏昇','Yeh Hung-sheng','O6','rn','nur','2019-01-14','703','0912-***-263','P2',58500,'full','E2602'],
- ['E2604','溫雅琳','Wen Ya-lin','O6','ca','care','2021-05-10','704','0912-***-264','G2',37200,'full','E2602'],
- ['E2605','薛柏丞','Hsueh Po-cheng','O6','drv','ops','2022-03-07','705','0912-***-265','G1',34500,'full','E2601'],
-
- ['E2701','游麗雲','Yu Li-yun','O7','dir','exec','2010-09-06','801','0912-***-271','M3',130000,'full','E1002'],
- ['E2702','簡君毅','Chien Chun-yi','O7','hn','nur','2016-06-20','802','0912-***-272','P3',78000,'full','E2701'],
- ['E2703','翁淑貞','Weng Shu-chen','O7','rn','nur','2018-12-03','803','0912-***-273','P2',59500,'full','E2702'],
- ['E2704','古信良','Ku Hsin-liang','O7','ca','care','2020-02-24','804','0912-***-274','G2',38200,'full','E2702'],
- ['E2705','戴宛柔','Tai Wan-jou','O7','ot','rehab','2021-07-19','805','0912-***-275','P2',61000,'full','E2701'],
- ['E2706','馮子涵','Feng Tzu-han','O7','ca','care','2023-08-14','806','0912-***-276','G2',36000,'part','E2702']
+ ['E2201','院長','O2','dir','exec','2016-05-27','301','M3',125000,'full','E1002'],
+ ['E2202','護理長','O2','hn','nur','2018-02-08','302','P3',76500,'full','E2201'],
+ ['E2203','護理師','O2','rn','nur','2019-09-13','303','P2',58500,'full','E2202'],
+ ['E2204','照服員','O2','ca','care','2020-07-01','304','G2',38500,'full','E2202'],
+ ['E2205','職能治療師','O2','ot','rehab','2021-01-25','305','P2',62500,'full','E2201'],
+ ['E2206','照服員','O2','ca','care','2023-02-10','306','G2',37000,'part','E2202'],
+ ['E2207','交通服務員','O2','drv','ops','2022-06-15','307','G1',34000,'full','E2201'],
+ ['E2208','社工師','O2','sw','soc','2022-09-05','308','P2',51500,'full','E2201'],
+ ['E2209','營養師','O2','die','care','2023-08-19','309','P2',54500,'full','E2202']
 ];
 const STAFF = RAW.map(r=>({
-  id:r[0], zh:r[1], en:r[2], unit:r[3], title:r[4], dept:r[5],
-  hired:r[6], ext:r[7], mobile:r[8], band:r[9], salary:r[10], type:r[11], mgr:r[12]
+  id:r[0], zh:r[1], unit:r[2], titleKey:r[3], dept:r[4],
+  hired:r[5], ext:r[6], band:r[7], salary:r[8], type:r[9], mgr:r[10]
 }));
 const person = id => STAFF.find(s=>s.id===id);
 </script>
@@ -385,8 +350,8 @@ const ANNOUNCEMENTS = [
  {id:'A08', date:'2026-09-04', cat:'policy', scope:'ALL', pin:true, author:'E1001',
   zh:'長照機構評鑑準備啟動說明',
   en:'Facility Accreditation Preparation Kick-off',
-  bodyZh:'衛生局將於 115 年第四季辦理長照機構評鑑。總部已成立跨院區準備小組，第一次會議訂於 9 月 22 日下午 2 時於台北中山院會議室舉行，各院請派院長及護理長出席。\n\n文件準備清單將另行於「文件管理」模組發布（本原型尚未建置）。',
-  bodyEn:'The city health bureau will conduct facility accreditation in Q4 2026. A cross-facility preparation team has been formed; the first meeting is 22 Sept, 14:00, at Taipei Zhongshan. Each facility should send its director and head nurse.\n\nThe document checklist will be published in the Document Control module (not built in this prototype).'},
+  bodyZh:'新竹衛生部門將於 115 年第四季辦理長照機構評鑑。營運中心已成立準備小組，第一次會議訂於 9 月 22 日下午 2 時舉行，各院請派院長及護理長出席。\n\n文件準備清單將另行於「文件管理」模組發布（本原型尚未建置）。',
+  bodyEn:'Local health authorities will conduct facility accreditation in Q4 2026. A preparation team has been formed; the first meeting is 22 Sept, 14:00. Each facility should send its director and head nurse.\n\nThe document checklist will be published in the Document Control module (not built in this prototype).'},
  {id:'A07', date:'2026-09-02', cat:'hr', scope:'ALL', pin:false, author:'E1003',
   zh:'115年度特休假結算與請假系統轉換',
   en:'2026 Annual Leave Reconciliation & Leave System Migration',
@@ -395,26 +360,26 @@ const ANNOUNCEMENTS = [
  {id:'A06', date:'2026-08-28', cat:'training', scope:'ALL', pin:false, author:'E1003',
   zh:'照顧服務員繼續教育時數提醒（第三季）',
   en:'Care Attendant Continuing Education Hours — Q3 Reminder',
-  bodyZh:'依規定照顧服務員每年須完成 20 小時繼續教育。系統統計截至 8 月底，全集團仍有 11 位同仁時數不足，名單已寄送各院院長。\n\n9 月 18 日將於台中西屯院辦理實體補課場次，可跨院報名。',
-  bodyEn:'Care attendants must complete 20 hours of continuing education per year. As of end-August, 11 staff group-wide are short of hours; lists have been sent to facility directors.\n\nA make-up session runs 18 Sept at Taichung Xitun and is open to all facilities.'},
- {id:'A05', date:'2026-09-05', cat:'facility', scope:'O4', pin:false, author:'E2401',
-  zh:'西屯院二樓浴室整修施工通知（9/14–9/25）',
-  en:'Xitun 2F Bathroom Renovation Notice (14–25 Sept)',
+  bodyZh:'依規定照顧服務員每年須完成 20 小時繼續教育。系統統計截至 8 月底，本院區仍有同仁時數不足，名單已由主管級發送。\n\n9 月 18 日將於竹北院辦理實體補課場次，竹東院同仁可跨院報名。',
+  bodyEn:'Care attendants must complete 20 hours of continuing education per year. As of end-August, some staff are short of hours; lists have been sent to directors.\n\nA make-up session runs 18 Sept at Zhuibei and is open to all facilities.'},
+ {id:'A05', date:'2026-09-05', cat:'facility', scope:'O1', pin:false, author:'E2101',
+  zh:'竹北院二樓浴室整修施工通知（9/14–9/25）',
+  en:'Zhuibei 2F Bathroom Renovation Notice (14–25 Sept)',
   bodyZh:'二樓公共浴室自 9 月 14 日起整修，期間住民沐浴改於三樓浴室，請照服員依調整後之沐浴時段表執行。\n\n施工時間為每日 09:00–16:00，如有噪音影響住民作息請即時回報行政。',
   bodyEn:'The 2F shared bathroom will be renovated from 14 Sept. Residents will bathe on 3F during this period; care attendants should follow the revised bathing schedule.\n\nWork runs 09:00–16:00 daily. Report any disturbance to residents to the administration office.'},
  {id:'A04', date:'2026-09-03', cat:'facility', scope:'O2', pin:false, author:'E2201',
-  zh:'板橋院新住民入住前置作業分工',
-  en:'Banqiao — Pre-admission Workflow for New Residents',
-  bodyZh:'本月新增 6 位住民，入住前評估請於入住前 3 個工作天完成，社工與護理各自完成評估表後上傳共用資料夾。',
-  bodyEn:'Six new residents arrive this month. Pre-admission assessments must be completed three working days before admission; social work and nursing each upload their assessment forms to the shared folder.'},
- {id:'A03', date:'2026-08-31', cat:'safety', scope:'O7', pin:false, author:'E2701',
-  zh:'左營院消防演練檢討與改善事項',
-  en:'Zuoying — Fire Drill Review and Corrective Actions',
+  zh:'竹東院新住民入住前置作業分工',
+  en:'Zhudong — Pre-admission Workflow for New Residents',
+  bodyZh:'本月新增住民，入住前評估請於入住前 3 個工作天完成，社工與護理各自完成評估表後上傳共用資料夾。',
+  bodyEn:'New residents arrive this month. Pre-admission assessments must be completed three working days before admission; social work and nursing each upload their assessment forms to the shared folder.'},
+ {id:'A03', date:'2026-08-31', cat:'safety', scope:'O1', pin:false, author:'E2101',
+  zh:'竹北院消防演練檢討與改善事項',
+  en:'Zhuibei — Fire Drill Review and Corrective Actions',
   bodyZh:'8 月 26 日消防演練檢討：夜間人力疏散動線需再演練一次，訂於 9 月 11 日夜班時段辦理，請夜班同仁全員參加。',
   bodyEn:'Review of the 26 Aug fire drill: the night-shift evacuation route needs one more run-through, scheduled for 11 Sept during the night shift. All night-shift staff must attend.'},
  {id:'A02', date:'2026-08-26', cat:'hr', scope:'O1', pin:false, author:'E2101',
-  zh:'中山院九月班表公布',
-  en:'Zhongshan — September Shift Roster Published',
+  zh:'竹北院九月班表公布',
+  en:'Zhuibei — September Shift Roster Published',
   bodyZh:'九月班表已公布於護理站，換班需經護理長同意並登錄於本系統出勤模組。',
   bodyEn:'The September roster is posted at the nursing station. Shift swaps require head-nurse approval and must be logged in the attendance module.'},
  {id:'A01', date:'2026-08-20', cat:'training', scope:'ALL', pin:false, author:'E1006',
@@ -428,18 +393,18 @@ const ANNOUNCEMENTS = [
 const EVENTS = [
  {d:'2026-09-01', type:'hr',    scope:'ALL', zh:'新進人員職前訓練', en:'New-hire orientation'},
  {d:'2026-09-03', type:'train', scope:'O2',  zh:'失智照護實務工作坊', en:'Dementia care workshop'},
- {d:'2026-09-05', type:'event', scope:'O4',  zh:'住民中秋手作活動', en:'Resident Mid-Autumn craft activity'},
+ {d:'2026-09-05', type:'event', scope:'O1',  zh:'住民中秋手作活動', en:'Resident Mid-Autumn craft activity'},
  {d:'2026-09-08', type:'hr',    scope:'ALL', zh:'月度營運會議', en:'Monthly operations meeting'},
  {d:'2026-09-09', type:'train', scope:'O1',  zh:'感染管制在職教育', en:'Infection control in-service'},
- {d:'2026-09-11', type:'audit', scope:'O7',  zh:'夜間消防疏散演練', en:'Night-shift evacuation drill'},
- {d:'2026-09-14', type:'audit', scope:'O4',  zh:'二樓浴室整修進場', en:'2F bathroom renovation starts'},
+ {d:'2026-09-11', type:'audit', scope:'O1',  zh:'夜間消防疏散演練', en:'Night-shift evacuation drill'},
+ {d:'2026-09-14', type:'audit', scope:'O1',  zh:'二樓浴室整修進場', en:'2F bathroom renovation starts'},
  {d:'2026-09-15', type:'hr',    scope:'ALL', zh:'流感疫苗接種開始', en:'Influenza vaccination begins'},
- {d:'2026-09-16', type:'train', scope:'O5',  zh:'跌倒預防個案研討', en:'Fall-prevention case review'},
- {d:'2026-09-18', type:'train', scope:'O4',  zh:'照服員繼續教育補課', en:'Care attendant make-up session'},
+ {d:'2026-09-16', type:'train', scope:'O2',  zh:'跌倒預防個案研討', en:'Fall-prevention case review'},
+ {d:'2026-09-18', type:'train', scope:'O1',  zh:'照服員繼續教育補課', en:'Care attendant make-up session'},
  {d:'2026-09-22', type:'audit', scope:'ALL', zh:'評鑑準備小組第一次會議', en:'Accreditation prep meeting #1'},
- {d:'2026-09-24', type:'event', scope:'O6',  zh:'家屬座談會', en:'Family council meeting'},
+ {d:'2026-09-24', type:'event', scope:'O2',  zh:'家屬座談會', en:'Family council meeting'},
  {d:'2026-09-25', type:'hr',    scope:'ALL', zh:'請假單簽核截止', en:'Leave approval deadline'},
- {d:'2026-09-28', type:'audit', scope:'O3',  zh:'衛生局不定期查核', en:'Health bureau spot check'},
+ {d:'2026-09-28', type:'audit', scope:'O2',  zh:'衛生局不定期查核', en:'Health bureau spot check'},
  {d:'2026-09-30', type:'hr',    scope:'ALL', zh:'特休假結算日', en:'Annual leave reconciliation'}
 ];
 const EV_TYPE = {
@@ -453,17 +418,17 @@ const LEAVE_TYPES = {
   family:{zh:'家庭照顧假',en:'Family care'}, comp:{zh:'補休',en:'Comp time'}
 };
 let LEAVE = [
- {id:'L241', emp:'E2403', type:'annual',   from:'2026-09-14', to:'2026-09-16', days:3,  filed:'2026-09-01', status:'pending',  note:{zh:'家庭旅遊，已與同仁換班',en:'Family trip; shift swap arranged'}},
- {id:'L242', emp:'E2404', type:'sick',     from:'2026-09-09', to:'2026-09-09', days:1,  filed:'2026-09-08', status:'pending',  note:{zh:'附診斷證明',en:'Medical certificate attached'}},
- {id:'L243', emp:'E2407', type:'family',   from:'2026-09-18', to:'2026-09-18', days:1,  filed:'2026-09-05', status:'pending',  note:{zh:'子女學校活動',en:'Child school event'}},
- {id:'L244', emp:'E2402', type:'annual',   from:'2026-09-28', to:'2026-09-30', days:3,  filed:'2026-09-06', status:'pending',  note:{zh:'需確認班表覆蓋',en:'Roster coverage to be confirmed'}},
- {id:'L245', emp:'E2103', type:'personal', from:'2026-09-11', to:'2026-09-11', days:1,  filed:'2026-09-04', status:'pending',  note:{zh:'家中事務',en:'Personal matter'}},
+ {id:'L241', emp:'E2103', type:'annual',   from:'2026-09-14', to:'2026-09-16', days:3,  filed:'2026-09-01', status:'pending',  note:{zh:'家庭旅遊，已與同仁換班',en:'Family trip; shift swap arranged'}},
+ {id:'L242', emp:'E2104', type:'sick',     from:'2026-09-09', to:'2026-09-09', days:1,  filed:'2026-09-08', status:'pending',  note:{zh:'附診斷證明',en:'Medical certificate attached'}},
+ {id:'L243', emp:'E2107', type:'family',   from:'2026-09-18', to:'2026-09-18', days:1,  filed:'2026-09-05', status:'pending',  note:{zh:'子女學校活動',en:'Child school event'}},
+ {id:'L244', emp:'E2102', type:'annual',   from:'2026-09-28', to:'2026-09-30', days:3,  filed:'2026-09-06', status:'pending',  note:{zh:'需確認班表覆蓋',en:'Roster coverage to be confirmed'}},
+ {id:'L245', emp:'E2203', type:'personal', from:'2026-09-11', to:'2026-09-11', days:1,  filed:'2026-09-04', status:'pending',  note:{zh:'家中事務',en:'Personal matter'}},
  {id:'L246', emp:'E2204', type:'sick',     from:'2026-09-07', to:'2026-09-08', days:2,  filed:'2026-09-07', status:'pending',  note:{zh:'腸胃不適',en:'Gastrointestinal illness'}},
- {id:'L247', emp:'E2604', type:'annual',   from:'2026-09-21', to:'2026-09-22', days:2,  filed:'2026-09-02', status:'pending',  note:{zh:'',en:''}},
- {id:'L248', emp:'E2704', type:'comp',     from:'2026-09-12', to:'2026-09-12', days:1,  filed:'2026-09-03', status:'pending',  note:{zh:'中秋加班補休',en:'Comp time for holiday shift'}},
- {id:'L231', emp:'E2405', type:'annual',   from:'2026-08-24', to:'2026-08-26', days:3,  filed:'2026-08-10', status:'approved', note:{zh:'',en:''}},
- {id:'L232', emp:'E2303', type:'sick',     from:'2026-08-19', to:'2026-08-20', days:2,  filed:'2026-08-19', status:'approved', note:{zh:'',en:''}},
- {id:'L233', emp:'E2503', type:'personal', from:'2026-08-28', to:'2026-08-28', days:1,  filed:'2026-08-21', status:'rejected', note:{zh:'當日人力不足，建議改期',en:'Insufficient coverage; asked to reschedule'}}
+ {id:'L247', emp:'E2206', type:'annual',   from:'2026-09-21', to:'2026-09-22', days:2,  filed:'2026-09-02', status:'pending',  note:{zh:'',en:''}},
+ {id:'L248', emp:'E2208', type:'comp',     from:'2026-09-12', to:'2026-09-12', days:1,  filed:'2026-09-03', status:'pending',  note:{zh:'中秋加班補休',en:'Comp time for holiday shift'}},
+ {id:'L231', emp:'E2105', type:'annual',   from:'2026-08-24', to:'2026-08-26', days:3,  filed:'2026-08-10', status:'approved', note:{zh:'',en:''}},
+ {id:'L232', emp:'E2203', type:'sick',     from:'2026-08-19', to:'2026-08-20', days:2,  filed:'2026-08-19', status:'approved', note:{zh:'',en:''}},
+ {id:'L233', emp:'E2209', type:'personal', from:'2026-08-28', to:'2026-08-28', days:1,  filed:'2026-08-21', status:'rejected', note:{zh:'當日人力不足，建議改期',en:'Insufficient coverage; asked to reschedule'}}
 ];
 </script>
 <script>
