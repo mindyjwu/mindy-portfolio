@@ -86,6 +86,7 @@ select[disabled]{background:var(--surface-2);color:var(--ink-3);cursor:not-allow
 .assume[aria-pressed="true"] .switch::after{transform:translateX(13px)}
 
 .content{padding:20px 22px 60px;display:flex;flex-direction:column;gap:16px;max-width:1320px;width:100%}
+.content-solo{padding:20px 22px 60px;display:flex;flex-direction:column;gap:16px;max-width:900px;width:100%}
 .pagehead{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
 .pagehead h1{font-size:20px}
 .pagehead .sub{color:var(--ink-3);font-size:12.5px}
@@ -271,6 +272,15 @@ const OFFICES = [
 const HQ = {id:'HQ', zh:'集團總部', en:'Group HQ', code:'HQ', city:{zh:'台北市',en:'Taipei'}, beds:0};
 const ALL_UNITS = [HQ].concat(OFFICES);
 const unit = id => ALL_UNITS.find(o=>o.id===id) || HQ;
+
+/* ---------- v2.0: multi-company structure ---------- */
+const COMPANIES = [
+  {id:'C1', zh:'誠馨北區公司', en:'Kanghe North', hq:'HQ', offices:['O1','O2','O3']},
+  {id:'C2', zh:'誠馨中部公司', en:'Kanghe Central', hq:'HQ', offices:['O4','O5']},
+  {id:'C3', zh:'誠馨南部公司', en:'Kanghe South', hq:'HQ', offices:['O6','O7']}
+];
+const companyOf = officeId => COMPANIES.find(c=>c.offices.includes(officeId));
+const companyOffices = companyId => (COMPANIES.find(c=>c.id===companyId)?.offices||[]).map(id=>OFFICES.find(o=>o.id===id));
 
 /* ---------- job titles ---------- */
 const TITLES = {
@@ -458,21 +468,31 @@ let LEAVE = [
 </script>
 <script>
 /* ---------- roles & permissions ---------- */
+/* v2.0: 9 roles per specification, but only 3 fully working in this prototype */
 const ROLES = {
-  admin:{ id:'admin', zh:'系統管理員', en:'System Admin', persona:'E1005', allOffices:true,
+  /* --- Built (working in this prototype) --- */
+  admin:{ id:'admin', zh:'系統管理員', en:'System Admin', persona:'E1005', allOffices:true, built:true,
     perms:{ salary:false, editEmp:true, mobile:true, approve:false, finalize:false,
             annGroup:true, annOffice:true, perms:true, exportAll:true } },
-  hr:{ id:'hr', zh:'人資部經理', en:'HR Manager', persona:'E1003', allOffices:true,
+  hr:{ id:'hr', zh:'人資部經理', en:'HR Manager', persona:'E1003', allOffices:true, built:true,
     perms:{ salary:true, editEmp:true, mobile:true, approve:true, finalize:true,
             annGroup:true, annOffice:true, perms:false, exportAll:true } },
-  manager:{ id:'manager', zh:'院長／單位主管', en:'Facility Director', persona:'E2401', allOffices:false,
+  manager:{ id:'manager', zh:'院長／單位主管', en:'Facility Director', persona:'E2401', allOffices:false, built:true,
     perms:{ salary:false, editEmp:false, mobile:false, approve:true, finalize:false,
-            annGroup:false, annOffice:true, perms:false, exportAll:false } }
+            annGroup:false, annOffice:true, perms:false, exportAll:false } },
+
+  /* --- Planned for Phase 2–3 (stubs only) --- */
+  coo:{ id:'coo', zh:'營運長', en:'COO', built:false, phase:'Phase 1+' },
+  finance:{ id:'finance', zh:'財務部經理', en:'Finance Manager', built:false, phase:'Phase 2' },
+  nurse:{ id:'nurse', zh:'護理部主管', en:'Nursing Director', built:false, phase:'Phase 2' },
+  care:{ id:'care', zh:'照護部主管', en:'Care Services Manager', built:false, phase:'Phase 2' },
+  social:{ id:'social', zh:'社工室主任', en:'Social Work Supervisor', built:false, phase:'Phase 3' },
+  company:{ id:'company', zh:'公司經理', en:'Company Manager', built:false, phase:'Phase 2' }
 };
 
 /* ---------- state ---------- */
 const state = {
-  lang:'zh', role:'admin', module:'ann', tab:'board',
+  lang:'zh', role:'admin', module:'arch', tab:'scope',
   crossOffice:false,          // ASSUMPTION TOGGLE: managers see all offices?
   office:'ALL',               // office filter within the allowed scope
   annId:'A09', calMonth:'2026-09', calDay:null,
@@ -553,6 +573,10 @@ function attSummary(empId, y, m){
 <script>
 /* ---------- module / tab map ---------- */
 const MODULES = [
+  {id:'arch', zh:'原型說明', en:'Prototype Info', built:true, tabs:[
+    {id:'scope',  zh:'範圍與進展', en:'Scope & Status'},
+    {id:'roles',  zh:'角色與權限', en:'Roles & Permissions'}
+  ]},
   {id:'ann', zh:'公告欄', en:'Announcements', built:true, tabs:[
     {id:'board',  zh:'公告',     en:'Board'},
     {id:'cal',    zh:'公司行事曆', en:'Calendar'},
@@ -606,7 +630,7 @@ function renderShell(){
       <div class="utility">
         <div class="ufield">
           <span class="ulabel">${both('身分','Role')}</span>
-          <select id="roleSel">${Object.values(ROLES).map(r=>`<option value="${r.id}" ${r.id===state.role?'selected':''}>${esc(both(r.zh,r.en))}</option>`).join('')}</select>
+          <select id="roleSel">${Object.values(ROLES).filter(r=>r.built).map(r=>`<option value="${r.id}" ${r.id===state.role?'selected':''}>${esc(both(r.zh,r.en))}</option>`).join('')}</select>
         </div>
         <div class="ufield">
           <span class="ulabel">${both('資料範圍','Data scope')}</span>
@@ -694,6 +718,7 @@ function render(){
   const v=document.getElementById('view');
   const key=state.module+':'+state.tab;
   const fn={
+    'arch:scope':viewArchScope, 'arch:roles':viewArchRoles,
     'ann:board':viewBoard, 'ann:cal':viewCalendar, 'ann:org':viewOrg, 'ann:dir':viewDirectory,
     'hr:emp':viewEmployees, 'hr:att':viewAttendance, 'hr:leave':viewLeave,
     'perm:matrix':viewMatrix, 'perm:open':viewOpen
@@ -702,6 +727,193 @@ function render(){
   (BINDERS[key]||function(){})();
 }
 const BINDERS={};
+</script>
+<script>
+/* =============================== 原型說明 Prototype Info =============================== */
+function viewArchScope(){
+  return `
+  <div class="content-solo">
+    <div class="pagehead">
+      <h1>${esc(both('原型 v2.0 範圍與進展','Prototype v2.0 Scope & Status'))}</h1>
+      <span class="sub">${esc(both('9/30 會議展示版本','Delivery: 30 Sept Meeting'))}</span>
+    </div>
+
+    <div class="note" style="border-left-color:var(--info);background:var(--info-soft)">
+      <b>${esc(both('原型說明','Prototype Status'))}</b><br>
+      ${esc(both(
+        '本原型為互動式示意，展示 UI 設計與權限架構。所有資料均為虛構示意，無真實資料庫。',
+        'This prototype is an interactive mockup for UI design and permission modeling. All data is fictional for demonstration purposes only.'))}
+    </div>
+
+    <section class="card">
+      <div class="card-h"><h2>${esc(both('已建置功能','Built Features'))}</h2></div>
+      <div class="card-b">
+        <div style="display:grid;gap:12px">
+          <div style="border-left:3px solid var(--ok);padding-left:12px">
+            <div style="font-weight:600">${esc(both('公告欄 / Announcements','Announcements'))}</div>
+            <div style="font-size:13px;color:var(--ink-2)">
+              ${esc(both('✓ 公告管理、公司行事曆、組織圖、通訊錄 · 多語言 · 資料範圍篩選',
+                         '✓ Announcements, calendar, org chart, directory. Bilingual. Data scoping by role & facility.'))}
+            </div>
+          </div>
+          <div style="border-left:3px solid var(--ok);padding-left:12px">
+            <div style="font-weight:600">${esc(both('人事系統 / HR','HR System'))}</div>
+            <div style="font-size:13px;color:var(--ink-2)">
+              ${esc(both('✓ 員工資料（虛構示意）、出勤管理（演算法生成）、請假審核流程',
+                         '✓ Employee records (fictional), attendance (algorithmic), leave approval workflow.'))}
+            </div>
+          </div>
+          <div style="border-left:3px solid var(--ok);padding-left:12px">
+            <div style="font-weight:600">${esc(both('權限與範圍 / Roles','Roles & Permissions'))}</div>
+            <div style="font-size:13px;color:var(--ink-2)">
+              ${esc(both('✓ 3 個完整角色示意（系管、人資、院長）、權限矩陣、跨院區假設開關',
+                         '✓ 3 full roles demonstrated (admin, HR, director), permission matrix, cross-facility toggle.'))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-h"><h2>${esc(both('計畫中功能','Planned Features'))}</h2></div>
+      <div class="card-b">
+        <div style="display:grid;gap:12px">
+          <div style="border-left:3px solid var(--warn);padding-left:12px">
+            <div style="font-weight:600">${esc(both('第 2 階段 (11–12 月) / Phase 2 (Nov–Dec)','Phase 2 (Nov–Dec)'))}</div>
+            <div style="font-size:13px;color:var(--ink-2)">
+              ${esc(both('薪資管理、詳細報表、營運長與公司經理角色、多公司帳務分離',
+                         'Payroll, detailed reports, COO & Company Manager roles, multi-company accounting.'))}
+            </div>
+          </div>
+          <div style="border-left:3px solid var(--warn);padding-left:12px">
+            <div style="font-weight:600">${esc(both('第 3 階段 (2027 Q1) / Phase 3 (Q1 2027)','Phase 3 (Q1 2027)'))}</div>
+            <div style="font-size:13px;color:var(--ink-2)">
+              ${esc(both('仁仁系統整合、個案管理、社工評估模組',
+                         'Renren system integration, case management, social worker assessment module.'))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-h"><h2>${esc(both('多公司結構 / Multi-Company Architecture','Multi-Company Structure'))}</h2></div>
+      <div class="card-b">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
+          ${COMPANIES.map(co=>`
+          <div style="border:1px solid var(--line);border-radius:6px;padding:12px">
+            <div style="font-weight:600;margin-bottom:6px">${esc(both(co.zh,co.en))}</div>
+            <div style="font-size:12px;color:var(--ink-2);line-height:1.6">
+              ${co.offices.map(id=>unit(id)).map(u=>`<div>• ${esc(L(u))}</div>`).join('')}
+            </div>
+          </div>
+          `).join('')}
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-h"><h2>${esc(both('團隊資源 / Resources','Development Resources'))}</h2></div>
+      <div class="card-b">
+        <div class="kv">
+          <dt>${esc(both('開發','Development'))}</dt>
+          <dd>${esc(both('使用者 + AI 工具','User + AI Tools'))}</dd>
+          <dt>${esc(both('時程','Timeline'))}</dt>
+          <dd>${esc(both('9 月 6–30 日（原型 v1 + v2）','6–30 Sept (prototype v1 + v2)'))}</dd>
+          <dt>${esc(both('交付','Delivery'))}</dt>
+          <dd>${esc(both('原型 + 文檔 + 技術說明','Prototype + docs + technical spec'))}</dd>
+          <dt>${esc(both('後續','Follow-up'))}</dt>
+          <dd>${esc(both('若核准，完整開發 2027 年投入','If approved, full development Q4 2026–Q1 2027'))}</dd>
+        </div>
+      </div>
+    </section>
+  </div>
+  `;
+}
+
+function viewArchRoles(){
+  const builtRoles = Object.values(ROLES).filter(r=>r.built);
+  const plannedRoles = Object.values(ROLES).filter(r=>!r.built);
+  return `
+  <div class="content-solo">
+    <div class="pagehead">
+      <h1>${esc(both('角色與權限說明','Roles & Permissions Guide'))}</h1>
+    </div>
+
+    <div class="note" style="border-left-color:var(--info);background:var(--info-soft)">
+      <b>${esc(both('v2.0 角色矩陣','v2.0 Role Matrix'))}</b><br>
+      ${esc(both(
+        '規劃 9 個角色以支援多層級組織。本原型展示其中 3 個完整實現；其餘為計畫示意。',
+        'The v2.0 specification defines 9 roles to support the multi-level organization. This prototype implements 3 in full; others are planned for Phase 2–3.'))}
+    </div>
+
+    <section class="card">
+      <div class="card-h"><h2>${esc(both('✓ 已實現角色','✓ Implemented Roles'))}</h2></div>
+      <div class="card-b">
+        <table class="permtable" style="width:100%">
+          <thead><tr><th style="width:160px">${esc(both('角色','Role'))}</th><th>${esc(both('說明','Description'))}</th></tr></thead>
+          <tbody>
+            ${builtRoles.map(r=>`
+            <tr style="border-bottom:1px solid var(--line);padding:8px 0">
+              <td style="padding:8px;font-weight:500">${esc(L(r))}</td>
+              <td style="padding:8px;font-size:13px;color:var(--ink-2)">
+                ${r.id==='admin' ? esc(both('系統配置、全集團公告、員工資料編輯、所有院區存取','Configuration, group announcements, employee data management, all facilities access.')) :
+                  r.id==='hr' ? esc(both('薪資/請假核定、人資審核、教育訓練記錄、全集團報表','Salary approvals, leave finalization, training records, group reports.')) :
+                  r.id==='manager' ? esc(both('本院公告、請假核准（初層）、員工出勤查詢、本院組織圖','Facility announcements, leave initial approval, attendance viewing, own facility org chart.')) :
+                  ''}
+              </td>
+            </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-h"><h2>${esc(both('→ 計畫角色','→ Planned Roles'))}</h2></div>
+      <div class="card-b">
+        <table class="permtable" style="width:100%">
+          <thead><tr><th style="width:160px">${esc(both('角色','Role'))}</th><th style="width:80px">${esc(both('階段','Phase'))}</th><th>${esc(both('說明','Scope'))}</th></tr></thead>
+          <tbody>
+            ${plannedRoles.map(r=>`
+            <tr style="border-bottom:1px solid var(--line);padding:8px 0">
+              <td style="padding:8px;font-weight:500;color:var(--ink-3)">${esc(L(r))}</td>
+              <td style="padding:8px;font-size:12px"><span class="chip">${esc(r.phase)}</span></td>
+              <td style="padding:8px;font-size:13px;color:var(--ink-3)">
+                ${r.id==='coo' ? esc(both('營運數據、多公司統整、績效指標','Ops metrics, multi-company rollup, KPIs.')) :
+                  r.id==='finance' ? esc(both('薪資、採購、帳務、月結','Payroll, procurement, accounting, month-end close.')) :
+                  r.id==='nurse' ? esc(both('護理管理、感控、照護計畫覆核','Nursing management, infection control, care plan review.')) :
+                  r.id==='care' ? esc(both('照顧服務管理、評估表、滿意度追蹤','Care services mgmt, assessments, satisfaction tracking.')) :
+                  r.id==='social' ? esc(both('個案管理、家屬溝通、資源轉介','Case management, family communication, resource referrals.')) :
+                  r.id==='company' ? esc(both('公司層級營運、跨院區協調','Company-level operations, cross-facility coordination.')) :
+                  ''}
+              </td>
+            </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-h"><h2>${esc(both('查看其他角色','Try Other Roles'))}</h2></div>
+      <div class="card-b">
+        <p style="margin:0 0 12px 0;color:var(--ink-2);font-size:13px">
+          ${esc(both('選擇左側 [以此身份登入 / Switch role] 下拉選單，試試其他已實現的角色。計畫角色目前無法使用。',
+                     'Use the "Switch role" selector in the left sidebar to test the 3 implemented roles. Planned roles are not selectable yet.'))}
+        </p>
+        <div class="seg">
+          ${['admin','hr','manager'].map(rid=>`
+          <button onclick="state.role='${rid}'; render()" style="padding:8px 14px;cursor:pointer">
+            ${esc(L(ROLES[rid]))}
+          </button>
+          `).join('')}
+        </div>
+      </div>
+    </section>
+  </div>
+  `;
+}
 </script>
 <script>
 /* =============================== 公告欄 Announcements =============================== */
