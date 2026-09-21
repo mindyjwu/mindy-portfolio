@@ -1,11 +1,19 @@
-# 康禾長照 營運入口 — MVP 原型導覽
-# Kanghe Long-Term Care — Operations Portal MVP Walkthrough
+# 康禾長照 營運入口 — MVP 原型導覽 (v2.0)
+# Kanghe Long-Term Care — Operations Portal MVP Walkthrough (v2.0)
 
-> 這是一個「討論用原型」，不是可上線的系統。目的是把三個必須由貴院決定的問題，變成看得見、點得到的畫面。
-> This is a **discussion prototype**, not production software. Its purpose is to turn three decisions your team must make into something visible and clickable.
+> **原型 v2.0** — 2026年9月30日交付版本  
+> 這是一個「討論用原型」，不是可上線的系統。目的是把三個必須由貴院決定的問題，變成看得見、點得到的畫面；同時展示完整的組織架構與角色設計。  
+> This is a **discussion prototype**, not production software. It visualizes three decisions your team must make, and demonstrates the full organizational structure and role model.
 
-**檔案 / File:** `ltc-portal.html` — 單一檔案，用瀏覽器直接開啟即可，不需安裝、不需連線資料庫。
+**檔案 / File:** `ltc-portal.html` — 單一檔案，用瀏覽器直接開啟即可，不需安裝、不需連線資料庫。  
 Single self-contained file; open it in any browser. No install, no database, no login.
+
+### 進入方式 Startup
+開啟檔案後會先進到「原型說明」模組（新增），整理了：
+1. 本次原型涵蓋什麼 (Scope & Status) — 已建置 vs 計畫功能
+2. 角色與權限藍圖 (Roles & Permissions) — v2.0 規劃的9個角色中，哪3個已實現；其餘何時到位
+
+之後再逐個測試各模組。
 
 ---
 
@@ -13,6 +21,7 @@ Single self-contained file; open it in any browser. No install, no database, no 
 
 | 模組 Module | 內容 Contents | 狀態 Status |
 |---|---|---|
+| **原型說明 Prototype Info** (NEW) | 範圍與進展：已建置 / 計畫功能、多公司結構、團隊資源  角色與權限：9 個規劃角色藍圖、3 個已實現角色詳述  Scope & Status: built vs. planned features, multi-company model, resources. Roles & Permissions: 9-role roadmap and the 3 implemented roles. | 已建置 Built |
 | **公告欄 Announcements** | 公告列表與內文（全集團／單院分眾）、公司行事曆（月曆＋當日行程）、集團組織圖、內部通訊錄（可搜尋） Board with group- and facility-targeted posts, company calendar, group org chart, searchable internal directory | 已建置 Built |
 | **人事系統 HR core** | 員工資料（47 人／7 院＋總部）、出勤管理（各據點概況、個人月出勤圖、遲到／未打卡／加班統計）、請假審核（可實際簽核） Employee records (47 people across 7 facilities + HQ), attendance (by facility and by person), leave approvals you can actually click through | 已建置 Built |
 | **權限與範圍 Roles & scope** | 權限對照表（3 身分 × 11 項權限）＋ 待決議題頁 Permission matrix (3 roles × 11 capabilities) and the open-questions page | 已建置 Built |
@@ -72,15 +81,53 @@ Switch with the **Role** dropdown at top-left; the screen changes immediately.
 
 ---
 
-## 4. 建議的走查順序 / Suggested walkthrough order (約 10 分鐘 / ~10 min)
+## v2.0 新增：多公司結構與完整角色藍圖 / v2.0: Multi-Company Model & 9-Role Framework
 
-1. **人資身分 As HR** → 公告欄：看分眾公告（全集團 vs 單院）與行事曆。Announcements: group vs facility targeting, and the calendar.
-2. **人資身分 As HR** → 人事系統 → 員工資料：**薪資欄位可見**。Employee records — **pay is visible**.
-3. **切到管理員 Switch to System Admin** → 同一頁：薪資變成「僅人資可見」。→ **Q2**。Same page: pay becomes "HR only" → **Q2**.
-4. **切到院長 Switch to Facility Director** → 人數從 47 掉到 8，出勤只剩一院，通訊錄少了其他院同仁。Headcount drops 47 → 8; attendance covers one facility; the directory hides other facilities.
-5. **打開上方「假設」開關 Flip the Assumption switch** → 同一個院長立刻看得到 7 院。→ **Q1，本次最重要的決定**。The same director now sees all 7 → **Q1, the decision that matters most**.
-6. **請假審核 Leave approvals** → 用院長核准 → 切人資複核。→ **Q3**。Approve as director, countersign as HR → **Q3**.
-7. **權限與範圍 → 權限對照表 Roles & scope → Permission matrix**：一頁看完 3 身分 × 11 項權限，會議中可直接在這張表上改。One page, 3 roles × 11 capabilities — amend it live in the meeting.
+v2.0 原型加入組織全景：
+
+| 組織層級 | 實例 |
+|-------|------|
+| **3 家公司** | 誠馨北區公司（台北、新北、桃園）、誠馨中部公司（台中、彰化）、誠馨南部公司（台南、高雄） |
+| **7 家院區** | 台北中山、新北板橋、桃園中壢、台中西屯、彰化員林、台南永康、高雄左營 |
+| **9 個角色** (計畫) | ✓ 3 個已實現 (系管、人資、院長) + → 6 個計畫中 (營運長、財務、護理主管、照護主管、社工、公司經理) |
+
+#### 已實現 3 角色 vs. 計畫中 6 角色
+
+本原型實現的 3 個角色可完整互動；其餘 6 個角色（營運長、財務部經理等）在「角色與權限」頁面有完整說明但未建置功能，計畫於：
+- **Phase 2 (11–12月)**: 薪資、詳細報表、營運長、公司經理、多公司帳務分離
+- **Phase 3 (2027 Q1)**: 仁仁系統整合、個案管理、社工評估
+
+#### 開發資源  
+- **團隊**: 使用者 + AI 工具
+- **時程**: 9月6–30日（原型 v1 + v2）
+- **交付**: 互動原型 + 文檔 + 技術規劃
+- **下一階段**: 若核准，完整開發投入 2026年Q4–2027年Q1
+
+---
+
+## 4. 建議的走查順序 / Suggested walkthrough order (約 15 分鐘 / ~15 min)
+
+0. **(首先 First) 原型說明 → 範圍與進展 Prototype Info → Scope & Status**
+   - 了解本次交付內容、計畫功能、多公司結構與團隊資源。  
+   - Understand what's built, what's planned, the 3-company model, and development resources.
+
+1. **原型說明 → 角色與權限 Prototype Info → Roles & Permissions**
+   - 完整 9 角色藍圖：3 個已實現 + 6 個計畫中（分別在 Phase 2 與 Phase 3）。  
+   - Full 9-role roadmap: 3 implemented + 6 planned (Phase 2–3 timeline).
+
+2. **人資身分 As HR** → 公告欄：看分眾公告（全集團 vs 單院）與行事曆。Announcements: group vs facility targeting, and the calendar.
+
+3. **人資身分 As HR** → 人事系統 → 員工資料：**薪資欄位可見**。Employee records — **pay is visible**.
+
+4. **切到管理員 Switch to System Admin** → 同一頁：薪資變成「僅人資可見」。→ **Q2**。Same page: pay becomes "HR only" → **Q2**.
+
+5. **切到院長 Switch to Facility Director** → 人數從 47 掉到 8，出勤只剩一院，通訊錄少了其他院同仁。Headcount drops 47 → 8; attendance covers one facility; the directory hides other facilities.
+
+6. **打開上方「假設」開關 Flip the Assumption switch** → 同一個院長立刻看得到 7 院。→ **Q1，本次最重要的決定**。The same director now sees all 7 → **Q1, the decision that matters most**.
+
+7. **請假審核 Leave approvals** → 用院長核准 → 切人資複核。→ **Q3**。Approve as director, countersign as HR → **Q3**.
+
+8. **權限與範圍 → 權限對照表 Roles & scope → Permission matrix**：一頁看完 3 身分 × 11 項權限，會議中可直接在這張表上改。One page, 3 roles × 11 capabilities — amend it live in the meeting.
 
 ---
 
