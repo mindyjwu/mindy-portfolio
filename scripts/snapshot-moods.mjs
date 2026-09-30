@@ -78,7 +78,7 @@ async function capture(only) {
   const index = {
     frozen: prev.frozen ?? true,
     updatedAt: new Date().toISOString(),
-    walls: src.walls.map(w => ({ slug: w.slug, mood: w.mood, chip: !!w.chip, place: !!w.place })),
+    walls: src.walls.map(w => ({ slug: w.slug, mood: w.mood, chip: !!w.chip, place: !!w.place, keywords: w.keywords || [] })),
   };
   await writeJSON(INDEX, index);
   console.log(`\n${walls.length} wall(s) written · ${missing} pick(s) unresolved · frozen=${index.frozen}`);

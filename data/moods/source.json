@@ -138,6 +138,22 @@
           "why": "A town made of bookshops, reliably in the rain.",
           "wiki": "Hay Festival"
         }
+      ],
+      "keywords": [
+        "rain",
+        "rainy",
+        "sunday",
+        "lazy",
+        "cozy",
+        "slow",
+        "bored",
+        "nothing to do",
+        "weekend",
+        "quiet",
+        "calm",
+        "stay in",
+        "nap",
+        "gloomy"
       ]
     },
     {
@@ -277,6 +293,19 @@
           "why": "Three thousand shows in a month; the whole city stays up to catch the end of it.",
           "wiki": "Edinburgh Festival Fringe"
         }
+      ],
+      "keywords": [
+        "summer",
+        "end of summer",
+        "last week",
+        "nostalgia",
+        "nostalgic",
+        "goodbye",
+        "august",
+        "bittersweet",
+        "vacation",
+        "back to school",
+        "ending"
       ]
     },
     {
@@ -416,6 +445,20 @@
           "why": "Mud, politics, and a very British refusal to be cheerful about the weather.",
           "wiki": "Glastonbury Festival"
         }
+      ],
+      "keywords": [
+        "angry",
+        "anger",
+        "mad",
+        "furious",
+        "rage",
+        "annoyed",
+        "frustrated",
+        "irritated",
+        "unfair",
+        "resentful",
+        "betrayed",
+        "fed up"
       ]
     },
     {
@@ -555,6 +598,18 @@
           "why": "Ten thousand people who also don't know anyone yet.",
           "wiki": "South by Southwest"
         }
+      ],
+      "keywords": [
+        "new city",
+        "moved",
+        "moving",
+        "no friends",
+        "strangers",
+        "outsider",
+        "relocated",
+        "isolated",
+        "lonely",
+        "alone"
       ]
     },
     {
@@ -694,6 +749,20 @@
           "why": "The longest day of the year, and everyone's outside playing something.",
           "wiki": "Fête de la Musique"
         }
+      ],
+      "keywords": [
+        "love",
+        "in love",
+        "crush",
+        "romance",
+        "romantic",
+        "date",
+        "dating",
+        "butterflies",
+        "smitten",
+        "flirting",
+        "blushing",
+        "falling for"
       ]
     },
     {
@@ -833,6 +902,18 @@
           "why": "Sónar by Night runs until the sun's up.",
           "wiki": "Sónar"
         }
+      ],
+      "keywords": [
+        "3am",
+        "night",
+        "late night",
+        "insomnia",
+        "cant sleep",
+        "awake",
+        "sleepless",
+        "midnight",
+        "restless",
+        "overthinking"
       ]
     },
     {
@@ -972,6 +1053,17 @@
           "why": "Sufi singers in a medina courtyard; you'll want to have been there.",
           "wiki": "Fes Festival of World Sacred Music"
         }
+      ],
+      "keywords": [
+        "homesick",
+        "longing",
+        "wanderlust",
+        "faraway",
+        "yearning",
+        "somewhere else",
+        "escape",
+        "daydreaming",
+        "restless"
       ]
     },
     {
@@ -1115,6 +1207,11 @@
           "why": "The world's photographers under one glass roof, while it rains on it.",
           "wiki": "Paris Photo"
         }
+      ],
+      "keywords": [
+        "paris",
+        "france",
+        "french"
       ]
     },
     {
@@ -1258,6 +1355,11 @@
           "why": "Two million people and a hundred portable shrines in one neighbourhood.",
           "wiki": "Sanja Matsuri"
         }
+      ],
+      "keywords": [
+        "tokyo",
+        "japan",
+        "japanese"
       ]
     },
     {
@@ -1401,6 +1503,12 @@
           "why": "Latin America's biggest rock festival, in a football stadium.",
           "wiki": "Vive Latino"
         }
+      ],
+      "keywords": [
+        "mexico",
+        "mexico city",
+        "cdmx",
+        "mexican"
       ]
     },
     {
@@ -1540,6 +1648,650 @@
           "year": "October 31",
           "why": "Sixth Avenue, fifty thousand costumes, and giant puppets.",
           "wiki": "Village Halloween Parade"
+        }
+      ],
+      "keywords": [
+        "new york",
+        "nyc",
+        "manhattan",
+        "brooklyn",
+        "october",
+        "autumn"
+      ]
+    },
+    {
+      "slug": "first-day-somewhere-new",
+      "mood": "first day somewhere new",
+      "chip": false,
+      "keywords": [
+        "first day",
+        "new job",
+        "job",
+        "work",
+        "starting",
+        "start",
+        "new start",
+        "fresh start",
+        "new chapter",
+        "beginning",
+        "nervous",
+        "interview",
+        "school",
+        "college",
+        "onboarding",
+        "promotion"
+      ],
+      "reading": "Everyone else already knows where the good coffee is. By Friday, so will you.",
+      "picks": [
+        {
+          "medium": "art",
+          "title": "Wheat Field with Cypresses",
+          "creator": "Vincent van Gogh",
+          "year": "1889",
+          "why": "Wind in everything, nothing sitting still — the feeling of a place you haven't learned yet.",
+          "metQuery": "Wheat Field with Cypresses van Gogh",
+          "wiki": "Wheat Field with Cypresses"
+        },
+        {
+          "medium": "art",
+          "title": "The Great Wave off Kanagawa",
+          "creator": "Katsushika Hokusai",
+          "year": "ca. 1830–32",
+          "why": "The wave is enormous. The boats keep rowing anyway.",
+          "metQuery": "Under the Wave off Kanagawa Hokusai",
+          "wiki": "The Great Wave off Kanagawa"
+        },
+        {
+          "medium": "art",
+          "title": "Young Woman with a Water Pitcher",
+          "creator": "Johannes Vermeer",
+          "year": "ca. 1662",
+          "why": "A window opened, morning light, the first small task of the day.",
+          "metQuery": "Young Woman with a Water Pitcher Vermeer",
+          "wiki": "Young Woman with a Water Pitcher"
+        },
+        {
+          "medium": "book",
+          "title": "Brooklyn",
+          "creator": "Colm Tóibín",
+          "year": "2009",
+          "why": "A young woman crosses an ocean for a job and a city she doesn't know yet.",
+          "wiki": "Brooklyn (novel)"
+        },
+        {
+          "medium": "book",
+          "title": "Anne of Green Gables",
+          "creator": "L. M. Montgomery",
+          "year": "1908",
+          "why": "Arriving somewhere new and deciding, stubbornly, to belong.",
+          "wiki": "Anne of Green Gables"
+        },
+        {
+          "medium": "book",
+          "title": "Sweetbitter",
+          "creator": "Stephanie Danler",
+          "year": "2016",
+          "why": "A first job in a New York restaurant, learning everything the hard way.",
+          "wiki": ""
+        },
+        {
+          "medium": "music",
+          "title": "Here Comes the Sun",
+          "creator": "The Beatles",
+          "year": "1969",
+          "why": "The day starts before you feel ready. Let it.",
+          "wiki": ""
+        },
+        {
+          "medium": "music",
+          "title": "Dog Days Are Over",
+          "creator": "Florence + the Machine",
+          "year": "2008",
+          "why": "Running toward the next thing with your whole chest.",
+          "wiki": ""
+        },
+        {
+          "medium": "music",
+          "title": "Feeling Good",
+          "creator": "Nina Simone",
+          "year": "1965",
+          "why": "A song about the first morning of something.",
+          "wiki": ""
+        },
+        {
+          "medium": "film",
+          "title": "Spirited Away",
+          "creator": "Hayao Miyazaki",
+          "year": "2001",
+          "why": "A first day at a strange job in a stranger world, and she figures it out.",
+          "wiki": "Spirited Away"
+        },
+        {
+          "medium": "film",
+          "title": "The Intern",
+          "creator": "Nancy Meyers",
+          "year": "2015",
+          "why": "Proof that everyone is new somewhere, at every age.",
+          "wiki": "The Intern (2015 film)"
+        },
+        {
+          "medium": "film",
+          "title": "Frances Ha",
+          "creator": "Noah Baumbach",
+          "year": "2012",
+          "why": "Not quite there yet, running down the street anyway.",
+          "wiki": "Frances Ha"
+        },
+        {
+          "medium": "documentary",
+          "title": "Jiro Dreams of Sushi",
+          "creator": "David Gelb",
+          "year": "2011",
+          "why": "Apprentices who spend years getting one thing right — the long view of starting out.",
+          "wiki": "Jiro Dreams of Sushi"
+        },
+        {
+          "medium": "documentary",
+          "title": "Man on Wire",
+          "creator": "James Marsh",
+          "year": "2008",
+          "why": "The nerve it takes to step out onto the first inch.",
+          "wiki": "Man on Wire"
+        },
+        {
+          "medium": "festival",
+          "title": "Nowruz",
+          "creator": "Persian New Year",
+          "year": "every March",
+          "why": "A new year that starts on the first day of spring.",
+          "wiki": "Nowruz"
+        },
+        {
+          "medium": "festival",
+          "title": "Songkran",
+          "creator": "Thai New Year",
+          "year": "every April",
+          "why": "A whole country washing the old year off.",
+          "wiki": "Songkran (Thailand)"
+        }
+      ]
+    },
+    {
+      "slug": "heartbroken",
+      "mood": "heartbroken, and pretending you're fine",
+      "chip": false,
+      "keywords": [
+        "heartbroken",
+        "heartbreak",
+        "breakup",
+        "broke up",
+        "break up",
+        "ex",
+        "dumped",
+        "sad",
+        "crying",
+        "cry",
+        "grief",
+        "grieving",
+        "loss",
+        "miss",
+        "missing",
+        "divorce",
+        "hurt",
+        "rejected",
+        "sorrow"
+      ],
+      "reading": "It's allowed to take longer than everyone thinks it should.",
+      "picks": [
+        {
+          "medium": "art",
+          "title": "Madame X (Madame Pierre Gautreau)",
+          "creator": "John Singer Sargent",
+          "year": "1883–84",
+          "why": "Composure as armor — the most elegant way to pretend you're fine.",
+          "metQuery": "Madame X Madame Pierre Gautreau Sargent",
+          "wiki": "Portrait of Madame X"
+        },
+        {
+          "medium": "art",
+          "title": "Two Men Contemplating the Moon",
+          "creator": "Caspar David Friedrich",
+          "year": "ca. 1825–30",
+          "why": "Some nights you just need to stand next to someone and look at something far away.",
+          "metQuery": "Two Men Contemplating the Moon Friedrich",
+          "wiki": "Two Men Contemplating the Moon"
+        },
+        {
+          "medium": "art",
+          "title": "Northeaster",
+          "creator": "Winslow Homer",
+          "year": "1895",
+          "why": "The sea hits the rocks again and again. The rocks are still there.",
+          "metQuery": "Northeaster Winslow Homer",
+          "wiki": ""
+        },
+        {
+          "medium": "book",
+          "title": "Heartburn",
+          "creator": "Nora Ephron",
+          "year": "1983",
+          "why": "The funniest book ever written about being left.",
+          "wiki": "Heartburn (novel)"
+        },
+        {
+          "medium": "book",
+          "title": "The Year of Magical Thinking",
+          "creator": "Joan Didion",
+          "year": "2005",
+          "why": "Grief described so precisely it keeps you company.",
+          "wiki": "The Year of Magical Thinking"
+        },
+        {
+          "medium": "book",
+          "title": "Bluets",
+          "creator": "Maggie Nelson",
+          "year": "2009",
+          "why": "Heartbreak, told through an obsession with the color blue.",
+          "wiki": "Bluets"
+        },
+        {
+          "medium": "music",
+          "title": "Someone Like You",
+          "creator": "Adele",
+          "year": "2011",
+          "why": "For the moment you finally say it out loud.",
+          "wiki": ""
+        },
+        {
+          "medium": "music",
+          "title": "Dancing On My Own",
+          "creator": "Robyn",
+          "year": "2010",
+          "why": "Crying and dancing at the same time is allowed.",
+          "wiki": ""
+        },
+        {
+          "medium": "music",
+          "title": "Motion Sickness",
+          "creator": "Phoebe Bridgers",
+          "year": "2017",
+          "why": "Angry, funny, still hurt — all in one song.",
+          "wiki": ""
+        },
+        {
+          "medium": "film",
+          "title": "Eternal Sunshine of the Spotless Mind",
+          "creator": "Michel Gondry",
+          "year": "2004",
+          "why": "What if you could forget? The film's answer is kind.",
+          "wiki": "Eternal Sunshine of the Spotless Mind"
+        },
+        {
+          "medium": "film",
+          "title": "Past Lives",
+          "creator": "Celine Song",
+          "year": "2023",
+          "why": "Some people stay with you as a what-if, and that's bearable.",
+          "wiki": "Past Lives (film)"
+        },
+        {
+          "medium": "film",
+          "title": "In the Mood for Love",
+          "creator": "Wong Kar-wai",
+          "year": "2000",
+          "why": "Longing, perfectly dressed.",
+          "wiki": "In the Mood for Love"
+        },
+        {
+          "medium": "documentary",
+          "title": "Stories We Tell",
+          "creator": "Sarah Polley",
+          "year": "2012",
+          "why": "A family retelling its heartbreaks until they become a story.",
+          "wiki": "Stories We Tell"
+        },
+        {
+          "medium": "documentary",
+          "title": "Dick Johnson Is Dead",
+          "creator": "Kirsten Johnson",
+          "year": "2020",
+          "why": "Rehearsing loss with love and a lot of jokes.",
+          "wiki": "Dick Johnson Is Dead"
+        },
+        {
+          "medium": "festival",
+          "title": "Día de Muertos",
+          "creator": "Mexico",
+          "year": "November 1–2",
+          "why": "Missing someone out loud, with marigolds and music.",
+          "wiki": "Day of the Dead"
+        },
+        {
+          "medium": "festival",
+          "title": "Obon",
+          "creator": "Japan",
+          "year": "every summer",
+          "why": "Lanterns lit so the ones you miss can find their way.",
+          "wiki": "Bon Festival"
+        }
+      ]
+    },
+    {
+      "slug": "burnt-out",
+      "mood": "burnt out, running on empty",
+      "chip": false,
+      "keywords": [
+        "burnout",
+        "burnt out",
+        "burned out",
+        "exhausted",
+        "tired",
+        "drained",
+        "overworked",
+        "stressed",
+        "stress",
+        "overwhelmed",
+        "busy",
+        "deadline",
+        "empty",
+        "rest",
+        "need a break",
+        "fried",
+        "worn out"
+      ],
+      "reading": "Nothing is due in the next hour. Put it down.",
+      "picks": [
+        {
+          "medium": "art",
+          "title": "The Harvesters",
+          "creator": "Pieter Bruegel the Elder",
+          "year": "1565",
+          "why": "Half the field is still standing, and someone is asleep under the tree anyway.",
+          "metQuery": "The Harvesters Bruegel",
+          "wiki": "The Harvesters"
+        },
+        {
+          "medium": "art",
+          "title": "Haystacks: Autumn",
+          "creator": "Jean-François Millet",
+          "year": "1874",
+          "why": "The work is done for the season. The field gets to rest, and so do you.",
+          "metQuery": "Haystacks Autumn Millet",
+          "wiki": ""
+        },
+        {
+          "medium": "art",
+          "title": "View from Mount Holyoke, Northampton, Massachusetts, after a Thunderstorm—The Oxbow",
+          "creator": "Thomas Cole",
+          "year": "1836",
+          "why": "The storm is clearing on one side of the painting. Look at that side.",
+          "metQuery": "The Oxbow Thomas Cole",
+          "wiki": "The Oxbow"
+        },
+        {
+          "medium": "book",
+          "title": "How to Do Nothing",
+          "creator": "Jenny Odell",
+          "year": "2019",
+          "why": "A calm, convincing case for being unproductive on purpose.",
+          "wiki": "How to Do Nothing"
+        },
+        {
+          "medium": "book",
+          "title": "The Wind in the Willows",
+          "creator": "Kenneth Grahame",
+          "year": "1908",
+          "why": "It opens with Mole abandoning his spring cleaning to go sit by a river.",
+          "wiki": "The Wind in the Willows"
+        },
+        {
+          "medium": "book",
+          "title": "Four Thousand Weeks",
+          "creator": "Oliver Burkeman",
+          "year": "2021",
+          "why": "You will never get it all done, and that's the good news.",
+          "wiki": ""
+        },
+        {
+          "medium": "music",
+          "title": "Weightless",
+          "creator": "Marconi Union",
+          "year": "2011",
+          "why": "Eight minutes built to slow you down.",
+          "wiki": ""
+        },
+        {
+          "medium": "music",
+          "title": "Holocene",
+          "creator": "Bon Iver",
+          "year": "2011",
+          "why": "Feeling small in a way that's a relief.",
+          "wiki": ""
+        },
+        {
+          "medium": "music",
+          "title": "Clair de lune",
+          "creator": "Claude Debussy",
+          "year": "1905",
+          "why": "Five minutes of moonlight with nothing to answer.",
+          "wiki": ""
+        },
+        {
+          "medium": "film",
+          "title": "My Neighbor Totoro",
+          "creator": "Hayao Miyazaki",
+          "year": "1988",
+          "why": "Rain, a bus stop, and nowhere to be.",
+          "wiki": "My Neighbor Totoro"
+        },
+        {
+          "medium": "film",
+          "title": "Perfect Days",
+          "creator": "Wim Wenders",
+          "year": "2023",
+          "why": "A man whose ordinary days are enough.",
+          "wiki": "Perfect Days"
+        },
+        {
+          "medium": "film",
+          "title": "Paterson",
+          "creator": "Jim Jarmusch",
+          "year": "2016",
+          "why": "A week of small routines that turn out to be the point.",
+          "wiki": "Paterson (film)"
+        },
+        {
+          "medium": "documentary",
+          "title": "Honeyland",
+          "creator": "Tamara Kotevska & Ljubomir Stefanov",
+          "year": "2019",
+          "why": "Take half, leave half — a beekeeper's rule for not running empty.",
+          "wiki": "Honeyland"
+        },
+        {
+          "medium": "documentary",
+          "title": "My Octopus Teacher",
+          "creator": "Pippa Ehrlich & James Reed",
+          "year": "2020",
+          "why": "A burnt-out filmmaker goes into the sea every day and comes back different.",
+          "wiki": "My Octopus Teacher"
+        },
+        {
+          "medium": "festival",
+          "title": "Nyepi",
+          "creator": "Bali",
+          "year": "every March",
+          "why": "A day when a whole island stops — no lights, no work, no travel.",
+          "wiki": "Nyepi"
+        },
+        {
+          "medium": "festival",
+          "title": "Hanami",
+          "creator": "Japan",
+          "year": "every spring",
+          "why": "Sitting under cherry blossoms doing nothing is the whole point.",
+          "wiki": "Hanami"
+        }
+      ]
+    },
+    {
+      "slug": "something-to-celebrate",
+      "mood": "something to celebrate",
+      "chip": false,
+      "keywords": [
+        "celebrate",
+        "celebrating",
+        "celebration",
+        "good news",
+        "promoted",
+        "got the job",
+        "offer",
+        "win",
+        "won",
+        "success",
+        "proud",
+        "happy",
+        "joy",
+        "joyful",
+        "excited",
+        "party",
+        "birthday",
+        "graduation",
+        "graduated",
+        "engaged"
+      ],
+      "reading": "Say it out loud. Then say it again to someone who'll be loud about it with you.",
+      "picks": [
+        {
+          "medium": "art",
+          "title": "Hippopotamus (\"William\")",
+          "creator": "Ancient Egypt",
+          "year": "ca. 1961–1878 B.C.",
+          "why": "A four-thousand-year-old blue hippo who has been in a good mood the entire time.",
+          "metQuery": "Hippopotamus William faience",
+          "wiki": "William the Faience Hippopotamus"
+        },
+        {
+          "medium": "art",
+          "title": "Merrymakers at Shrovetide",
+          "creator": "Frans Hals",
+          "year": "ca. 1616–17",
+          "why": "A party at its loudest moment, painted four hundred years ago.",
+          "metQuery": "Merrymakers at Shrovetide Hals",
+          "wiki": ""
+        },
+        {
+          "medium": "art",
+          "title": "Snap the Whip",
+          "creator": "Winslow Homer",
+          "year": "1872",
+          "why": "Pure momentum — everyone holding on, nobody wanting it to stop.",
+          "metQuery": "Snap the Whip Winslow Homer",
+          "wiki": ""
+        },
+        {
+          "medium": "book",
+          "title": "The Book of Delights",
+          "creator": "Ross Gay",
+          "year": "2019",
+          "why": "A year of writing down one delight a day.",
+          "wiki": ""
+        },
+        {
+          "medium": "book",
+          "title": "Bossypants",
+          "creator": "Tina Fey",
+          "year": "2011",
+          "why": "Earned success, told by someone who refuses to take it too seriously.",
+          "wiki": "Bossypants"
+        },
+        {
+          "medium": "book",
+          "title": "The Importance of Being Earnest",
+          "creator": "Oscar Wilde",
+          "year": "1895",
+          "why": "Three acts of joy that end, naturally, in engagements.",
+          "wiki": "The Importance of Being Earnest"
+        },
+        {
+          "medium": "music",
+          "title": "September",
+          "creator": "Earth, Wind & Fire",
+          "year": "1978",
+          "why": "Impossible to hear sitting down.",
+          "wiki": ""
+        },
+        {
+          "medium": "music",
+          "title": "Good as Hell",
+          "creator": "Lizzo",
+          "year": "2016",
+          "why": "Your victory lap, set to music.",
+          "wiki": ""
+        },
+        {
+          "medium": "music",
+          "title": "Celebration",
+          "creator": "Kool & the Gang",
+          "year": "1980",
+          "why": "Named for exactly this.",
+          "wiki": ""
+        },
+        {
+          "medium": "film",
+          "title": "Paddington 2",
+          "creator": "Paul King",
+          "year": "2017",
+          "why": "Kindness pays off, loudly, with marmalade.",
+          "wiki": "Paddington 2"
+        },
+        {
+          "medium": "film",
+          "title": "Singin' in the Rain",
+          "creator": "Gene Kelly & Stanley Donen",
+          "year": "1952",
+          "why": "The purest happiness ever put on film.",
+          "wiki": "Singin' in the Rain"
+        },
+        {
+          "medium": "film",
+          "title": "Mamma Mia!",
+          "creator": "Phyllida Lloyd",
+          "year": "2008",
+          "why": "A whole island deciding the answer is to dance.",
+          "wiki": "Mamma Mia! (film)"
+        },
+        {
+          "medium": "documentary",
+          "title": "Amazing Grace",
+          "creator": "Alan Elliott & Sydney Pollack",
+          "year": "2018",
+          "why": "Aretha Franklin in a church in 1972, and everyone knows they're witnessing it.",
+          "wiki": "Amazing Grace (2018 film)"
+        },
+        {
+          "medium": "documentary",
+          "title": "Summer of Soul",
+          "creator": "Ahmir \"Questlove\" Thompson",
+          "year": "2021",
+          "why": "The Harlem Cultural Festival of 1969, finally shown.",
+          "wiki": "Summer of Soul"
+        },
+        {
+          "medium": "festival",
+          "title": "Diwali",
+          "creator": "India",
+          "year": "every autumn",
+          "why": "A festival of lights, sweets and everyone you love in one house.",
+          "wiki": "Diwali"
+        },
+        {
+          "medium": "festival",
+          "title": "Rio Carnival",
+          "creator": "Brazil",
+          "year": "every February",
+          "why": "A city-wide party that takes all year to plan.",
+          "wiki": "Rio Carnival"
         }
       ]
     }

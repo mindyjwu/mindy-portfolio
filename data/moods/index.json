@@ -1,72 +1,292 @@
 {
   "frozen": true,
-  "updatedAt": "2026-09-16T15:39:51.117Z",
+  "updatedAt": "2026-09-30T20:23:44.437Z",
   "walls": [
     {
       "slug": "rainy-sunday",
       "mood": "rainy Sunday, nothing to do",
       "chip": false,
-      "place": false
+      "place": false,
+      "keywords": [
+        "rain",
+        "rainy",
+        "sunday",
+        "lazy",
+        "cozy",
+        "slow",
+        "bored",
+        "nothing to do",
+        "weekend",
+        "quiet",
+        "calm",
+        "stay in",
+        "nap",
+        "gloomy"
+      ]
     },
     {
       "slug": "last-week-of-summer",
       "mood": "the last week of summer",
       "chip": true,
-      "place": false
+      "place": false,
+      "keywords": [
+        "summer",
+        "end of summer",
+        "last week",
+        "nostalgia",
+        "nostalgic",
+        "goodbye",
+        "august",
+        "bittersweet",
+        "vacation",
+        "back to school",
+        "ending"
+      ]
     },
     {
       "slug": "quietly-furious",
       "mood": "quietly furious",
       "chip": true,
-      "place": false
+      "place": false,
+      "keywords": [
+        "angry",
+        "anger",
+        "mad",
+        "furious",
+        "rage",
+        "annoyed",
+        "frustrated",
+        "irritated",
+        "unfair",
+        "resentful",
+        "betrayed",
+        "fed up"
+      ]
     },
     {
       "slug": "new-city-no-friends",
       "mood": "new city, no friends yet",
       "chip": true,
-      "place": false
+      "place": false,
+      "keywords": [
+        "new city",
+        "moved",
+        "moving",
+        "no friends",
+        "strangers",
+        "outsider",
+        "relocated",
+        "isolated",
+        "lonely",
+        "alone"
+      ]
     },
     {
       "slug": "in-love-embarrassed",
       "mood": "in love and slightly embarrassed about it",
       "chip": true,
-      "place": false
+      "place": false,
+      "keywords": [
+        "love",
+        "in love",
+        "crush",
+        "romance",
+        "romantic",
+        "date",
+        "dating",
+        "butterflies",
+        "smitten",
+        "flirting",
+        "blushing",
+        "falling for"
+      ]
     },
     {
       "slug": "3am-wide-awake",
       "mood": "3am and wide awake",
       "chip": true,
-      "place": false
+      "place": false,
+      "keywords": [
+        "3am",
+        "night",
+        "late night",
+        "insomnia",
+        "cant sleep",
+        "awake",
+        "sleepless",
+        "midnight",
+        "restless",
+        "overthinking"
+      ]
     },
     {
       "slug": "homesick-never-been",
       "mood": "homesick for a place I've never been",
       "chip": true,
-      "place": false
+      "place": false,
+      "keywords": [
+        "homesick",
+        "longing",
+        "wanderlust",
+        "faraway",
+        "yearning",
+        "somewhere else",
+        "escape",
+        "daydreaming",
+        "restless"
+      ]
     },
     {
       "slug": "paris-in-the-rain",
       "mood": "Paris in the rain",
       "chip": true,
-      "place": true
+      "place": true,
+      "keywords": [
+        "paris",
+        "france",
+        "french"
+      ]
     },
     {
       "slug": "tokyo-after-midnight",
       "mood": "Tokyo after midnight",
       "chip": true,
-      "place": true
+      "place": true,
+      "keywords": [
+        "tokyo",
+        "japan",
+        "japanese"
+      ]
     },
     {
       "slug": "mexico-city-first-morning",
       "mood": "Mexico City, first morning",
       "chip": true,
-      "place": true
+      "place": true,
+      "keywords": [
+        "mexico",
+        "mexico city",
+        "cdmx",
+        "mexican"
+      ]
     },
     {
       "slug": "new-york-in-october",
       "mood": "New York in October",
       "chip": true,
-      "place": true
+      "place": true,
+      "keywords": [
+        "new york",
+        "nyc",
+        "manhattan",
+        "brooklyn",
+        "october",
+        "autumn"
+      ]
+    },
+    {
+      "slug": "first-day-somewhere-new",
+      "mood": "first day somewhere new",
+      "chip": false,
+      "place": false,
+      "keywords": [
+        "first day",
+        "new job",
+        "job",
+        "work",
+        "starting",
+        "start",
+        "new start",
+        "fresh start",
+        "new chapter",
+        "beginning",
+        "nervous",
+        "interview",
+        "school",
+        "college",
+        "onboarding",
+        "promotion"
+      ]
+    },
+    {
+      "slug": "heartbroken",
+      "mood": "heartbroken, and pretending you're fine",
+      "chip": false,
+      "place": false,
+      "keywords": [
+        "heartbroken",
+        "heartbreak",
+        "breakup",
+        "broke up",
+        "break up",
+        "ex",
+        "dumped",
+        "sad",
+        "crying",
+        "cry",
+        "grief",
+        "grieving",
+        "loss",
+        "miss",
+        "missing",
+        "divorce",
+        "hurt",
+        "rejected",
+        "sorrow"
+      ]
+    },
+    {
+      "slug": "burnt-out",
+      "mood": "burnt out, running on empty",
+      "chip": false,
+      "place": false,
+      "keywords": [
+        "burnout",
+        "burnt out",
+        "burned out",
+        "exhausted",
+        "tired",
+        "drained",
+        "overworked",
+        "stressed",
+        "stress",
+        "overwhelmed",
+        "busy",
+        "deadline",
+        "empty",
+        "rest",
+        "need a break",
+        "fried",
+        "worn out"
+      ]
+    },
+    {
+      "slug": "something-to-celebrate",
+      "mood": "something to celebrate",
+      "chip": false,
+      "place": false,
+      "keywords": [
+        "celebrate",
+        "celebrating",
+        "celebration",
+        "good news",
+        "promoted",
+        "got the job",
+        "offer",
+        "win",
+        "won",
+        "success",
+        "proud",
+        "happy",
+        "joy",
+        "joyful",
+        "excited",
+        "party",
+        "birthday",
+        "graduation",
+        "graduated",
+        "engaged"
+      ]
     }
   ]
 }

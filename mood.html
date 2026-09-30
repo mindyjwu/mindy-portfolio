@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mood Wall · Mindy's Portfolio</title>
+  <title>Mood Wall · Mindy Wu</title>
   <meta name="description" content="Tell it how you feel. Get a wall of real art, books, music, film, documentaries and festivals chosen for exactly that.">
   <meta name="author" content="Mindy Wu">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
@@ -528,7 +528,7 @@ html[data-mw-theme="dark"] .mpnav__theme .moon{display:none;}
 <div class="toast" id="toast" role="status"></div>
 
 <script type="module">
-import { resolve, norm, overlap } from './js/mood-resolvers.js';
+import { resolve, norm } from './js/mood-resolvers.js';
 
 /* ============================================================
    STATE
@@ -739,12 +739,34 @@ function findSnapshot(mood) {
   const n = norm(mood);
   return SNAP.walls.find(w => norm(w.mood) === n) || null;
 }
-// Closest curated wall by word overlap; the first wall is the default when nothing overlaps.
+// Closest curated wall. Each wall carries emotion keywords; a whole-phrase hit
+// ("new job") outweighs a single word, filler words are ignored, and place walls
+// only win when the place itself is named, so "first day at a new job" no longer
+// lands on "Mexico City, first morning" just because both say "first".
+// The first wall is the default when nothing matches.
+const STOP = new Set('a an the and or but to of in on at for with my me i im is it its just so very really feel feeling feels like this that some about be am are was were after before from your you got get getting'.split(' '));
+const stem = w => w.length > 4 ? w.replace(/(ing|ed|es|s)$/, '') : w;
+const toks = s => norm(s).split(' ').filter(w => w.length > 1 && !STOP.has(w)).map(stem);
+function wallScore(mood, w) {
+  const have = new Set(toks(mood));
+  let kw = 0;
+  const seen = new Set();                        // "miss" and "missing" count once
+  for (const k of w.keywords || []) {
+    const t = toks(k), key = t.join(' ');
+    if (!t.length || seen.has(key) || !t.every(x => have.has(x))) continue;
+    seen.add(key);
+    kw += t.length > 1 ? 3 : 2;
+  }
+  if (w.place && !kw) return 0;
+  let words = 0;
+  for (const x of new Set(toks(w.mood))) if (have.has(x)) words++;
+  return kw + words + (w.place ? 3 : 0);         // a named place is the strongest signal
+}
 function nearestSnapshot(mood) {
   if (!SNAP.walls.length) return null;
   let best = SNAP.walls[0], bestScore = 0;
   for (const w of SNAP.walls) {
-    const s = overlap(mood, w.mood);
+    const s = wallScore(mood, w);
     if (s > bestScore) { best = w; bestScore = s; }
   }
   return best;
