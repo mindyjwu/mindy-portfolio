@@ -90,6 +90,8 @@
     color: transparent; -webkit-text-fill-color: transparent;
   }
   .metal { background-image: var(--silver-grad); animation: sheen 7s linear infinite; }
+  .sample-cta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 4px 0 18px; }
+  .sample-cta .hint { margin: 0; }
   .metal-rose { background-image: var(--rose-grad); animation: sheen 8s linear infinite; }
   @keyframes sheen { to { background-position: 220% center; } }
 
@@ -410,6 +412,11 @@ html[data-mw-theme="dark"] .mpnav__theme .moon{display:none;}
     <div class="card">
       <h2 class="section-title">🎚️ Festival Library</h2>
       <p class="section-sub">Real electronic festivals across Sep 2026 – 2027 — techno, house, trance, bass, hardstyle, drum &amp; bass, melodic — ready to plan against.</p>
+
+      <div class="sample-cta">
+        <button class="btn btn-primary" id="trySampleBtn" type="button">▶ Try a sample plan</button>
+        <span class="hint">One click: EDC Orlando, night one — priorities set and every clash resolved.</span>
+      </div>
 
       <label class="label" for="libFilter">Find an event</label>
       <input type="text" id="libFilter" placeholder="Filter by name, city, month or genre — techno, Amsterdam, bass, Jul…" autocomplete="off" style="margin-bottom:10px;" />
@@ -1824,6 +1831,27 @@ function loadLibraryEntry(entry) {
   loadFestival(clone);
 }
 
+// One-click demo for first-time visitors: load a real multi-stage night, star it with
+// a spread of priorities, and jump straight to the resolved plan.
+function trySample() {
+  const hasPlan = Object.values(state.priorities).some(p => p && p.starred);
+  if (hasPlan && !confirm("Replace your current plan with the sample?")) return;
+  const entry = Data.byId["edc-orlando-2026"] || Data.library.festivals[0];
+  loadLibraryEntry(entry);
+  const PRI = {
+    "Swedish House Mafia": "high", "John Summit": "high", "Charlotte de Witte": "high",
+    "Martin Garrix": "medium", "Dom Dolla": "medium", "Excision": "medium",
+    "Alesso": "low", "Subtronics": "low"
+  };
+  state.festival.sets.filter(s => s.day === 1).forEach(s => {
+    state.priorities[s.id] = { starred: true, level: PRI[s.artist] || "medium" };
+  });
+  state.activeDay = 1;
+  UI.el("sampleSelect").value = entry.id;
+  UI.setView("dashboard");
+  UI.toast("Sample plan: " + entry.name + ", night one ✨");
+}
+
 function resetAll() {
   if (!confirm("Clear the loaded schedule, priorities and transit times?")) return;
   Store.clear();
@@ -1883,6 +1911,8 @@ function init() {
     UI.el("parseMsg").innerHTML = `<span style="color:var(--ok)">✓ Loaded “${UI.esc(entry.name)}”.</span>`;
     UI.toast("Event loaded 🎉");
   });
+
+  UI.el("trySampleBtn").addEventListener("click", trySample);
 
   UI.el("parseBtn").addEventListener("click", () => {
     try {
