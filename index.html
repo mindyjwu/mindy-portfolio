@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- SEO -->
-  <title>Mindy's Portfolio</title>
-  <meta name="description" content="AI doesn't replace talent, it amplifies it. Who I am, what I build, and the idea behind it.">
+  <title>Mindy Wu</title>
+  <meta name="description" content="Mindy Wu — I build AI systems for Fortune 500 media companies, and small AI tools on the side. Portfolio and history.">
   <meta name="author" content="Mindy Wu">
 
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
 
-  <!-- Open Graph (for link previews on WhatsApp, iMessage, LinkedIn) -->
-  <meta property="og:title" content="Mindy's Portfolio">
-  <meta property="og:description" content="AI doesn't replace talent, it amplifies it. Why I build this, and who I am.">
+  <!-- Open Graph -->
+  <meta property="og:title" content="Mindy Wu">
+  <meta property="og:description" content="I build AI systems for Fortune 500 media companies, and small AI tools on the side. Portfolio and history.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://mindy-portfolio.vercel.app">
   <meta property="og:image" content="https://mindy-portfolio.vercel.app/assets/og-image.png">
@@ -28,229 +28,217 @@
   <link rel="stylesheet" href="css/styles.css">
 
   <style>
-    /* ============================================================
-       HOME / ABOUT-STYLE LANDING
-       ============================================================ */
-
-    .about-page-hero {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 80px 2rem 40px;
-      text-align: center;
-    }
-
-    .about-page-hero h1 {
+    /* ===== HOME: intro + portfolio + history ===== */
+    .intro { max-width: 720px; margin: 0 auto; padding: 76px 2rem 12px; }
+    .intro h1 {
       font-family: 'Fraunces', serif;
-      font-size: clamp(32px, 5vw, 52px);
-      line-height: 1.15;
+      font-size: clamp(30px, 4.5vw, 44px);
       font-weight: 600;
       color: var(--ink);
-      margin-bottom: 1.25rem;
+      line-height: 1.12;
+      margin-bottom: 1rem;
     }
-
-    .about-page-hero h1 em { font-style: italic; color: var(--clay); }
-
-    .about-page-hero .hero-actions { justify-content: center; margin-top: 2rem; }
-
-    /* Essay */
-    .essay-section { background: var(--warm-white); border-top: 1px solid var(--border); }
-
-    .essay-inner { max-width: 640px; margin: 0 auto; padding: 72px 2rem; }
-
-    .essay-inner h2 {
-      font-family: 'Fraunces', serif;
-      font-size: clamp(24px, 3vw, 32px);
-      font-weight: 600;
-      color: var(--ink);
-      margin-bottom: 1.5rem;
-    }
-
-    .essay-inner p {
-      font-size: 17px;
-      line-height: 1.75;
-      color: var(--ink-soft);
-      margin-bottom: 1.25rem;
-    }
-
-    .essay-inner p:last-child { margin-bottom: 0; }
-
-    /* Pull-quote / aside */
-    .essay-aside {
-      background: var(--butter-light);
-      border-left: 3px solid var(--butter);
-      border-radius: 8px;
-      padding: 1.5rem 1.75rem;
-      margin: 2rem 0;
-      font-size: 15px;
+    .intro p {
+      font-size: 18px;
       line-height: 1.7;
       color: var(--ink-soft);
+      max-width: 62ch;
     }
-
-    .essay-aside strong { color: var(--ink); }
-
-    .essay-aside .video-slot {
-      margin-top: 1rem;
-      font-size: 13px;
-    }
-
-    .essay-aside .video-slot a {
+    .intro a.inline {
       color: var(--clay);
-      font-weight: 500;
       text-decoration: none;
-      transition: color 0.2s;
+      border-bottom: 1px solid rgba(47,102,144,.32);
+      transition: border-color .15s;
     }
+    .intro a.inline:hover { border-color: var(--clay); }
 
-    .essay-aside .video-slot a:hover { color: var(--silver-dark); }
-
-    /* See it in action */
-    .see-it-section { padding: 72px 2rem; }
-
-    .see-it-inner { max-width: 1100px; margin: 0 auto; }
-
-    .see-it-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      margin-top: 1.5rem;
-    }
-
-    .see-it-links a {
-      font-size: 14px;
-      font-weight: 500;
+    .sec { max-width: 720px; margin: 0 auto; padding: 44px 2rem; }
+    .sec-h {
+      font-family: 'Fraunces', serif;
+      font-size: 22px;
+      font-weight: 600;
       color: var(--ink);
-      background: var(--warm-white);
-      border: 1px solid var(--border);
-      padding: 8px 16px;
-      border-radius: 100px;
-      text-decoration: none;
-      transition: border-color 0.2s, color 0.2s;
+      margin-bottom: 1.1rem;
     }
 
-    .see-it-links a:hover { border-color: var(--clay); color: var(--clay); }
+    /* Portfolio list */
+    .plist { border-top: 1px solid var(--border); }
+    .prow {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      gap: 1.5rem;
+      padding: 17px 0;
+      border-bottom: 1px solid var(--border);
+      align-items: baseline;
+    }
+    .prow a.pname {
+      font-family: 'Fraunces', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--ink);
+      text-decoration: none;
+      transition: color .15s;
+    }
+    .prow a.pname:hover { color: var(--clay); }
+    .prow a.pname .arw { color: var(--ink-muted); font-weight: 400; }
+    .prow .pfocus { font-size: 15px; line-height: 1.55; color: var(--ink-soft); }
 
-    @media (max-width: 640px) {
-      .about-page-hero { padding: 60px 1.5rem 32px; }
-      .essay-inner { padding: 48px 1.5rem; }
+    /* History timeline */
+    .hlist { border-top: 1px solid var(--border); }
+    .hrow {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 1.5rem;
+      padding: 17px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .hrow .hyear {
+      font-size: 14px;
+      color: var(--ink-muted);
+      font-variant-numeric: tabular-nums;
+      padding-top: 2px;
+      white-space: nowrap;
+    }
+    .hrow .htitle { font-weight: 600; color: var(--ink); font-size: 16px; margin-bottom: .3rem; }
+    .hrow .htitle .org { color: var(--ink-soft); font-weight: 500; }
+    .hrow .hdesc { font-size: 15px; line-height: 1.55; color: var(--ink-soft); }
+    .hrow.ph .htitle { font-style: italic; color: var(--ink-muted); font-weight: 500; }
+    .hrow.ph .hdesc { color: var(--ink-muted); }
+    .fill-note { font-size: 13px; color: var(--ink-muted); margin-top: 1rem; }
+
+    @media (max-width: 600px) {
+      .intro { padding: 52px 1.5rem 8px; }
+      .sec { padding: 36px 1.5rem; }
+      .prow, .hrow { grid-template-columns: 1fr; gap: .3rem; padding: 15px 0; }
+      .hrow .hyear { order: -1; }
     }
   </style>
 </head>
 <body>
 
-<!-- ===================== NAV ===================== -->
 <!-- ===== PORTFOLIO NAV — shared across all pages (self-contained; keep identical everywhere) ===== -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600&family=DM+Sans:wght@400;500&display=swap');
-.mpnav{position:sticky;top:0;z-index:99999;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0 1.25rem;min-height:58px;background:#F8FBFD;border-bottom:1px solid rgba(22,35,46,.12);box-sizing:border-box;font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;}
+.mpnav{position:sticky;top:0;z-index:99999;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0 1.5rem;min-height:58px;background:#F8FBFD;border-bottom:1px solid rgba(22,35,46,.10);box-sizing:border-box;font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;}
 .mpnav *{box-sizing:border-box;}
 .mpnav a{text-decoration:none;}
-.mpnav__brand{font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:600;color:#2F6690;white-space:nowrap;flex-shrink:0;}
-.mpnav__brand span{color:#16232E;}
-.mpnav__links{display:flex;align-items:center;gap:1.15rem;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
-.mpnav__links::-webkit-scrollbar{display:none;}
-.mpnav__links a{font-size:14px;font-weight:500;color:#3E5A6E;white-space:nowrap;padding:4px 0;transition:opacity .15s;}
-.mpnav__links a:hover{opacity:.6;}
-.mpnav__links a.ge{color:#6B3FA8;}
-.mpnav__links a.genai{color:#1A4FCC;}
-.mpnav__links a.sa{color:#1A7A4A;}
-.mpnav__links a.mw{color:#B0253F;}
-.mpnav__links a.sig{color:#946200;}
-.mpnav__links a.plm{color:#5E8A63;}
-.mpnav__links a.fcr{color:#A8604F;}
-.mpnav__links a.is-here{border-bottom:2px solid currentColor;padding-bottom:2px;}
-@media(max-width:760px){.mpnav__brand span{display:none;}.mpnav{padding:0 .85rem;gap:.6rem;}.mpnav__links{gap:1rem;}}
+.mpnav__brand{font-family:'Fraunces',Georgia,serif;font-size:19px;font-weight:600;color:#16232E;white-space:nowrap;flex-shrink:0;}
+.mpnav__links{display:flex;align-items:center;gap:1.5rem;}
+.mpnav__links a{font-size:14.5px;font-weight:500;color:#3E5A6E;white-space:nowrap;transition:color .15s;}
+.mpnav__links a:hover{color:#2F6690;}
+.mpnav__links a.is-here{color:#2F6690;}
+@media(max-width:600px){.mpnav{padding:0 1rem;}.mpnav__links{gap:1.1rem;}.mpnav__links a{font-size:13.5px;}}
 </style>
-<nav class="mpnav" aria-label="Mindy's Portfolio">
-  <a class="mpnav__brand" href="index.html">Mindy<span>'s Portfolio</span></a>
+<nav class="mpnav" aria-label="Mindy Wu">
+  <a class="mpnav__brand" href="index.html">Mindy Wu</a>
   <div class="mpnav__links">
-    <a href="index.html#bio">About</a>
-    <a class="ge" href="https://global-explorer-ivory.vercel.app" target="_blank" rel="noopener">Global Explorer ✦</a>
-    <a class="genai" href="https://gender-ai.vercel.app" target="_blank" rel="noopener">GenAI ✦</a>
-    <a class="sa" href="stock-advisor.html">Stock Advisor ✦</a>
-    <a class="mw" href="mood.html">Mood Wall ✦</a>
-    <a class="sig" href="signal.html">SIGNAL ✦</a>
-    <a class="plm" href="people-like-me.html">People Like Me ✦</a>
-    <a class="fcr" href="festival-clash-resolver.html">Festival Clash Resolver ✦</a>
+    <a href="index.html#portfolio">Portfolio</a>
+    <a href="index.html#history">History</a>
+    <a href="about.html">About</a>
   </div>
 </nav>
 <!-- ===== /PORTFOLIO NAV ===== -->
 
-<!-- ===================== HERO ===================== -->
-<section class="about-page-hero">
-  <div class="hero-tag">✦ Why I build this</div>
-  <h1>AI doesn't replace<br><em>talent</em>. It amplifies it.</h1>
-  <p class="hero-sub" style="margin-left:auto;margin-right:auto;">
-    It's the pattern I see every day building AI systems for Fortune 500 companies, and it's why I built this for my parents first.
-  </p>
-  <div class="hero-actions">
-    <a href="#see-it" class="btn-primary">See what I've built →</a>
-    <a href="https://github.com/mindyjwu" target="_blank" rel="noopener" class="btn-secondary">Full portfolio →</a>
-  </div>
+<!-- ===================== INTRO ===================== -->
+<section class="intro">
+  <h1>Mindy Wu</h1>
+  <p>Based in New York. I build and deploy RAG pipelines and AI systems for Fortune&nbsp;500 media companies, and on the side I build small AI tools for problems I'm personally curious about — the ones below. <a class="inline" href="about.html">More about me →</a></p>
 </section>
 
-<!-- ===================== BIO ===================== -->
-<section class="about-section" id="bio">
-  <div class="about-inner">
-    <img src="assets/mindy.jpg" alt="Mindy Wu" class="about-photo" onerror="this.style.display='none';document.getElementById('about-avatar-fallback').style.display='flex';">
-    <div class="about-avatar" id="about-avatar-fallback" aria-hidden="true" style="display:none;">M</div>
-    <div>
-      <div class="about-label">Who I am</div>
-      <h2 class="about-title">Hi, I'm Mindy.</h2>
-      <p class="about-text">By day I build and deploy RAG pipelines and AI systems for Fortune 500 media companies. By night I explain it to my parents, which turned into this. I studied CS &amp; Data Science at NYU, and I've been building small AI tools on the side ever since: this guide, the Mood Wall, and a handful of other projects.</p>
-      <a href="https://github.com/mindyjwu" target="_blank" rel="noopener" class="about-portfolio-link">See my full portfolio →</a>
+<!-- ===================== PORTFOLIO ===================== -->
+<section class="sec" id="portfolio">
+  <h2 class="sec-h">Portfolio</h2>
+  <div class="plist">
+
+    <div class="prow">
+      <a class="pname" href="https://global-explorer-ivory.vercel.app" target="_blank" rel="noopener">Global Explorer <span class="arw">↗</span></a>
+      <div class="pfocus">A 3D globe you click to explore any country's cities, each tagged by what makes it worth visiting.</div>
     </div>
+
+    <div class="prow">
+      <a class="pname" href="https://gender-ai.vercel.app" target="_blank" rel="noopener">GenAI <span class="arw">↗</span></a>
+      <div class="pfocus">Ask anything and get two perspectives in distinct voices — then see what your choices reveal about you.</div>
+    </div>
+
+    <div class="prow">
+      <a class="pname" href="stock-advisor.html">Stock Advisor</a>
+      <div class="pfocus">Scores stocks on fundamentals, technicals and news sentiment, then grades its own calls. Educational, not advice.</div>
+    </div>
+
+    <div class="prow">
+      <a class="pname" href="mood.html">Mood Wall</a>
+      <div class="pfocus">Name a feeling or a place and get back real art, books, music and film that match the moment.</div>
+    </div>
+
+    <div class="prow">
+      <a class="pname" href="signal.html">SIGNAL</a>
+      <div class="pfocus">A live feed that turns AI-industry news into short, sourced reads instead of endless scrolling.</div>
+    </div>
+
+    <div class="prow">
+      <a class="pname" href="people-like-me.html">People Like Me</a>
+      <div class="pfocus">Vetted beauty and body providers, ranked by people who share your hair, skin type and budget.</div>
+    </div>
+
+    <div class="prow">
+      <a class="pname" href="festival-clash-resolver.html">Festival Clash Resolver</a>
+      <div class="pfocus">An offline-first set-clash resolver and route planner for electronic-music festivals.</div>
+    </div>
+
   </div>
 </section>
 
-<!-- ===================== THE IDEA (essay) ===================== -->
-<section class="essay-section">
-  <div class="essay-inner reveal">
-    <h2>The idea behind it</h2>
-    <p>I don't think AI replaces talent. I think it amplifies it.</p>
-    <p>I see this every day at work. I build and deploy RAG pipelines and AI systems for Fortune 500 media and entertainment companies, and the pattern holds no matter the team: the people who get the most out of AI aren't the ones who know the most about AI. They're the ones who already had something real, real judgment, real taste, a real point of view, and just needed a faster way to act on it.</p>
-    <p>My parents don't work in tech. They kept asking me, separately, whether AI was going to take their jobs, and I didn't have an answer that fit in a text message. So instead of explaining it, I started showing them: here's how you'd use it for an email you're dreading, for a letter you don't understand, for a conversation you've been putting off. Watching it actually click for them is what convinced me the amplifier idea holds up outside of enterprise software too, not just for consultants and engineers.</p>
+<!-- ===================== HISTORY ===================== -->
+<section class="sec" id="history">
+  <h2 class="sec-h">History</h2>
+  <div class="hlist">
 
-    <div class="essay-aside">
-      <strong>A favorite example of this:</strong> a musician who takes his own voice and layers it live, in real time, into full vocal harmony no single throat could produce alone. The raw talent was always there; the tool just let it fully out.
-      <div class="video-slot">
-        <a href="https://youtu.be/BFul90BFjGc?t=891" target="_blank" rel="noopener">▶ Watch the moment: Jacob Collier, live with orchestra →</a>
+    <div class="hrow">
+      <div class="hyear">2023 — present</div>
+      <div>
+        <div class="htitle">Technology Consultant, <span class="org">Qvest.US</span></div>
+        <div class="hdesc">Deploy agentic AI and RAG systems for Fortune 500 media &amp; entertainment clients — driving 4,000+ enterprise apps to 100% mapping completion during a $110B M&amp;A separation, and building AI contract-intelligence and multi-agent platform prototypes from design through production.</div>
       </div>
     </div>
 
-    <p>That's the lens I build through, at work and here. Every tool on this site (the Mood Wall, Signal, People Like Me, the guide itself) starts from the same question: what's someone already capable of, that a good AI tool could help them actually do? And the projects I build outside the guide (Global Explorer, GenAI, Stock Advisor, Festival Clash Resolver) are the same instinct pointed at problems I'm just personally curious about.</p>
-  </div>
-</section>
-
-<!-- ===================== SEE IT IN ACTION ===================== -->
-<section class="see-it-section" id="see-it">
-  <div class="see-it-inner reveal">
-    <div class="section-label">See it in action</div>
-    <h2 class="section-title">The idea, in practice</h2>
-    <div class="see-it-links">
-      <a href="https://global-explorer-ivory.vercel.app" target="_blank" rel="noopener">Global Explorer →</a>
-      <a href="https://gender-ai.vercel.app" target="_blank" rel="noopener">GenAI →</a>
-      <a href="stock-advisor.html">Stock Advisor →</a>
-      <a href="mood.html">Mood Wall ✦</a>
-      <a href="signal.html">SIGNAL ✦</a>
-      <a href="people-like-me.html">People Like Me ✦</a>
-      <a href="festival-clash-resolver.html">Festival Clash Resolver ✦</a>
-      <a href="https://github.com/mindyjwu" target="_blank" rel="noopener">All my projects →</a>
+    <div class="hrow">
+      <div class="hyear">Summer 2022</div>
+      <div>
+        <div class="htitle">Data Analytics Consultant Intern, <span class="org">KPMG</span></div>
+        <div class="hdesc">Built 6+ BI dashboards and customer-segmentation models for enterprise clients in Taipei, turning multi-million-dollar sales data into recommendations that informed $10M+ in capital decisions and a $15M+ revenue-optimization roadmap.</div>
+      </div>
     </div>
+
+    <div class="hrow">
+      <div class="hyear">Summer 2020</div>
+      <div>
+        <div class="htitle">GTM Solutions Intern, <span class="org">Taiwan Mobile &amp; NVIDIA</span></div>
+        <div class="hdesc">Supported the 5G GeForce NOW launch — running product demos and technical deep-dives with partners like Acer, ASUS and Razer, and presenting edge-computing ROI analysis to C-suite executives.</div>
+      </div>
+    </div>
+
+    <div class="hrow">
+      <div class="hyear">2019 — 2023</div>
+      <div>
+        <div class="htitle">B.A. Computer Science &amp; Data Science, <span class="org">New York University</span></div>
+        <div class="hdesc">Minors in Economics and Business of Entertainment, Media &amp; Technology; studied abroad at NYU Paris. Co-founded the NYU Data Science Club and served as President of the Taiwanese American Student Society.</div>
+      </div>
+    </div>
+
   </div>
 </section>
 
 <!-- ===================== FOOTER ===================== -->
 <footer>
   <p>
-    Made with curiosity by <a href="https://linkedin.com/in/mindyjwu/" target="_blank" rel="noopener">Mindy Wu</a>
+    © 2026 Mindy Wu
     &nbsp;·&nbsp;
-    Powered by <a href="https://claude.ai" target="_blank" rel="noopener">Claude</a> by Anthropic
+    <a href="https://linkedin.com/in/mindyjwu/" target="_blank" rel="noopener">LinkedIn</a>
     &nbsp;·&nbsp;
-    <a href="#">Back to top ↑</a>
+    <a href="https://github.com/mindyjwu" target="_blank" rel="noopener">GitHub</a>
   </p>
 </footer>
 
-<!-- Scripts -->
-<script src="js/main.js"></script>
 <!-- Vercel Web Analytics -->
 <script defer src="/_vercel/insights/script.js"></script>
 </body>

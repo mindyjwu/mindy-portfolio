@@ -3,18 +3,97 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mindy's Portfolio</title>
-  <!-- This page is now the homepage. Redirecting to the root. -->
-  <link rel="canonical" href="https://mindy-portfolio.vercel.app/">
-  <meta http-equiv="refresh" content="0; url=index.html">
+
+  <title>About · Mindy Wu</title>
+  <meta name="description" content="Who I am, why this page exists, and what I believe about building with AI.">
+  <meta name="author" content="Mindy Wu">
+
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
-  <script>window.location.replace('index.html');</script>
+  <meta property="og:title" content="About · Mindy Wu">
+  <meta property="og:description" content="Who I am, why this page exists, and what I believe about building with AI.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mindy-portfolio.vercel.app/about.html">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+
   <style>
-    body { font-family: 'DM Sans', system-ui, sans-serif; background: #F6F9FB; color: #16232E; display: grid; place-items: center; min-height: 100vh; margin: 0; }
-    a { color: #2F6690; }
+    .about-wrap { max-width: 640px; margin: 0 auto; padding: 76px 2rem 64px; }
+    .about-wrap img.me {
+      width: 116px; height: 116px;
+      object-fit: cover; object-position: center top;
+      border-radius: 16px; display: block; margin-bottom: 1.75rem;
+    }
+    .about-wrap h1 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(30px, 4vw, 42px);
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.12;
+      margin-bottom: 1.5rem;
+    }
+    .about-wrap p {
+      font-size: 17px;
+      line-height: 1.78;
+      color: var(--ink-soft);
+      margin-bottom: 1.25rem;
+    }
+    .about-wrap p:last-of-type { margin-bottom: 0; }
+    .about-wrap .lead { color: var(--ink); }
+    @media (max-width: 600px) { .about-wrap { padding: 52px 1.5rem 48px; } }
   </style>
 </head>
 <body>
-  <p>This page is now the homepage. <a href="index.html">Continue →</a></p>
+
+<!-- ===== PORTFOLIO NAV — shared across all pages (self-contained; keep identical everywhere) ===== -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600&family=DM+Sans:wght@400;500&display=swap');
+.mpnav{position:sticky;top:0;z-index:99999;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0 1.5rem;min-height:58px;background:#F8FBFD;border-bottom:1px solid rgba(22,35,46,.10);box-sizing:border-box;font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;}
+.mpnav *{box-sizing:border-box;}
+.mpnav a{text-decoration:none;}
+.mpnav__brand{font-family:'Fraunces',Georgia,serif;font-size:19px;font-weight:600;color:#16232E;white-space:nowrap;flex-shrink:0;}
+.mpnav__links{display:flex;align-items:center;gap:1.5rem;}
+.mpnav__links a{font-size:14.5px;font-weight:500;color:#3E5A6E;white-space:nowrap;transition:color .15s;}
+.mpnav__links a:hover{color:#2F6690;}
+.mpnav__links a.is-here{color:#2F6690;}
+@media(max-width:600px){.mpnav{padding:0 1rem;}.mpnav__links{gap:1.1rem;}.mpnav__links a{font-size:13.5px;}}
+</style>
+<nav class="mpnav" aria-label="Mindy Wu">
+  <a class="mpnav__brand" href="index.html">Mindy Wu</a>
+  <div class="mpnav__links">
+    <a href="index.html#portfolio">Portfolio</a>
+    <a href="index.html#history">History</a>
+    <a href="about.html" class="is-here">About</a>
+  </div>
+</nav>
+<!-- ===== /PORTFOLIO NAV ===== -->
+
+<!-- ===================== ABOUT ===================== -->
+<section class="about-wrap">
+  <img src="assets/mindy.jpg" alt="Mindy Wu" class="me" onerror="this.style.display='none'">
+  <h1>About</h1>
+
+  <p class="lead">I'm Mindy Wu, based in New York. I studied Computer Science and Data Science at NYU, and I build and deploy RAG pipelines and AI systems for Fortune 500 media and entertainment companies. On the side, I build small AI tools for problems I'm personally curious about.</p>
+
+  <p>This site started with my parents. They don't work in tech, and they kept asking me — separately — whether AI was going to take their jobs. I never had an answer that fit in a text message, so instead of explaining it, I started showing them: here's how you'd use it for an email you're dreading, a letter you don't understand, a conversation you've been putting off. The tools on this site grew out of that, and then out of my own curiosity.</p>
+
+  <p>What I keep coming back to is that the people who get the most out of AI usually aren't the ones who know the most about it. They're the ones who already have real judgment, real taste, and a real point of view — and just need a faster way to act on it. I think good tools should meet people where they are and help them do more of what they're already good at. That's the lens I build through, at work and here.</p>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <p>
+    © 2026 Mindy Wu
+    &nbsp;·&nbsp;
+    <a href="https://linkedin.com/in/mindyjwu/" target="_blank" rel="noopener">LinkedIn</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/mindyjwu" target="_blank" rel="noopener">GitHub</a>
+  </p>
+</footer>
+
+<!-- Vercel Web Analytics -->
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
