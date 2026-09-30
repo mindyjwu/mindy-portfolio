@@ -10,6 +10,9 @@
       try { t = localStorage.getItem('mw-theme'); } catch (e) {}
       if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       document.documentElement.dataset.mwTheme = t;
+      // Scroll reveal only when motion is welcome (js/liquid.js drives it).
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window)
+        document.documentElement.classList.add('js-reveal');
     })();
   </script>
 
@@ -124,7 +127,8 @@
     }
   </style>
 </head>
-<body>
+<body class="liquid">
+<canvas id="liquid" aria-hidden="true"></canvas>
 
 <!-- ===== PORTFOLIO NAV — shared across all pages (self-contained; keep identical everywhere) ===== -->
 <style>
@@ -265,6 +269,8 @@ html[data-mw-theme="dark"] .mpnav__theme .moon{display:none;}
     <a href="https://github.com/mindyjwu" target="_blank" rel="noopener">GitHub</a>
   </p>
 </footer>
+
+<script src="js/liquid.js" defer></script>
 
 <!-- Theme toggle -->
 <script>

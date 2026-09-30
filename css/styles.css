@@ -1110,3 +1110,121 @@ textarea:focus-visible {
   .nav-links li { padding: 0.35rem 0; }
   .nav-links li a { display: inline-block; font-size: 16px; }
 }
+
+/* ============================================
+   LIQUID SURFACE — Home + About only (body.liquid)
+   The water itself is drawn by js/liquid.js on #liquid.
+   ============================================ */
+#liquid { position: fixed; z-index: -1; pointer-events: none; display: block; filter: blur(1.5px); }
+
+/* Name and page titles: a slow liquid-silver sheen across the letters */
+body.liquid .intro h1,
+body.liquid .about-wrap h1 {
+  background: linear-gradient(105deg, #16232E 0%, #2F6690 30%, #6F93AE 44%, #A9C0CF 50%, #6F93AE 56%, #2F6690 70%, #16232E 100%);
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: silverSheen 9s ease-in-out infinite;
+}
+html[data-mw-theme="dark"] body.liquid .intro h1,
+html[data-mw-theme="dark"] body.liquid .about-wrap h1 {
+  background-image: linear-gradient(105deg, #AEC1CE 0%, #E6EEF3 30%, #8CBCE0 44%, #FFFFFF 50%, #8CBCE0 56%, #E6EEF3 70%, #AEC1CE 100%);
+}
+body.liquid .intro h1 { font-size: clamp(46px, 8.5vw, 92px); letter-spacing: -0.02em; line-height: 1.02; }
+@keyframes silverSheen { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0% 0; } }
+
+/* Section headings trail off into a silver hairline */
+body.liquid .sec-h { display: flex; align-items: center; gap: 16px; }
+body.liquid .sec-h::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, rgba(47,102,144,.45), rgba(183,196,204,0));
+}
+html[data-mw-theme="dark"] body.liquid .sec-h::after { background: linear-gradient(90deg, rgba(140,188,224,.45), rgba(140,188,224,0)); }
+
+/* Portfolio rows: numbered, lift on hover, and catch a silver glow under the cursor */
+body.liquid .plist { border-top: none; counter-reset: proj; }
+body.liquid .prow {
+  position: relative; isolation: isolate; cursor: pointer;
+  counter-increment: proj;
+  margin: 0 -18px; padding: 20px 18px;
+  border-bottom: none; border-radius: 16px;
+  transition: transform .35s cubic-bezier(.2,.7,.2,1);
+}
+body.liquid .prow::after {
+  content: ''; position: absolute; left: 18px; right: 18px; bottom: 0; height: 1px;
+  background: var(--border);
+}
+body.liquid .prow::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; opacity: 0;
+  background:
+    radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.85), rgba(255,255,255,0) 62%),
+    linear-gradient(120deg, rgba(214,228,236,.62), rgba(242,247,250,.42));
+  box-shadow: inset 0 0 0 1px rgba(47,102,144,.12), 0 12px 32px rgba(31,74,102,.10);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  transition: opacity .35s ease;
+}
+html[data-mw-theme="dark"] body.liquid .prow::before {
+  background:
+    radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(140,188,224,.20), rgba(140,188,224,0) 62%),
+    linear-gradient(120deg, rgba(38,58,74,.60), rgba(22,34,44,.40));
+  box-shadow: inset 0 0 0 1px rgba(230,238,243,.09), 0 12px 32px rgba(0,0,0,.30);
+}
+body.liquid .prow:hover { transform: translateY(-2px); }
+body.liquid .prow:hover::before { opacity: 1; }
+body.liquid .prow a.pname::before {
+  content: counter(proj, decimal-leading-zero);
+  display: inline-block; width: 2.2em;
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 500;
+  letter-spacing: .12em; color: var(--ink-muted); vertical-align: 2px;
+}
+body.liquid .prow a.pname:not([target])::after {
+  content: '→'; display: inline-block; margin-left: 8px; opacity: 0;
+  transform: translateX(-6px); color: var(--clay);
+  transition: opacity .3s ease, transform .3s ease;
+}
+body.liquid .prow:hover a.pname:not([target])::after { opacity: 1; transform: none; }
+body.liquid .prow:hover a.pname { color: var(--clay); }
+
+/* History: a silver timeline with glinting beads */
+body.liquid .hlist { border-top: none; position: relative; padding-left: 24px; }
+body.liquid .hlist::before {
+  content: ''; position: absolute; left: 4px; top: 12px; bottom: 12px; width: 2px; border-radius: 2px;
+  background: linear-gradient(180deg, rgba(47,102,144,.55), rgba(183,196,204,.40) 65%, rgba(183,196,204,0));
+}
+html[data-mw-theme="dark"] body.liquid .hlist::before { background: linear-gradient(180deg, rgba(140,188,224,.6), rgba(140,188,224,.18) 65%, rgba(140,188,224,0)); }
+body.liquid .hrow { position: relative; }
+body.liquid .hrow::before {
+  content: ''; position: absolute; left: -24px; top: 23px; width: 10px; height: 10px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #FFFFFF, #B7C4CC 55%, #7C8E99);
+  box-shadow: 0 0 0 3px rgba(246,250,251,.95), 0 0 12px rgba(47,102,144,.35);
+}
+html[data-mw-theme="dark"] body.liquid .hrow::before {
+  background: radial-gradient(circle at 35% 30%, #FFFFFF, #8CBCE0 55%, #3B5466);
+  box-shadow: 0 0 0 3px rgba(14,22,29,.95), 0 0 14px rgba(140,188,224,.45);
+}
+body.liquid .hlist .hrow:first-child::before { animation: beadGlow 2.8s ease-in-out infinite; }
+@keyframes beadGlow { 50% { box-shadow: 0 0 0 3px rgba(246,250,251,.95), 0 0 22px rgba(47,102,144,.7); } }
+
+/* About photo: a silver rim */
+body.liquid .about-wrap img.me {
+  box-shadow: 0 0 0 1px rgba(255,255,255,.75), 0 0 0 5px rgba(183,196,204,.35), 0 18px 40px rgba(31,74,102,.18);
+}
+
+/* Scroll reveal. html.js-reveal is set in <head> only when motion is welcome;
+   the fail-safe animation shows everything after 3s even if the script never runs. */
+html.js-reveal body.liquid :is(.sec-h, .prow, .hrow, .about-wrap > *) {
+  opacity: 0; translate: 0 18px;
+  transition: opacity .8s ease var(--d, 0ms), translate .9s cubic-bezier(.2,.7,.2,1) var(--d, 0ms), transform .35s cubic-bezier(.2,.7,.2,1);
+}
+html.js-reveal body.liquid :is(.sec-h, .prow, .hrow, .about-wrap > *).in { opacity: 1; translate: none; }
+/* Only if liquid.js never ran (it adds .reveal-ready at once). */
+html.js-reveal:not(.reveal-ready) body.liquid :is(.sec-h, .prow, .hrow, .about-wrap > *) { animation: revealFailsafe 0s linear 3s forwards; }
+@keyframes revealFailsafe { to { opacity: 1; translate: none; } }
+
+@media (max-width: 600px) {
+  body.liquid .prow { margin: 0 -10px; padding: 16px 10px; }
+  body.liquid .prow::after { left: 10px; right: 10px; }
+  body.liquid .hlist { padding-left: 20px; }
+  body.liquid .hrow::before { left: -20px; top: 21px; }
+}
