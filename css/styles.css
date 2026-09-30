@@ -26,6 +26,44 @@
   --silver-shine: linear-gradient(135deg, #CBD8DE 0%, #F2F6F8 45%, #AFC0C9 100%);
 }
 
+/* === DARK MODE — "evening water" at night.
+   Pages opt in by setting html[data-mw-theme] (index + about do); pages that
+   don't set it (e.g. mood.html) are unaffected. === */
+html[data-mw-theme="dark"] {
+  color-scheme: dark;
+  --cream: #0E161D;
+  --warm-white: #121C25;
+  --clay: #8CBCE0;
+  --clay-light: #1B2B38;
+  --clay-dark: #B7D5EC;
+  --sage: #74A7C0;
+  --sage-light: #16242E;
+  --butter: #3B5466;
+  --butter-light: #15212B;
+  --ink: #E6EEF3;
+  --ink-soft: #AEC1CE;
+  --ink-muted: #7E96A6;
+  --border: rgba(230, 238, 243, 0.10);
+  --silver: #4A5C68;
+  --silver-light: #1A252E;
+  --silver-dark: #9FB2BF;
+  --silver-shine: linear-gradient(135deg, #2A3A46 0%, #3D5060 45%, #22313C 100%);
+}
+
+html[data-mw-theme="dark"] body {
+  background: linear-gradient(
+    120deg,
+    #0B131A 0%,
+    #111D27 18%,
+    #0D1820 36%,
+    #13202B 54%,
+    #0C161E 72%,
+    #112029 90%,
+    #0B131A 100%
+  );
+  background-size: 320% 320%;
+}
+
 html { scroll-behavior: smooth; }
 
 body {
