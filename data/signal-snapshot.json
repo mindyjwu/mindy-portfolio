@@ -1,7 +1,181 @@
 {
-  "frozen": false,
-  "date": null,
-  "capturedAt": null,
-  "meta": {},
-  "stories": []
+  "frozen": true,
+  "date": "2026-09-30",
+  "capturedAt": "2026-09-30T20:12:01+00:00",
+  "meta": {
+    "hottest": "software",
+    "totalFunding": "$1.3B",
+    "storiesFound": 8,
+    "note": "Hand-verified sweep: every figure comes from the linked article."
+  },
+  "stories": [
+    {
+      "industry": "software",
+      "company": "Instinct",
+      "headline": "AI agent Instinct raises $1B at a $10B valuation",
+      "summary": "Instinct, an AI assistant that books travel, pays bills and cancels subscriptions over text, raised a $1 billion Series C at a $10 billion valuation. It was valued at $2.5 billion just a month earlier.",
+      "stat": "$10B",
+      "statLabel": "post-money valuation",
+      "metricB": "$1B",
+      "metricBLabel": "Series C",
+      "metricC": "4×",
+      "metricCLabel": "valuation jump in a month",
+      "detail": "Instinct launched as an invite-only service in August 2026, when it raised $350 million at a $2.5 billion valuation. The Series C came from Sequoia Capital, Benchmark and Coatue. The agent uses its own phone number and computer to complete tasks such as reservations, grocery orders and research, and recently added a concierge that makes phone calls and a network for coordinating plans between friends. It works over SMS and has no mobile app. Instinct has not disclosed user numbers, and it competes with Meta's Muse, which plugs into Meta's social products. It also updated its privacy policy after early criticism.",
+      "readMinutes": 3,
+      "tags": [
+        "AI Agents",
+        "Consumer AI",
+        "Series C"
+      ],
+      "source": "TechCrunch",
+      "url": "https://techcrunch.com/2026/09/28/viral-ai-agent-instinct-raises-1b-series-c-at-a-10b-valuation/"
+    },
+    {
+      "industry": "software",
+      "company": "Ema",
+      "headline": "Ema raises $77M for AI agents that run HR, IT and finance work",
+      "summary": "Ema, which deploys teams of AI agents to automate corporate processes, raised a $77 million Series B led by Creaegis, bringing total funding to $140 million. It reports $150 million-plus in bookings and 50-fold revenue growth over two years.",
+      "stat": "$77M",
+      "statLabel": "Series B",
+      "metricB": "50×",
+      "metricBLabel": "revenue growth in two years",
+      "metricC": "~180%",
+      "metricCLabel": "net dollar retention",
+      "detail": "Existing investors Accel, Section 32 and Prosus increased their stakes, and the round more than quadruples Ema's valuation from 2024. Founded in 2023 by Surojit Chatterjee and Souvik Sen, the company sells 'AI employees' that coordinate multiple agents across a customer's existing apps and can draw on 150-plus models. It prices on completed tasks rather than seats or tokens. Ema says it has more than a million active enterprise users, about 80% gross margins and customers including NTT DATA, Hitachi, ADP and PwC. It has about 200 employees and plans to expand into Asia-Pacific, South America and the Middle East.",
+      "readMinutes": 5,
+      "tags": [
+        "Enterprise AI",
+        "Agents",
+        "Series B"
+      ],
+      "source": "TechCrunch",
+      "url": "https://techcrunch.com/2026/09/23/ema-raises-77m-as-ai-starts-eating-into-enterprise-software-and-services/"
+    },
+    {
+      "industry": "finance",
+      "company": "Outmarket",
+      "headline": "Insurtech Outmarket raises $34.5M four months after its Series A",
+      "summary": "Outmarket, which uses AI to automate paperwork for insurance agencies and brokers, raised a $34.5 million Series B led by SignalFire at a $335 million valuation. It closed a $17 million Series A just four months earlier.",
+      "stat": "$34.5M",
+      "statLabel": "Series B",
+      "metricB": "$335M",
+      "metricBLabel": "valuation",
+      "metricC": "300+",
+      "metricCLabel": "insurance agencies",
+      "detail": "Fika Ventures, Permanent Capital Ventures, TTV Capital and Dash Fund also joined the round. Founder Vishal Sankhla previously led product at Ethos and started Outmarket in late 2023. The company targets commercial insurance, where custom policies span 250-plus coverage types and brokers spend hours on administrative work. Fourteen months after launch it counts more than 300 agencies as customers, including a quarter of the top 100. Competitors in AI for brokerages include Fulcrum AI and FurtherAI.",
+      "readMinutes": 2,
+      "tags": [
+        "Insurtech",
+        "Automation",
+        "Series B"
+      ],
+      "source": "TechCrunch",
+      "url": "https://techcrunch.com/2026/09/28/insuretech-outmarket-raises-34-5m-just-months-after-prior-round/"
+    },
+    {
+      "industry": "hardware",
+      "company": "CScale",
+      "headline": "CScale exits stealth with $145M, backed by Nvidia and Intel",
+      "summary": "Palo Alto startup CScale raised a $145 million Series C to build optical interconnects that let thousands of AI accelerators work as one system. Nvidia and Intel Capital joined as its first strategic investors.",
+      "stat": "$145M",
+      "statLabel": "Series C",
+      "metricB": "$188M",
+      "metricBLabel": "total raised",
+      "metricC": "~85",
+      "metricCLabel": "employees",
+      "detail": "Atreides Management led the round, co-led by Valor Equity Partners and Premji Invest, with Sutter Hill Ventures and Maverick Silicon participating. CScale is designing its light engines so that when optical parts fail, the failure is contained instead of stalling the compute job. 'Lasers will fail. Compute shouldn't,' said CEO Martin Lund, who previously led Cisco's Common Hardware Group. CTO Sanjai Kohli co-founded SiRF and Inovi. Founded in 2023, CScale enters a crowded field in which rivals Lumilens, Celero and Eliyan have raised $700 million, $275 million and $145 million.",
+      "readMinutes": 2,
+      "tags": [
+        "Photonics",
+        "AI Infrastructure",
+        "Data Centers"
+      ],
+      "source": "The Next Web",
+      "url": "https://thenextweb.com/news/cscale-145m-series-c-optical-interconnect-ai"
+    },
+    {
+      "industry": "energy",
+      "company": "U.S. Department of Energy",
+      "headline": "Energy Department puts $1.9B into squeezing more power from the grid",
+      "summary": "The Energy Department is funding 31 grid-modernization projects across 26 states, expected to add more than 23 gigawatts of capacity from existing lines. It comes as AI data centers come online faster than new power plants can be built.",
+      "stat": "23 GW",
+      "statLabel": "added grid capacity",
+      "metricB": "$1.9B",
+      "metricBLabel": "federal funding",
+      "metricC": "26",
+      "metricCLabel": "states",
+      "detail": "Energy Secretary Chris Wright announced the awards in Allentown, Pennsylvania. Recipients will add $3.35 billion in matching funds. The projects use sensors and weather monitoring to move more electricity through existing lines in real time and route power around congestion, with component upgrades on more than 1,500 miles of transmission and technology upgrades across 21,000 miles. The added capacity is enough for about 16 million homes, and the department says it benefits roughly 100 million people. The money comes from the bipartisan infrastructure law, as communities push back on data centers over rising electricity bills.",
+      "readMinutes": 4,
+      "tags": [
+        "Grid",
+        "Data Centers",
+        "Policy"
+      ],
+      "source": "Fortune (AP)",
+      "url": "https://fortune.com/2026/09/24/ai-power-grid-energy-department-electricity-bills"
+    },
+    {
+      "industry": "biotech",
+      "company": "AbbVie · Iambic Therapeutics",
+      "headline": "AbbVie taps Iambic's AI platform for new small-molecule drugs",
+      "summary": "AbbVie and Iambic Therapeutics signed a multi-year collaboration to discover small-molecule drugs in immunology, neuroscience and oncology using Iambic's AI platform. Financial terms beyond milestones and tiered royalties were not disclosed.",
+      "stat": "6,000+",
+      "statLabel": "molecular properties modeled",
+      "metricB": "3",
+      "metricBLabel": "therapeutic areas",
+      "metricC": "Undisclosed",
+      "metricCLabel": "deal value",
+      "detail": "The deal centers on Iambic's platform, including Enchant v3, a multimodal transformer trained on more than 6,000 molecular properties, and NeuralPLexer. Instead of testing properties one candidate at a time, the platform evaluates many design hypotheses in parallel. The partners aim for programs with first-in-class or best-in-class potential. Iambic says it previously advanced a novel candidate to the clinic in about two years. Iambic is eligible for success-based milestone payments and tiered royalties on net sales.",
+      "readMinutes": 4,
+      "tags": [
+        "Drug Discovery",
+        "Pharma",
+        "Partnership"
+      ],
+      "source": "AbbVie",
+      "url": "https://news.abbvie.com/2026-09-21-AbbVie-and-Iambic-Announce-Collaboration-to-Accelerate-AI-driven-Drug-Discovery"
+    },
+    {
+      "industry": "manufacturing",
+      "company": "Boston Dynamics · Hyundai",
+      "headline": "Atlas humanoids begin factory testing at Hyundai's Georgia plant",
+      "summary": "Boston Dynamics' Atlas is being trained on automotive parts logistics at Hyundai Motor Group's robotics center in Georgia. Hyundai plans to deploy 25,000 Atlas units across Hyundai and Kia plants.",
+      "stat": "25,000",
+      "statLabel": "Atlas units planned",
+      "metricB": "30,000/yr",
+      "metricBLabel": "US production capacity",
+      "metricC": "2030",
+      "metricCLabel": "target for assembly work",
+      "detail": "Testing runs at the Robotics Metaplant Application Center near Savannah, where human trainers teleoperate Atlas to teach it logistics and parts sequencing. The initial focus is logistics, with component assembly planned by 2030. Atlas stands 1.9 meters, has 56 degrees of freedom, carries a sustained 30 kg and runs about four hours per charge, swapping its own battery. A dedicated US factory can build 30,000 robots a year, and the test center is set to grow about tenfold in 2027.",
+      "readMinutes": 1,
+      "tags": [
+        "Humanoids",
+        "Automotive",
+        "Robotics"
+      ],
+      "source": "Electronics For You",
+      "url": "https://www.electronicsforu.com/news/humanoid-robots-enter-factory-testing-for-scaled-deployment"
+    },
+    {
+      "industry": "biotech",
+      "company": "Qiagen",
+      "headline": "Qiagen: drug-discovery agents need human-curated knowledge",
+      "summary": "Qiagen argues that AI agents for drug discovery hallucinate unless grounded in traceable, human-curated data. Its Discovery Platform layers MCP access and an agentic Discovery Explorer on top of 25-plus years of curation.",
+      "stat": "25+ yrs",
+      "statLabel": "human-curated data",
+      "metricB": "150+",
+      "metricBLabel": "MD & PhD curators",
+      "metricC": "MCP",
+      "metricCLabel": "agent access layer",
+      "detail": "Speaking at Neo4j's GraphSummit, Qiagen's Iman Bhattacharya said agents working from raw model knowledge 'will start to provide output, and it will hallucinate.' Qiagen employs more than 150 MD- and PhD-level experts who curate biomedical findings. The company pairs that knowledge graph with Model Context Protocol access so agents can cite where each answer comes from. It partnered with Nvidia in May on graph-based AI for drug discovery. The pitch: pharma's return depends on reaching the right indication faster, which requires outputs scientists can trace.",
+      "readMinutes": 3,
+      "tags": [
+        "Knowledge Graphs",
+        "Agents",
+        "Drug Discovery"
+      ],
+      "source": "SiliconANGLE",
+      "url": "https://siliconangle.com/2026/09/28/qiagen-grounds-ai-drug-discovery-agents-curated-knowledge-neo4jgraphsummit"
+    }
+  ]
 }

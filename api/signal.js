@@ -235,6 +235,13 @@ export default async function handler(req, res) {
     console.error('[/api/signal]', err);
     // Never cache a failure, or one bad sweep poisons the day.
     res.setHeader('Cache-Control', 'no-store');
-    return res.status(500).json({ error: String(err) });
+    // Keep provider details (request ids, billing text) in the server log, not
+    // in the response. The page falls back to the committed snapshot either way.
+    const outOfCredits = /credit balance/i.test(String(err?.message || err));
+    return res.status(outOfCredits ? 503 : 500).json({
+      error: outOfCredits
+        ? 'Live sweeps are paused right now, so the page shows the last saved sweep.'
+        : 'The live sweep failed, so the page shows the last saved sweep.',
+    });
   }
 }
