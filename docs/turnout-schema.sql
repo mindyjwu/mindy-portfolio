@@ -26,6 +26,8 @@ create table memberships (
   circle_id uuid references circles on delete cascade,
   user_id uuid references profiles on delete cascade,
   role text default 'member' check (role in ('owner','member')),
+  status text default 'pending' check (status in ('pending','approved','removed')),  -- owner approves invitees
+  invited_by uuid references profiles,   -- the friend whose invite link they used
   points int default 0 check (points >= 0),
   skip_until date,
   joined_at timestamptz default now(),
@@ -122,6 +124,8 @@ create policy "see circle mates" on profiles for select using (
           where a.user_id = auth.uid() and b.user_id = profiles.id));
 create policy "members see their circle" on circles for select using (in_circle(id));
 create policy "members see memberships" on memberships for select using (in_circle(circle_id));
+-- Make in_circle() count only approved members: add "and status = 'approved'" inside it.
+-- Owner approval: owners update memberships.status through a server function, not directly.
 create policy "members see events" on events for select using (in_circle(circle_id));
 create policy "own ratings" on idea_ratings for all using (user_id = auth.uid());
 create policy "own rsvp" on rsvps for select using (user_id = auth.uid() or
