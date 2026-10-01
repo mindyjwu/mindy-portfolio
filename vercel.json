@@ -6,5 +6,17 @@
     "api/mood.js": {
       "maxDuration": 60
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/wellness",
+      "destination": "https://wellness-buddy-chi.vercel.app",
+      "permanent": false
+    },
+    {
+      "source": "/wellness.html",
+      "destination": "https://wellness-buddy-chi.vercel.app",
+      "permanent": false
+    }
+  ]
 }
