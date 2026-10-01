@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turnout · Everyone takes a turn hosting</title>
+<meta name="description" content="A rotating-host community for real-life gatherings. Fair turns, themed ideas, shared costs, a guest list that mixes friends with friends-of-friends, and a network you build in person.">
+<meta name="author" content="Mindy Wu">
+<meta property="og:title" content="Turnout">
+<meta property="og:description" content="Everyone takes a turn hosting. Nobody burns out.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍊</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FFF6E9; --paper:#FFFDF8; --ink:#3B2A1F; --soft:#7A6556; --line:#F0DFC9;
+  --orange:#FF7A3D; --orange-d:#E85F20; --sun:#FFB93E; --green:#2FA36B; --green-d:#1F7F50;
+  --sage:#DDF1E3; --blue:#3C8DDE; --sky:#DDEEFF; --peach:#FFE3CF; --rose:#FF8FA3;
+  --r:22px; --shadow:0 10px 30px rgba(120,70,30,.12);
+}
+@media (prefers-color-scheme: dark){
+  :root{--cream:#2A1F18;--paper:#352820;--ink:#FFEFE0;--soft:#CDB6A3;--line:#4A382C;--sage:#1F3A2C;--sky:#1D3350;--peach:#4B2E1E;--shadow:0 10px 30px rgba(0,0,0,.35)}
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{font-family:'Nunito',system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.55;overflow-x:hidden;padding-bottom:84px}
+h1,h2,h3,.disp{font-family:'Baloo 2','Nunito',sans-serif;line-height:1.05}
+button{font:inherit;cursor:pointer;border:0;color:inherit}
+a{color:var(--blue)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 18px}
+
+/* hero */
+.hero{position:relative;padding:34px 0 22px;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(2px);opacity:.55;z-index:0;animation:drift 14s ease-in-out infinite}
+.b1{width:260px;height:260px;background:var(--sun);top:-80px;right:-60px}
+.b2{width:200px;height:200px;background:var(--sage);top:80px;left:-70px;animation-delay:-4s}
+.b3{width:150px;height:150px;background:var(--sky);bottom:-40px;right:22%;animation-delay:-8s}
+@keyframes drift{50%{transform:translate(18px,-22px) scale(1.06)}}
+.hero .wrap{position:relative;z-index:1}
+.back{font-weight:800;font-size:14px;text-decoration:none;color:var(--soft)}
+.brand{display:flex;align-items:center;gap:10px;margin:14px 0 6px;font-weight:800}
+.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--orange),var(--sun));display:grid;place-items:center;font-size:24px;animation:wob 5s ease-in-out infinite}
+@keyframes wob{50%{transform:rotate(-8deg) scale(1.06)}}
+.hero h1{font-size:clamp(38px,7vw,68px);font-weight:800;letter-spacing:-.5px}
+.hero h1 .o{color:var(--orange)} .hero h1 .g{color:var(--green)} .hero h1 .b{color:var(--blue)}
+.hero p.lede{max-width:600px;margin-top:12px;font-size:18px;color:var(--soft)}
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.stat{background:var(--paper);border:2px solid var(--line);border-radius:16px;padding:8px 16px;display:flex;align-items:baseline;gap:8px;box-shadow:var(--shadow)}
+.stat b{font-family:'Baloo 2';font-size:28px;color:var(--orange)}
+.stat span{font-size:13px;font-weight:700;color:var(--soft)}
+
+/* tabs */
+.tabs{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--cream) 88%,transparent);backdrop-filter:blur(10px);padding:10px 0;border-bottom:2px solid var(--line)}
+.tabs .wrap{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.tab{flex:0 0 auto;padding:10px 18px;border-radius:999px;background:var(--paper);border:2px solid var(--line);font-weight:800;transition:.2s}
+.tab:hover{transform:translateY(-2px)}
+.tab[aria-selected=true]{background:var(--orange);color:#fff;border-color:var(--orange);box-shadow:0 6px 16px rgba(255,122,61,.4)}
+@media(max-width:700px){
+  .tabs{position:fixed;top:auto;bottom:0;left:0;right:0;border-top:2px solid var(--line);border-bottom:0;padding:8px 0 max(8px,env(safe-area-inset-bottom))}
+  .tabs .wrap{justify-content:space-between;padding:0 10px}
+  .tab{padding:9px 6px;font-size:12.5px;flex:1;text-align:center}
+}
+
+/* layout */
+main{padding:26px 0 40px}
+.pane{display:none;animation:rise .45s ease both}
+.pane.on{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:860px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--paper);border:2px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);margin-bottom:20px}
+.card h2{font-size:28px;margin-bottom:4px}
+.card .sub{color:var(--soft);font-size:15px;margin-bottom:14px}
+.tint-o{background:linear-gradient(160deg,var(--peach),var(--paper) 70%)}
+.tint-g{background:linear-gradient(160deg,var(--sage),var(--paper) 70%)}
+.tint-b{background:linear-gradient(160deg,var(--sky),var(--paper) 70%)}
+.btn{background:var(--orange);color:#fff;font-weight:800;padding:12px 22px;border-radius:999px;box-shadow:0 6px 0 var(--orange-d);transition:.15s;display:inline-block}
+.btn:hover{transform:translateY(-2px)} .btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--orange-d)}
+.btn.g{background:var(--green);box-shadow:0 6px 0 var(--green-d)} .btn.g:active{box-shadow:0 2px 0 var(--green-d)}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:none;border:2px solid var(--line)}
+.btn:disabled{opacity:.45;pointer-events:none}
+.btn.sm{padding:7px 14px;font-size:14px;box-shadow:0 4px 0 var(--orange-d)}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:800;background:var(--peach);color:var(--orange-d);margin:2px 4px 2px 0}
+.chip.g{background:var(--sage);color:var(--green-d)} .chip.b{background:var(--sky);color:#2468B0}
+.chip.pick{border:2px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;padding:6px 12px;font-size:14px}
+.chip.pick.on{background:var(--green);border-color:var(--green);color:#fff}
+input[type=text],select{font:inherit;padding:11px 14px;border-radius:14px;border:2px solid var(--line);background:var(--paper);color:var(--ink);width:100%}
+input[type=text]:focus,select:focus{outline:3px solid color-mix(in srgb,var(--blue) 45%,transparent);border-color:var(--blue)}
+input[type=range]{width:100%;accent-color:var(--orange)}
+label.f{display:block;font-weight:800;font-size:14px;margin:12px 0 4px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.note{font-size:13px;color:var(--soft)}
+
+/* wheel */
+.wheelbox{position:relative;width:min(100%,320px);margin:6px auto 14px;aspect-ratio:1}
+.wheel{width:100%;height:100%;transition:transform 4.2s cubic-bezier(.12,.7,.1,1);filter:drop-shadow(0 10px 18px rgba(120,70,30,.25))}
+.pointer{position:absolute;top:-8px;left:50%;transform:translateX(-50%);font-size:34px;z-index:2;animation:bob 1.2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateX(-50%) translateY(5px)}}
+.hub{position:absolute;inset:0;margin:auto;width:64px;height:64px;border-radius:50%;background:var(--paper);border:4px solid var(--orange);display:grid;place-items:center;font-size:28px;z-index:1}
+
+/* members */
+.members{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.mem{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:12px;text-align:center;transition:.2s;position:relative}
+.mem:hover{transform:translateY(-4px) rotate(-1deg);border-color:var(--orange)}
+.av{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-size:28px;margin:0 auto 6px}
+.mem .h{font-weight:800;font-size:14.5px;word-break:break-all}
+.mem.up{border-color:var(--orange);box-shadow:0 0 0 4px color-mix(in srgb,var(--orange) 25%,transparent)}
+.capbar{height:12px;background:var(--line);border-radius:99px;overflow:hidden;margin:8px 0}
+.capbar i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--sun));border-radius:99px;transition:width .6s}
+
+/* schedule */
+.sched{list-style:none;padding:0}
+.sched li{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:2px dashed var(--line)}
+.sched li:last-child{border:0}
+.sched .m{font-family:'Baloo 2';font-weight:700;width:112px;font-size:17px}
+.sched .w{flex:1;font-weight:700}
+
+/* ideas */
+.ideas{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.idea{background:var(--paper);border:2px solid var(--line);border-radius:20px;padding:16px;text-align:left;transition:.2s;position:relative;display:block;width:100%}
+.idea:hover{transform:translateY(-4px) rotate(.6deg);border-color:var(--sun)}
+.idea.sel{border-color:var(--green);background:var(--sage);box-shadow:0 0 0 4px color-mix(in srgb,var(--green) 25%,transparent)}
+.idea .em{font-size:36px;display:block;margin-bottom:4px}
+.idea h3{font-size:20px}
+.fit{height:8px;border-radius:99px;background:var(--line);margin:10px 0 4px;overflow:hidden}
+.fit i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:99px;transition:width .8s}
+.segs{display:inline-flex;background:var(--line);border-radius:99px;padding:4px;margin-bottom:14px}
+.segs button{background:transparent;padding:7px 16px;border-radius:99px;font-weight:800}
+.segs button.on{background:var(--paper);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+
+/* guests */
+.guest{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:2px dashed var(--line);animation:rise .4s both}
+.guest:last-child{border:0}
+.guest .av{margin:0;flex:0 0 auto;width:46px;height:46px;font-size:24px}
+.guest p{font-size:14.5px}
+.mixbar{display:flex;height:18px;border-radius:99px;overflow:hidden;margin:8px 0}
+.mixbar i{display:block;height:100%;transition:width .7s}
+
+/* money */
+.big{font-family:'Baloo 2';font-size:40px;font-weight:800;line-height:1}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0}
+.cmp>div{border-radius:18px;padding:16px;border:2px solid var(--line)}
+.bar{height:26px;border-radius:99px;background:var(--line);margin:6px 0 2px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;transition:width .6s;background:var(--orange)}
+.bar.gr i{background:var(--green)}
+table.t{width:100%;border-collapse:collapse;font-size:15px}
+table.t td{padding:7px 0;border-bottom:1px dashed var(--line)} table.t td:last-child{text-align:right;font-weight:800}
+.warn{background:var(--peach);border-radius:14px;padding:10px 14px;font-weight:700;font-size:14px;margin-top:10px}
+
+/* rate */
+.rates{display:flex;gap:8px;flex-wrap:wrap}
+.rates button{font-size:30px;background:var(--paper);border:2px solid var(--line);border-radius:16px;padding:6px 12px;transition:.2s}
+.rates button:hover{transform:scale(1.15) rotate(-6deg)} .rates button.on{background:var(--sun);border-color:var(--orange)}
+.check{display:flex;align-items:center;gap:12px;padding:10px;border:2px solid var(--line);border-radius:16px;margin-bottom:8px;cursor:pointer;background:var(--paper)}
+.check input{width:22px;height:22px;accent-color:var(--green)}
+.node{animation:pop .5s both}
+@keyframes pop{from{opacity:0;transform:scale(.2)}}
+
+/* misc */
+.road{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.road div{background:var(--paper);border:2px dashed var(--line);border-radius:18px;padding:14px;font-weight:700}
+.modal{position:fixed;inset:0;background:rgba(40,25,15,.55);display:none;place-items:center;z-index:100;padding:16px;overflow:auto}
+.modal.on{display:grid}
+.modal .card{max-width:520px;width:100%;margin:auto;animation:rise .4s both}
+.toast{position:fixed;left:50%;bottom:96px;transform:translate(-50%,30px);background:var(--ink);color:var(--cream);padding:12px 20px;border-radius:22px;font-weight:800;opacity:0;pointer-events:none;transition:.3s;z-index:200;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.conf{position:fixed;top:-30px;font-size:26px;z-index:150;pointer-events:none;animation:fall 2.4s ease-in forwards}
+@keyframes fall{to{transform:translate(var(--dx),105vh) rotate(var(--rot));opacity:.8}}
+
+.heart{background:transparent;font-size:24px;opacity:.28;padding:2px 3px;transition:.15s;filter:grayscale(1)}
+.heart.on{opacity:1;filter:none}.heart:hover{transform:scale(1.25)}
+.rrow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:2px dashed var(--line)}
+.rrow b{font-size:15px}
+.steps{display:flex;gap:6px;margin-bottom:12px}.steps i{flex:1;height:8px;border-radius:99px;background:var(--line)}.steps i.on{background:var(--orange)}
+.vq{margin:14px 0}.vq .lh{display:flex;justify-content:space-between;font-size:13px;color:var(--soft);font-weight:700}
+.lb{display:flex;align-items:center;gap:10px;margin:6px 0}.lb .nm{width:130px;font-weight:800;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb .bar{flex:1;margin:0;height:16px}.lb .pt{width:44px;text-align:right;font-weight:800}
+.wbar{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:13px;font-weight:700}.wbar span:first-child{width:130px}
+.wbar i{display:block;height:12px;border-radius:99px;background:var(--blue)}
+footer{text-align:center;color:var(--soft);font-size:13px;padding:20px 18px 40px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <div class="wrap">
+    <a class="back" href="index.html">← Mindy's portfolio</a>
+    <div class="brand"><div class="logo">🍊</div><span class="disp" style="font-size:26px">Turnout</span></div>
+    <h1><span class="o">Everyone hosts.</span><br><span class="g">Nobody burns out.</span></h1>
+    <p class="lede">A circle of friends and friends-of-friends who take turns hosting. Fair rotation, themed ideas where everyone contributes, costs shared so the host isn't the one footing the bill, and new people you actually meet in person.</p>
+    <div class="stats" id="stats"></div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Sections"><div class="wrap" role="tablist">
+  <button class="tab" role="tab" data-tab="circle">🎡 Circle</button>
+  <button class="tab" role="tab" data-tab="party">🎉 Party</button>
+  <button class="tab" role="tab" data-tab="money">💸 Money</button>
+  <button class="tab" role="tab" data-tab="after">🤝 After</button>
+  <button class="tab" role="tab" data-tab="me">⭐ Me</button>
+</div></nav>
+
+<main class="wrap">
+  <section class="pane" id="pane-circle"></section>
+  <section class="pane" id="pane-party"></section>
+  <section class="pane" id="pane-money"></section>
+  <section class="pane" id="pane-after"></section>
+  <section class="pane" id="pane-me"></section>
+
+  <div class="card tint-b">
+    <h2>Next up: Move 🏃‍♀️</h2>
+    <p class="sub">Same circle, same fair rotation, different activity. Whoever's turn it is picks the class, the trail or the court.</p>
+    <div class="road"><div>🧘 Pilates &amp; smoothies</div><div>🌅 Sunrise yoga</div><div>🥾 Trail walks + coffee</div><div>🏐 Pickup sports</div></div>
+    <p class="note" style="margin-top:10px">Three of these already show up as previews in the Party tab.</p>
+  </div>
+</main>
+
+<footer>Demo build. Everything runs in your browser and saves on this device only. No accounts, no server, no data leaves the page. <a href="#" id="reset">Reset demo</a></footer>
+
+<div class="modal" id="join"><div class="card tint-o" id="join-card"></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ===================== helpers & constants ===================== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const ymOf=d=>d.getFullYear()+'-'+pad(d.getMonth()+1);
+const addM=(y,n)=>{const[a,b]=y.split('-').map(Number);return ymOf(new Date(a,b-1+n,1))};
+const mLabel=(y,short)=>{const[a,b]=y.split('-').map(Number);return new Date(a,b-1,1).toLocaleString('en',{month:short?'short':'long',year:short?undefined:'numeric'})};
+const KEY='turnout.v2';
+const TAGS={food:'🍽️',wine:'🍷',coffee:'☕',wellness:'🧘',games:'🎲',music:'🎶',outdoors:'🌿',art:'🎨',books:'📚',sports:'🏃'};
+const AV=['🦊','🐙','🌻','🦋','🐢','🍊','🦄','🐝','🥑','🌵','🐳','🍉','🦉','🍄','🐨','🦩'];
+const HUES=['#FFE3CF','#DDF1E3','#DDEEFF','#FFE9B8','#FFD9E0','#E7DFFF'];
+const PLATS={instagram:'Instagram',phone:'Phone',tiktok:'TikTok',other:'Other'};
+const COLORS=['#FF7A3D','#2FA36B','#3C8DDE','#FFB93E','#FF8FA3','#7C6CF2'];
+
+const DIMS=[
+ {k:'energy',q:'Your ideal night is…',lo:'Quiet & cozy',hi:'Loud & lively'},
+ {k:'depth',q:'Conversations you love',lo:'Light & funny',hi:'Deep & personal'},
+ {k:'plan',q:'Plans',lo:'Spontaneous',hi:'Organized'},
+ {k:'comp',q:'Games & competitions',lo:'Just for fun',hi:'Play to win'},
+ {k:'drink',q:'Drinks at gatherings',lo:'Little or none',hi:'Love a good pour'},
+ {k:'new',q:'Meeting strangers',lo:'Slow to warm up',hi:'Instant friends'},
+ {k:'late',q:'Body clock',lo:'Early bird',hi:'Night owl'},
+ {k:'move',q:'Activity level',lo:'Couch & snacks',hi:'Always moving'}
+];
+const QUAL={curious:'🔍',funny:'😂',ambitious:'🚀',creative:'🎨',grounded:'🌱',adventurous:'🧭',thoughtful:'💭',warm:'🤗'};
+const FEAT_KEYS=[...DIMS.map(d=>d.k),'want','int'];
+const FEAT_NAME=Object.fromEntries([...DIMS.map(d=>[d.k,d.q.replace('…','')]),['want','Has what you look for'],['int','Shared interests']]);
+const IDEAS=[
+ {id:'charcuterie',cat:'gather',emoji:'🧀',name:'Charcuterie Night',feats:['food','wine','cozy','evening','lowEffort'],host:['Boards, knives, napkins','A big shared wine pour'],bring:['A cheese you love','Cured or smoked something','Something pickled or sweet','Crackers or a baguette','Seasonal fruit'],game:'Everyone votes best board in three words',hf:30,hg:6,gb:14},
+ {id:'wine',cat:'gather',emoji:'🍷',name:'Blind Wine Tasting',feats:['wine','games','competitive','evening'],host:['Glasses, paper bags, scorecards','Water and plain crackers'],bring:['A bottle under $20, hidden in a paper bag'],game:'Guess the grape, price and country. Closest wins the leftover bottle',hf:25,hg:5,gb:16},
+ {id:'bagel',cat:'gather',emoji:'🥯',name:'Bagel Spread-Off Brunch',feats:['food','coffee','morning','competitive','handsOn'],host:['Warm toasted bagels','Coffee and juice'],bring:['A homemade spread (sweet)','A homemade spread (savory)','A fruit or veggie topper','A dip nobody expects'],game:'Blind taste vote crowns the Spread Champion',hf:25,hg:5,gb:10},
+ {id:'chili',cat:'gather',emoji:'🌶️',name:'Potluck Chili Cook-Off',feats:['food','cozy','competitive','evening'],host:['Bowls, spoons, toppings bar','Cornbread'],bring:['A pot of chili (any style)','Toppings or a side','A drink to share'],game:'Spoon-ballot voting, winner gets a wooden ladle trophy',hf:20,hg:4,gb:12},
+ {id:'dumpling',cat:'gather',emoji:'🥟',name:'Dumpling Folding Party',feats:['food','handsOn','cozy','evening'],host:['Wrappers, a steamer, dipping station','Tea'],bring:['A filling to fold','A dipping sauce','A side or pickle'],game:'Fastest pretty fold, and weirdest filling',hf:25,hg:7,gb:8},
+ {id:'games',cat:'gather',emoji:'🎲',name:'Board Game Night',feats:['games','lowEffort','evening','competitive'],host:['A table and a couple of games','Basic snacks'],bring:['A game you love','A snack','A drink'],game:'Tournament bracket, loser does the dishes',hf:15,hg:4,gb:8},
+ {id:'picnic',cat:'gather',emoji:'🧺',name:'Sunset Picnic',feats:['outdoors','food','lowEffort','evening'],host:['Blankets, a speaker, a good spot'],bring:['Something to share','A drink','A dessert'],game:'Cloud-shape guessing and a sunset toast',hf:15,hg:3,gb:12},
+ {id:'mix',cat:'gather',emoji:'🍹',name:'Cocktail & Mocktail Mix-Off',feats:['wine','music','competitive','handsOn','evening'],host:['Ice, glasses, bar tools','Soda and citrus'],bring:['A spirit or a mixer','Garnish or syrup you made'],game:'Name your drink, best story wins',hf:35,hg:6,gb:14},
+ {id:'dessert',cat:'gather',emoji:'🍰',name:'Dessert Swap',feats:['food','cozy','lowEffort','handsOn'],host:['Plates, tea, coffee','Takeaway boxes'],bring:['A dozen of something sweet'],game:'Everyone leaves with a mixed box',hf:15,hg:3,gb:10},
+ {id:'vinyl',cat:'gather',emoji:'🎧',name:'Listening Party',feats:['music','art','cozy','evening','lowEffort'],host:['Speaker or turntable','Snacks and a lamp-lit room'],bring:['One record or playlist with a story','A snack'],game:'Guess who brought which track',hf:10,hg:3,gb:6},
+ {id:'bookbake',cat:'gather',emoji:'📖',name:'Book & Bake Swap',feats:['books','coffee','food','morning','cozy'],host:['Coffee, tea, a shelf-sized swap table'],bring:['A book to give away','Something baked'],game:'Pitch your book in 20 seconds',hf:15,hg:4,gb:9},
+ {id:'pilates',cat:'move',emoji:'🧘',name:'Sunrise Pilates + Smoothies',feats:['wellness','sports','morning'],host:['Mats and a playlist','Blender and fruit'],bring:['A mat (or borrow one)','A smoothie add-in'],game:'Plank-off finale',hf:20,hg:5,gb:6},
+ {id:'yoga',cat:'move',emoji:'🌿',name:'Park Yoga & Picnic',feats:['wellness','outdoors','food','lowEffort'],host:['A shady spot, a guest instructor','Water'],bring:['A mat','A picnic dish to share'],game:'Group handstand attempt photo',hf:20,hg:3,gb:9},
+ {id:'trail',cat:'move',emoji:'🥾',name:'Trail Walk + Coffee',feats:['outdoors','sports','coffee','morning','lowEffort'],host:['A route and a thermos'],bring:['Snack for the summit','A pastry'],game:'Strangers-only trail buddy pairs',hf:10,hg:2,gb:7}
+];
+
+let S;
+const ideaOf=id=>IDEAS.find(i=>i.id===id);
+/* ===================== ML #1: idea recommender =====================
+   Logistic regression trained online (SGD) on your circle's ratings.
+   Input = the idea's feature flags + how well it matches members' interests. */
+const sigm=z=>1/(1+Math.exp(-z));
+/* Collaborative filtering: if someone hasn't rated an idea, predict it from members with
+   similar taste (Pearson similarity on the ideas they both rated). */
+const mean=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:3;
+function cfPredict(m,iid){
+  const mine=m.prefs||{},mv=mean(Object.values(mine));let num=0,den=0;
+  S.members.forEach(o=>{
+    if(o===m||!o.prefs||!o.prefs[iid])return;
+    const co=IDEAS.filter(i=>mine[i.id]&&o.prefs[i.id]);if(co.length<3)return;
+    const a=co.map(i=>mine[i.id]),b=co.map(i=>o.prefs[i.id]),ma=mean(a),mb=mean(b);
+    let c=0,va=0,vb=0;for(let k=0;k<co.length;k++){c+=(a[k]-ma)*(b[k]-mb);va+=(a[k]-ma)**2;vb+=(b[k]-mb)**2}
+    const sim=va&&vb?c/Math.sqrt(va*vb):0;if(sim<=0)return;
+    num+=sim*(o.prefs[iid]-mean(Object.values(o.prefs)));den+=sim;
+  });
+  return Math.max(1,Math.min(5,mv+(den?num/den:0)));
+}
+const prefOf=(m,iid)=>m.prefs&&m.prefs[iid]?m.prefs[iid]:cfPredict(m,iid);
+const avgStar=idea=>mean(S.members.map(m=>prefOf(m,idea.id)));
+function affinity(idea){return(avgStar(idea)-1)/4}
+function score(model,idea){let z=model.b;idea.feats.forEach(f=>z+=model.w[f]||0);return sigm(z+4*(affinity(idea)-.5))}
+function sgd(model,id,rating,lr){
+  const idea=ideaOf(id),y=(rating-1)/4,err=y-score(model,idea);
+  idea.feats.forEach(f=>model.w[f]=(model.w[f]||0)+lr*err);model.b+=lr*err*.5;
+}
+function why(idea){
+  let best=null,bv=0;idea.feats.forEach(f=>{const v=S.model.w[f]||0;if(v>bv){bv=v;best=f}});
+  const aff=affinity(idea);
+  if(best&&bv>.15)return `Your circle has loved ${best==='lowEffort'?'low-effort':best} nights`;
+  return aff>.62?'The circle voted this up':aff<.4?'A fresh change of pace':'Matches what your members are into';
+}
+
+/* ===================== state ===================== */
+function hash(s){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))>>>0;return h}
+function mk(id,handle,platform,tags,i){return{id,handle,platform,tags,av:AV[i%AV.length],hue:HUES[i%HUES.length],skip:false,hosted:[]}}
+function enrich(m){
+  const ks=Object.keys(QUAL),h=(x)=>hash(m.id+x);
+  m.vibe={};DIMS.forEach(d=>m.vibe[d.k]=1+h(d.k)%5);
+  if(m.tags.includes('sports')||m.tags.includes('outdoors'))m.vibe.move=Math.max(m.vibe.move,4);
+  if(m.tags.includes('wine'))m.vibe.drink=Math.max(m.vibe.drink,3);
+  if(m.tags.includes('games'))m.vibe.comp=Math.max(m.vibe.comp,3);
+  if(m.tags.includes('books')||m.tags.includes('art'))m.vibe.depth=Math.max(m.vibe.depth,3);
+  m.is=[...new Set([ks[h('i1')%8],ks[h('i2')%8],ks[h('i3')%8]])];
+  m.want=[...new Set([ks[h('w1')%8],ks[h('w2')%8],ks[h('w3')%8]])];
+  m.prefs={};IDEAS.forEach(i=>{const t=i.feats.filter(f=>TAGS[f]),mt=t.length?t.filter(x=>m.tags.includes(x)).length/t.length:.3;
+    m.prefs[i.id]=Math.max(1,Math.min(5,Math.round(2+2.4*mt+(h(i.id)%100)/100*1.5)))});
+  m.points=h('pts')%60+(m.hosted.length?100:0);
+  return m;
+}
+const PM0=()=>{const w={};DIMS.forEach(d=>w[d.k]=.6);w.want=1.4;w.int=1;return{w,b:0,n:0}};
+function seed(){
+  const now=new Date(),cur=ymOf(now);
+  const M=[
+    mk('m1','@maya.eats','instagram',['food','wine','music'],0),
+    mk('m2','@jordan.runs','instagram',['sports','outdoors','coffee'],1),
+    mk('m3','@priya_reads','instagram',['books','coffee','art'],2),
+    mk('m4','+1 ••• 0142','phone',['games','music','food'],3),
+    mk('m5','@leo.makes','instagram',['food','art','wine'],4),
+    mk('m6','@sana.moves','tiktok',['wellness','sports','outdoors'],5),
+    mk('m7','@kai.plays','instagram',['games','sports','music'],6),
+    mk('m8','+1 ••• 7788','phone',['wellness','books','coffee'],7),
+    mk('m9','@noor.draws','instagram',['art','music','books'],8),
+    mk('m10','@theo.hikes','tiktok',['outdoors','sports','food'],9),
+    mk('m11','@ivy.sips','instagram',['wine','food','art'],10)
+  ];
+  M.forEach(enrich);
+  const edges=['me|m1','me|m2','me|m3','me|m4','m1|m5','m1|m6','m2|m7','m2|m8','m3|m9','m4|m10','m5|m6','m7|m8','m9|m10','m10|m11','m3|m11','m1|m4','m6|m2'];
+  const history=[
+    {ym:addM(cur,-3),host:'m1',idea:'charcuterie',rating:5},
+    {ym:addM(cur,-2),host:'m5',idea:'bagel',rating:4},
+    {ym:addM(cur,-1),host:'m7',idea:'games',rating:3}
+  ];
+  M.find(m=>m.id==='m1').hosted.push(history[0].ym);M.find(m=>m.id==='m5').hosted.push(history[1].ym);M.find(m=>m.id==='m7').hosted.push(history[2].ym);
+  M.forEach(m=>{m.points=hash(m.id+'pts')%60+(m.hosted.length?100:0)});
+  const model={w:{},b:0};
+  S={pm:PM0(),me:null,circle:{name:'The Sunday Table',cap:20},members:M,edges,history,cycle:1,cycleHosted:['m1','m5','m7'],nextYm:cur,upcoming:null,claims:{},model,attended:{}};
+  for(let e=0;e<6;e++)history.forEach(h=>sgd(model,h.idea,h.rating,.2));
+  return S;
+}
+S=load();
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.members)return s}catch(e){}return seed()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const ui={tab:'circle',rot:0,spinning:false,cat:'gather',size:8,tier:1,guests:12,dues:5,cap:80,ideaMoney:'charcuterie',rate:0,met:{}};
+const byId=id=>S.members.find(m=>m.id===id);
+const label=m=>m?(m.id==='me'?'You':m.handle):'?';
+const adj=()=>{const a={};S.edges.forEach(e=>{const[x,y]=e.split('|');(a[x]=a[x]||new Set()).add(y);(a[y]=a[y]||new Set()).add(x)});return a};
+const knows=(A,x,y)=>!!(A[x]&&A[x].has(y));
+
+/* ===================== ML #2: guest-list matcher =====================
+   Interest vectors -> cosine similarity. A hill-climbing search picks the room that
+   maximises novel-but-compatible pairs, keeps everyone connected to someone they know,
+   and nudges in people who've attended less. */
+const vec=m=>Object.keys(TAGS).map(t=>m.tags.includes(t)?1:0);
+function cos(a,b){const x=vec(a),y=vec(b);let d=0,na=0,nb=0;for(let i=0;i<x.length;i++){d+=x[i]*y[i];na+=x[i];nb+=y[i]}return na&&nb?d/Math.sqrt(na*nb):0}
+/* Pair-compatibility model: logistic regression over how closely two people match on each
+   vibe dimension, whether each has what the other looks for, and shared interests.
+   Retrained after every party from who you actually locked in as a friend. */
+function pairFeat(a,b){
+  const f=DIMS.map(d=>1-Math.abs((a.vibe&&a.vibe[d.k]||3)-(b.vibe&&b.vibe[d.k]||3))/4);
+  const ov=(w,i)=>w&&w.length?w.filter(x=>(i||[]).includes(x)).length/w.length:.5;
+  f.push((ov(a.want,b.is)+ov(b.want,a.is))/2);f.push(cos(a,b));return f;
+}
+function pairProb(a,b){const f=pairFeat(a,b);let z=S.pm.b;f.forEach((v,i)=>z+=S.pm.w[FEAT_KEYS[i]]*(v-.5));return sigm(z)}
+function trainPair(a,b,y){
+  const f=pairFeat(a,b),e=y-pairProb(a,b);
+  f.forEach((v,i)=>S.pm.w[FEAT_KEYS[i]]+=.35*e*(v-.5));S.pm.b+=.2*e;S.pm.n++;
+}
+function roomScore(ids,A,fair){
+  let s=0;const known={},novel={};
+  for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++){
+    const a=byId(ids[i]),b=byId(ids[j]),k=knows(A,a.id,b.id),c=pairProb(a,b);
+    if(k){s+=.35;known[a.id]=1;known[b.id]=1}else{s+=.4+1.6*c;if(c>.55){novel[a.id]=1;novel[b.id]=1}}
+  }
+  ids.forEach(id=>{if(!known[id])s-=3;if(!novel[id])s-=1.5;s+=fair[id]||0});
+  return s;
+}
+function buildRoom(hostId,size,noise){
+  const A=adj(),all=S.members.map(m=>m.id),must=[...new Set([hostId,'me'])];
+  const att=all.map(id=>S.attended[id]||0),mx=Math.max(...att,0);
+  const fair={};all.forEach(id=>fair[id]=.6*(mx-(S.attended[id]||0))/(mx+1)+.8*Math.min(byId(id).points||0,250)/250+((S.attended[id]||0)===0?.4:0)+(noise?Math.random()*.5:0));
+  size=Math.min(size,all.length);
+  let room=[...must];const pool=all.filter(id=>!room.includes(id)).sort(()=>Math.random()-.5);
+  while(room.length<size&&pool.length)room.push(pool.pop());
+  let cur=roomScore(room,A,fair);
+  for(let it=0;it<400;it++){
+    const out=room.filter(id=>!must.includes(id));if(!out.length||!pool.length)break;
+    const i=room.indexOf(out[Math.floor(Math.random()*out.length)]),j=Math.floor(Math.random()*pool.length);
+    const t=[...room];t[i]=pool[j];const s=roomScore(t,A,fair);
+    if(s>cur){pool[j]=room[i];room=t;cur=s}
+  }
+  return room;
+}
+function icebreaker(id,room,A){
+  const g=byId(id);let best=null,bs=-1;
+  room.forEach(o=>{if(o===id)return;const m=byId(o);if(knows(A,id,o))return;const c=pairProb(g,m);if(c>bs){bs=c;best=m}});
+  if(!best)return'You all know each other already. Swap one story each.';
+  const sh=g.tags.filter(t=>best.tags.includes(t));
+  const dim=DIMS.filter(d=>g.vibe&&best.vibe&&g.vibe[d.k]===best.vibe[d.k]&&(g.vibe[d.k]>=4||g.vibe[d.k]<=2))[0];
+  const bits=[];if(sh.length)bits.push('you both like '+sh.map(t=>TAGS[t]+' '+t).join(', '));
+  if(dim)bits.push('you both lean “'+(g.vibe[dim.k]>=4?dim.hi:dim.lo).toLowerCase()+'”');
+  return `Meet ${esc(label(best))} · ${Math.round(bs*100)}% vibe match${bits.length?' · '+bits.join(' · '):''}`;
+}
+
+/* ===================== rotation logic ===================== */
+function eligible(){return S.members.filter(m=>!S.cycleHosted.includes(m.id)&&!m.skip)}
+function monthsSince(m){const l=m.hosted[m.hosted.length-1];if(!l)return 6;const[a,b]=l.split('-').map(Number),[c,d]=S.nextYm.split('-').map(Number);return(c-a)*12+(d-b)}
+function pickWeighted(pool){
+  const w=pool.map(m=>1+.25*Math.min(monthsSince(m),12));let r=Math.random()*w.reduce((a,b)=>a+b,0);
+  for(let i=0;i<pool.length;i++){r-=w[i];if(r<=0)return i}return pool.length-1;
+}
+function schedule(n){
+  const out=[];let cyc=S.cycle,hosted=new Set(S.cycleHosted);
+  const order=S.members.map(m=>m.id).sort((a,b)=>hash(a+cyc)-hash(b+cyc));
+  let ym=S.nextYm;
+  for(let k=0;k<n;k++,ym=addM(ym,1)){
+    let host=S.claims[ym]||(k===0&&S.upcoming?S.upcoming.host:null),fixed=!!host;
+    if(!host){
+      let pool=order.filter(id=>!hosted.has(id)&&!byId(id).skip);
+      if(!pool.length){cyc++;hosted=new Set();pool=order.filter(id=>!byId(id).skip)}
+      host=pool.find(id=>!Object.values(S.claims).includes(id))||pool[0];
+    }
+    hosted.add(host);out.push({ym,host,fixed,cyc});
+  }
+  return out;
+}
+
+/* ===================== render ===================== */
+function avatar(m){return `<div class="av" style="background:${m.hue}">${m.av}</div>`}
+function renderStats(){
+  const A=adj(),net=A.me?A.me.size:0;
+  $('#stats').innerHTML=`<div class="stat"><b>${S.members.length}</b><span>in the circle</span></div><div class="stat"><b>${S.history.length}</b><span>parties thrown</span></div><div class="stat"><b>${net}</b><span>friends in your network</span></div>${byId('me')?`<div class="stat"><b>${byId('me').points}</b><span>points</span></div>`:''}`;
+}
+function renderCircle(){
+  const pool=eligible(),up=S.upcoming,n=pool.length||1;
+  let slices='';
+  const R=150,C=150;
+  pool.forEach((m,i)=>{
+    const a0=(i/n)*2*Math.PI-Math.PI/2,a1=((i+1)/n)*2*Math.PI-Math.PI/2,am=(a0+a1)/2;
+    const x0=C+R*Math.cos(a0),y0=C+R*Math.sin(a0),x1=C+R*Math.cos(a1),y1=C+R*Math.sin(a1);
+    slices+=n===1?`<circle cx="${C}" cy="${C}" r="${R}" fill="${COLORS[0]}"/>`:`<path d="M${C} ${C} L${x0} ${y0} A${R} ${R} 0 ${a1-a0>Math.PI?1:0} 1 ${x1} ${y1}Z" fill="${COLORS[i%6]}" stroke="#fff" stroke-width="3"/>`;
+    slices+=`<text x="${C+R*.7*Math.cos(am)}" y="${C+R*.7*Math.sin(am)}" font-size="${n>9?22:28}" text-anchor="middle" dominant-baseline="central">${m.av}</text>`;
+  });
+  const sched=schedule(6).map(s=>{
+    const m=byId(s.host),mine=s.host==='me';
+    return `<li><span class="m">${mLabel(s.ym,true)}</span><span class="w">${m.av} ${esc(label(m))} ${s.fixed?'<span class="chip g">locked</span>':'<span class="chip b">likely</span>'}${s.cyc>S.cycle?'<span class="chip">new cycle</span>':''}</span>${!mine&&!S.claims[s.ym]&&byId('me')&&!S.cycleHosted.includes('me')?`<button class="btn sm" data-act="claim" data-ym="${s.ym}">I'll take it</button>`:''}</li>`;
+  }).join('');
+  const meSkip=byId('me')&&byId('me').skip;
+  $('#pane-circle').innerHTML=`
+  <div class="grid2">
+    <div class="card tint-o">
+      <h2>${esc(S.circle.name)}</h2>
+      <p class="sub">Cycle ${S.cycle}: ${S.cycleHosted.length} of ${S.members.length} have hosted. Nobody goes twice until everyone has gone once.</p>
+      <div class="wheelbox"><div class="pointer">📍</div>
+        <svg class="wheel" viewBox="0 0 300 300" style="transform:rotate(${ui.rot}deg)">${pool.length?slices:'<circle cx="150" cy="150" r="150" fill="#ddd"/>'}</svg>
+        <div class="hub">${up?byId(up.host).av:'🍊'}</div></div>
+      ${up?`<div style="text-align:center"><div class="chip g" style="font-size:15px">${mLabel(up.ym)}</div><h3 style="font-size:30px;margin:4px 0">${byId(up.host).av} ${esc(label(byId(up.host)))} is hosting!</h3>
+        <div class="row" style="justify-content:center;margin-top:10px"><button class="btn g" data-act="goparty">Plan the party →</button><button class="btn ghost sm" data-act="pass">Can't this month</button></div></div>`
+      :`<div style="text-align:center"><button class="btn" data-act="spin" ${ui.spinning||!pool.length?'disabled':''}>🎡 Spin for ${mLabel(S.nextYm)}</button>
+        <p class="note" style="margin-top:10px">Longer since someone last hosted means a slightly bigger chance. Everyone eligible gets a real shot.</p></div>`}
+      ${byId('me')?`<label class="check" style="margin-top:14px"><input type="checkbox" data-act="skipme" ${meSkip?'checked':''}> <span>Skip me this month (I stay in the pool for later)</span></label>`:''}
+    </div>
+    <div class="card tint-g">
+      <h2>Next six months</h2>
+      <p class="sub">Spin, or claim a month that works for your calendar. Claims lock in and the rest rotate around them.</p>
+      <ul class="sched">${sched}</ul>
+    </div>
+  </div>
+  <div class="card tint-b">
+    <h2>What the circle is craving</h2>
+    <p class="sub">Everyone's own ratings of every idea, averaged. Where someone skipped one, the app estimates it from people with similar taste.</p>
+    ${IDEAS.map(i=>({i,a:avgStar(i)})).sort((x,y)=>y.a-x.a).slice(0,6).map((x,k)=>`<div class="lb"><span class="nm">${k+1}. ${x.i.emoji} ${x.i.name}</span><div class="bar gr"><i style="width:${(x.a-1)/4*100}%"></i></div><span class="pt">★${x.a.toFixed(1)}</span></div>`).join('')}
+    <div class="row" style="margin-top:10px"><button class="btn sm" data-act="setup" data-step="2">Update my picks</button></div>
+  </div>
+  <div class="card">
+    <h2>The circle</h2>
+    <div class="row" style="justify-content:space-between"><p class="sub" style="margin:0">${S.members.length} of ${S.circle.cap} spots filled · parties host 6–15 at a time</p>
+      <div class="row"><label class="note">Max size</label><select id="cap" style="width:auto">${[12,20,30,50].map(c=>`<option ${c===S.circle.cap?'selected':''}>${c}</option>`).join('')}</select></div></div>
+    <div class="capbar"><i style="width:${S.members.length/S.circle.cap*100}%"></i></div>
+    <div class="members" style="margin-top:14px">${S.members.map(m=>`<div class="mem ${up&&up.host===m.id?'up':''}">${avatar(m)}<div class="h">${esc(label(m))}</div><div class="note">${PLATS[m.platform]||''}</div>
+      <div>${S.cycleHosted.includes(m.id)?'<span class="chip g">hosted ✓</span>':'<span class="chip">in the pool</span>'}${m.skip?'<span class="chip b">skipping</span>':''}</div>
+      <div>${m.tags.map(t=>TAGS[t]).join(' ')}</div></div>`).join('')}</div>
+    <h3 style="font-size:22px;margin:22px 0 4px">Invite someone</h3>
+    <div class="row"><select id="a-plat" style="width:auto">${Object.entries(PLATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select><input type="text" id="a-handle" placeholder="@handle or phone" style="flex:1;min-width:140px" maxlength="30">
+      <button class="btn sm g" data-act="add" style="box-shadow:0 4px 0 var(--green-d)">Add</button></div>
+    <div id="a-tags" style="margin-top:8px">${Object.entries(TAGS).map(([t,e])=>`<span class="chip pick" data-tag="${t}">${e} ${t}</span>`).join('')}</div>
+  </div>`;
+}
+
+function ranked(cat){return IDEAS.filter(i=>i.cat===cat).map(i=>({i,p:score(S.model,i)})).sort((a,b)=>b.p-a.p)}
+function renderParty(){
+  const el=$('#pane-party'),up=S.upcoming;
+  if(!up){el.innerHTML=`<div class="card tint-o" style="text-align:center"><h2>No host yet 🎡</h2><p class="sub">Spin the wheel on the Circle tab to see whose turn it is for ${mLabel(S.nextYm)}.</p><button class="btn" data-act="gocircle">Go spin</button></div>`;return}
+  const host=byId(up.host),A=adj(),idea=up.idea&&ideaOf(up.idea);
+  const list=ranked(ui.cat);
+  let html=`<div class="card tint-o"><div class="chip g">${mLabel(up.ym)}</div><h2>${host.av} ${esc(label(host))}'s party</h2>
+    <p class="sub">${host.id==='me'?"It's your turn! Pick an idea and let the matcher build your guest list.":'Pick an idea together and let the matcher build the guest list.'}</p></div>
+  <div class="card"><h2>1 · Pick an idea</h2>
+    <p class="sub">Ranked by an on-device model that learns from your circle's ratings. Rate parties in the After tab and it gets smarter.</p>
+    <div class="segs"><button data-act="cat" data-cat="gather" class="${ui.cat==='gather'?'on':''}">🍽️ Gather</button><button data-act="cat" data-cat="move" class="${ui.cat==='move'?'on':''}">🏃 Move (preview)</button></div>
+    <div class="ideas">${list.map(({i,p})=>`<button class="idea ${up.idea===i.id?'sel':''}" data-act="idea" data-id="${i.id}"><span class="em">${i.emoji}</span><h3>${i.name}</h3>
+      <div class="fit"><i style="width:${Math.round(p*100)}%"></i></div><div class="note"><b>${Math.round(p*100)}% fit</b> · ★${avgStar(i).toFixed(1)} circle avg · ${esc(why(i))}</div></button>`).join('')}</div></div>`;
+  if(idea){
+    html+=`<div class="card tint-g"><h2>${idea.emoji} ${idea.name}</h2>
+      <div class="grid2"><div><h3 style="font-size:20px">Host brings</h3>${idea.host.map(x=>`<div>🏠 ${x}</div>`).join('')}</div><div><h3 style="font-size:20px">The game</h3><div>🏆 ${idea.game}</div></div></div></div>
+    <div class="card"><h2>2 · Build the guest list</h2>
+      <p class="sub">A mix of people you know and people you don't, matched by shared interests so strangers have something to talk about.</p>
+      <label class="f">Party size: <b id="sz">${ui.size}</b> people (including the host)</label>
+      <input type="range" id="size" min="6" max="${Math.max(6,Math.min(15,S.members.length))}" value="${ui.size}">
+      <div class="row" style="margin-top:12px"><button class="btn" data-act="mix">✨ ${up.guests&&up.guests.length?'Reshuffle':'Match my guests'}</button></div>
+      <div id="mix">${renderMix()}</div></div>`;
+  }
+  el.innerHTML=html;
+}
+function renderMix(){
+  const up=S.upcoming;if(!up||!up.guests||!up.guests.length)return'';
+  const A=adj(),room=up.guests,idea=ideaOf(up.idea);
+  let kn=0,nw=0;room.forEach(id=>{if(id==='me')return;knows(A,'me',id)?kn++:nw++});
+  const tot=Math.max(1,kn+nw);
+  return `<div style="margin-top:16px"><b>Your view of the room</b><div class="mixbar"><i style="width:${kn/tot*100}%;background:var(--green)"></i><i style="width:${nw/tot*100}%;background:var(--orange)"></i></div>
+    <div class="note">🟢 ${kn} you know · 🟠 ${nw} new faces</div></div>
+    <div style="margin-top:10px">${room.map((id,k)=>{const m=byId(id),isK=knows(A,'me',id);
+      return `<div class="guest" style="animation-delay:${k*.05}s">${avatar(m)}<div><b>${esc(label(m))}</b> ${id===up.host?'<span class="chip">host</span>':id==='me'?'<span class="chip b">you</span>':isK?'<span class="chip g">friend</span>':'<span class="chip">new</span>'}
+        <p>${id===up.host?'Hosting. Brings: '+esc(idea.host[0]):'Brings: <b>'+esc(up.assign[id]||'')+'</b>'}</p><p class="note">${icebreaker(id,room,A)}</p></div></div>`}).join('')}</div>
+    <div class="row" style="margin-top:14px"><button class="btn g sm" data-act="copy" style="box-shadow:0 4px 0 var(--green-d)">📋 Copy invite text</button></div>`;
+}
+function assignBring(room,host,idea){
+  const guests=room.filter(id=>id!==host).sort((a,b)=>(idea.feats.filter(f=>byId(b).tags.includes(f)).length)-(idea.feats.filter(f=>byId(a).tags.includes(f)).length));
+  const out={};guests.forEach((id,i)=>out[id]=idea.bring[i%idea.bring.length]);return out;
+}
+
+function money(){
+  const idea=ideaOf(ui.ideaMoney),t=ui.tier,G=ui.guests,N=S.members.length;
+  const hf=idea.hf*t,hg=idea.hg*t,gb=idea.gb*t;
+  const trad=hf+(hg+gb)*G,hostCost=hf+hg*G,pot=ui.dues*N,reimb=Math.min(pot,hostCost*ui.cap/100),hostNet=hostCost-reimb;
+  const guestCost=gb+ui.dues,total=hf+(hg+gb)*G;
+  const avgMonthly=ui.dues+gb*G/Math.max(1,N-1)*(N-1)/N+hostNet/N;
+  const need=hostCost*ui.cap/100/N;
+  return{idea,hf,hg,gb,trad,hostCost,pot,reimb,hostNet,guestCost,total,avgMonthly,need,N,G};
+}
+const $$=n=>'$'+Math.round(n).toLocaleString();
+function moneyOut(){
+  const m=money(),cut=m.trad?Math.round((1-m.hostNet/m.trad)*100):0;
+  return `<div class="cmp">
+    <div style="background:var(--peach)"><div class="note">Host pays everything (the usual way)</div><div class="big">${$$(m.trad)}</div><div class="bar"><i style="width:100%"></i></div></div>
+    <div style="background:var(--sage)"><div class="note">Host out-of-pocket with Turnout</div><div class="big" style="color:var(--green-d)">${$$(m.hostNet)}</div><div class="bar gr"><i style="width:${m.trad?m.hostNet/m.trad*100:0}%"></i></div><b style="color:var(--green-d)">${cut}% less</b></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3 style="font-size:24px">Where the money goes</h3>
+      <table class="t"><tr><td>Host's setup (${m.idea.host[0].toLowerCase()})</td><td>${$$(m.hf)}</td></tr><tr><td>Host's food per guest × ${m.G}</td><td>${$$(m.hg*m.G)}</td></tr>
+      <tr><td>Each guest brings (${m.idea.bring[0].toLowerCase()}…)</td><td>${$$(m.gb)}</td></tr><tr><td>Whole party, all costs</td><td>${$$(m.total)}</td></tr>
+      <tr><td>Reimbursed from the pot</td><td>−${$$(m.reimb)}</td></tr><tr><td>Guest's total (bring + monthly pot)</td><td>${$$(m.guestCost)}</td></tr></table>
+      ${m.pot<m.hostCost*ui.cap/100?`<div class="warn">⚠️ The pot is short. To cover ${ui.cap}% of this party, set the pot to about $${Math.ceil(m.need)}/member/month.</div>`:`<div class="warn">✅ The pot covers it, with about ${$$(m.pot-m.reimb)} left over each month for a rainy-day fund or a thank-you gift for hosts.</div>`}</div>
+    <div class="card"><h3 style="font-size:24px">Honest math</h3>
+      <p>The party's total cost doesn't disappear. What changes is <b>who feels it and when</b>. The host's worst month drops from ${$$(m.trad)} to ${$$(m.hostNet)}, and everyone's average month works out to roughly <b>${$$(m.avgMonthly)}</b>.</p>
+      <p style="margin-top:8px">That's the whole bet: a small steady cost for everyone beats one scary bill for one person, and scary bills are why people don't volunteer.</p>
+      <h3 style="font-size:20px;margin-top:16px">How Turnout itself could earn</h3>
+      <p class="note">Ideas to test, not proven: premium circles (bigger size, recurring events), partner offers on contribution items (a wine shop or grocer sponsoring Blind Wine Night), and a small fee on pot payments. Nothing here charges anyone today.</p></div>
+  </div>`;
+}
+function renderMoney(){
+  $('#pane-money').innerHTML=`
+  <div class="card tint-b"><h2>Hosting shouldn't cost a fortune 💸</h2>
+    <p class="sub">The fear of the bill is a big reason people stop hosting. Turnout attacks it three ways: guests bring a real part of the menu, a small monthly circle pot reimburses the host, and each theme has a budget tier.</p>
+    <div class="grid2"><div>
+      <label class="f">Theme</label><select id="m-idea">${IDEAS.filter(i=>i.cat==='gather').map(i=>`<option value="${i.id}" ${i.id===ui.ideaMoney?'selected':''}>${i.emoji} ${i.name}</option>`).join('')}</select>
+      <label class="f">Budget tier</label><div class="row">${[['Cozy $',.7],['Classic $$',1],['Fancy $$$',1.5]].map(([l,v])=>`<span class="chip pick ${ui.tier===v?'on':''}" data-tier="${v}">${l}</span>`).join('')}</div>
+      <label class="f">Guests (excluding host): <b id="l-g">${ui.guests}</b></label><input type="range" id="m-g" min="5" max="14" value="${ui.guests}">
+    </div><div>
+      <label class="f">Circle pot: $<b id="l-d">${ui.dues}</b> per member per month</label><input type="range" id="m-d" min="0" max="20" value="${ui.dues}">
+      <label class="f">Pot reimburses up to <b id="l-c">${ui.cap}</b>% of the host's cost</label><input type="range" id="m-c" min="0" max="100" step="10" value="${ui.cap}">
+    </div></div></div>
+  <div id="money-out">${moneyOut()}</div>`;
+}
+function updMoney(){$('#money-out').innerHTML=moneyOut()}
+function renderAfter(){
+  const up=S.upcoming,el=$('#pane-after'),A=adj();
+  let html='';
+  if(!up||!up.guests||!up.guests.length){
+    html=`<div class="card tint-o" style="text-align:center"><h2>After the party 🤝</h2><p class="sub">Once a party is planned, this is where you rate it and lock in the new people you met.</p><button class="btn" data-act="goparty">Plan a party</button></div>`;
+  }else{
+    const idea=ideaOf(up.idea),newcomers=up.guests.filter(id=>id!=='me'&&!knows(A,'me',id));
+    html=`<div class="card tint-o"><h2>🎉 ${byId(up.host).av} ${esc(label(byId(up.host)))}'s ${idea.name} is a wrap</h2><p class="sub">Two quick things, then the next host is up.</p>
+      <h3 style="font-size:22px">How was it?</h3>
+      <div class="rates">${['😕','🙂','😊','😍','🤩'].map((e,i)=>`<button data-act="rate" data-r="${i+1}" class="${ui.rate===i+1?'on':''}" aria-label="${i+1} out of 5">${e}</button>`).join('')}</div>
+      <p class="note" style="margin-top:6px">Your rating retrains the idea model on your circle.</p>
+      <h3 style="font-size:22px;margin-top:18px">Who did you meet for the first time?</h3>
+      ${newcomers.length?newcomers.map(id=>{const m=byId(id);return `<label class="check"><input type="checkbox" data-met="${id}" ${ui.met[id]?'checked':''}><div class="av" style="background:${m.hue};margin:0;width:42px;height:42px;font-size:22px">${m.av}</div><span><b>${esc(label(m))}</b><br><span class="note">${m.tags.map(t=>TAGS[t]).join(' ')}</span></span></label>`}).join(''):'<p class="note">You already knew everyone. Next time, let the matcher aim for more new faces.</p>'}
+      <div class="row" style="margin-top:14px"><button class="btn g" data-act="finish" ${ui.rate?'':'disabled'}>🔒 Lock in friends &amp; close the party</button></div>
+      ${ui.rate?'':'<p class="note" style="margin-top:6px">Pick a rating to continue.</p>'}</div>`;
+  }
+  html+=`<div class="grid2"><div class="card tint-g"><h2>Your network</h2><p class="sub">You in the middle, friends in the ring, their friends outside. Every lock-in grows it.</p>${graph(A)}</div>
+    <div class="card"><h2>People you may know</h2><p class="sub">Ranked by mutual friends plus shared interests.</p>${suggest(A)}</div></div>`;
+  el.innerHTML=html;
+}
+function graph(A){
+  const me=byId('me');if(!me)return'<p class="note">Join the circle to see your network.</p>';
+  const r1=[...(A.me||[])],r2=[...new Set(r1.flatMap(f=>[...(A[f]||[])]))].filter(x=>x!=='me'&&!r1.includes(x));
+  const pos={me:[170,170]};
+  r1.forEach((id,i)=>{const a=i/r1.length*6.283-1.57;pos[id]=[170+80*Math.cos(a),170+80*Math.sin(a)]});
+  r2.forEach((id,i)=>{const a=i/Math.max(1,r2.length)*6.283-1.2;pos[id]=[170+138*Math.cos(a),170+138*Math.sin(a)]});
+  const show=new Set(['me',...r1,...r2]);
+  const lines=S.edges.filter(e=>{const[x,y]=e.split('|');return show.has(x)&&show.has(y)}).map(e=>{const[x,y]=e.split('|');return `<line x1="${pos[x][0]}" y1="${pos[x][1]}" x2="${pos[y][0]}" y2="${pos[y][1]}" stroke="${x==='me'||y==='me'?'#FF7A3D':'#9bb8a5'}" stroke-width="${x==='me'||y==='me'?2.5:1.5}" opacity=".75"/>`}).join('');
+  const nodes=[...show].map((id,i)=>{const m=byId(id),[x,y]=pos[id],big=id==='me';return `<g class="node" style="animation-delay:${i*.05}s;transform-origin:${x}px ${y}px"><circle cx="${x}" cy="${y}" r="${big?24:r1.includes(id)?17:13}" fill="${big?'#FF7A3D':m.hue}" stroke="#fff" stroke-width="3"/><text x="${x}" y="${y+1}" font-size="${big?22:r1.includes(id)?18:14}" text-anchor="middle" dominant-baseline="central">${big?'😊':m.av}</text></g>`}).join('');
+  return `<svg viewBox="0 0 340 340" role="img" aria-label="Your friend network" style="width:100%;max-width:380px;display:block;margin:auto">${lines}${nodes}</svg>`;
+}
+function suggest(A){
+  const me=byId('me');if(!me)return'';const mine=A.me||new Set();
+  const cand=S.members.filter(m=>m.id!=='me'&&!mine.has(m.id)).map(m=>{
+    const mut=[...(A[m.id]||[])].filter(x=>mine.has(x));return{m,mut,s:.5*Math.min(1,mut.length/3)+.5*pairProb(me,m)};
+  }).sort((a,b)=>b.s-a.s).slice(0,5);
+  if(!cand.length)return'<p class="note">You know everyone in the circle. Time to invite more people.</p>';
+  return cand.map(c=>`<div class="guest">${avatar(c.m)}<div><b>${esc(label(c.m))}</b> <span class="chip g">${Math.round(c.s*100)}% match</span><p class="note">${c.mut.length?c.mut.length+' mutual: '+c.mut.map(x=>esc(label(byId(x)))).join(', '):'No mutual friends yet'} · ${c.m.tags.map(t=>TAGS[t]).join(' ')}</p></div></div>`).join('');
+}
+
+function renderMe(){
+  const me=byId('me'),el=$('#pane-me');
+  if(!me){el.innerHTML='<div class="card tint-o" style="text-align:center"><h2>Join to unlock your profile</h2><button class="btn" data-act="setup" data-step="1">Join the circle</button></div>';return}
+  const rank=[...S.members].sort((a,b)=>b.points-a.points),pos=rank.findIndex(m=>m.id==='me')+1,mx=Math.max(1,rank[0].points);
+  const top=S.members.filter(m=>m.id!=='me').map(m=>({m,p:pairProb(me,m)})).sort((a,b)=>b.p-a.p).slice(0,5);
+  const w=FEAT_KEYS.map(k=>({k,v:S.pm.w[k]})).sort((a,b)=>b.v-a.v),wm=Math.max(...w.map(x=>Math.abs(x.v)),1);
+  el.innerHTML=`<div class="grid2">
+   <div class="card tint-o"><h2>⭐ ${me.points} points</h2><p class="sub">You're #${pos} of ${S.members.length}. Points move you up the list when guests are picked.</p>
+     ${rank.slice(0,6).map(m=>`<div class="lb"><span class="nm">${m.av} ${esc(label(m))}</span><div class="bar"><i style="width:${m.points/mx*100}%"></i></div><span class="pt">${m.points}</span></div>`).join('')}
+     <table class="t" style="margin-top:12px"><tr><td>Rate an idea</td><td>+3</td></tr><tr><td>Finish the vibe quiz</td><td>+20</td></tr><tr><td>Show up to a party</td><td>+20</td></tr><tr><td>Rate the party</td><td>+10</td></tr><tr><td>Lock in a new friend</td><td>+15</td></tr><tr><td>Host a party</td><td>+60</td></tr></table>
+     <p class="note" style="margin-top:8px">Fairness guardrails: points only count up to 250 when picking guests, people who've never attended get a boost, and the host rotation ignores points entirely.</p></div>
+   <div class="card tint-g"><h2>Your vibe matches</h2><p class="sub">Highest compatibility with you in the circle, from the pair model below.</p>
+     ${top.map(x=>`<div class="lb"><span class="nm">${x.m.av} ${esc(label(x.m))}</span><div class="bar gr"><i style="width:${x.p*100}%"></i></div><span class="pt">${Math.round(x.p*100)}%</span></div>`).join('')}
+     <div class="row" style="margin-top:12px"><button class="btn sm g" style="box-shadow:0 4px 0 var(--green-d)" data-act="setup" data-step="3">Retake vibe quiz</button><button class="btn sm" data-act="setup" data-step="2">Update my picks</button></div></div>
+  </div>
+  <div class="card tint-b"><h2>What the matcher has learned</h2>
+    <p class="sub">Starts with sensible guesses. Every time you lock in (or skip) people after a party, it re-weights which traits actually predict that you'd click. Trained on ${S.pm.n} pair${S.pm.n===1?'':'s'} so far.</p>
+    ${w.map(x=>`<div class="wbar"><span>${esc(FEAT_NAME[x.k])}</span><i style="width:${Math.max(4,Math.abs(x.v)/wm*55)}%;${x.v<0?'background:var(--orange)':''}"></i><span style="width:auto">${x.v.toFixed(2)}</span></div>`).join('')}
+    <p class="note" style="margin-top:8px">Demo note: the other members' answers here are simulated. In the real app they fill in their own.</p></div>`;
+}
+function renderAll(){renderStats();renderCircle();renderParty();renderMoney();renderAfter();renderMe();
+  document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.tab===ui.tab));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='pane-'+ui.tab));
+  save();}
+function go(tab){ui.tab=tab;renderAll();window.scrollTo({top:document.querySelector('.tabs').offsetTop-4,behavior:'smooth'})}
+
+/* ===================== fun ===================== */
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),3200)}
+function confetti(){
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  const em=['🍊','🥑','🎉','✨','🌿','💙','🧀','🍷'];
+  for(let i=0;i<28;i++){const s=document.createElement('span');s.className='conf';s.textContent=em[i%em.length];
+    s.style.left=Math.random()*100+'vw';s.style.setProperty('--dx',(Math.random()*160-80)+'px');s.style.setProperty('--rot',(Math.random()*720-360)+'deg');s.style.animationDelay=Math.random()*.6+'s';
+    document.body.appendChild(s);setTimeout(()=>s.remove(),3400)}
+}
+
+/* ===================== actions ===================== */
+function spin(){
+  const pool=eligible();
+  if(!pool.length){S.cycle++;S.cycleHosted=[];toast('Everyone has hosted. Starting cycle '+S.cycle+' 🎊');renderAll();return}
+  const idx=pickWeighted(pool),n=pool.length,center=(idx+.5)*360/n;
+  ui.rot=ui.rot-(ui.rot%360)+360*5+(360-center);ui.spinning=true;
+  const w=document.querySelector('.wheel');w.style.transform=`rotate(${ui.rot}deg)`;
+  document.querySelector('[data-act=spin]').disabled=true;
+  const done=()=>{ui.spinning=false;S.upcoming={host:pool[idx].id,ym:S.nextYm,idea:null,guests:[],assign:{}};
+    toast(`${label(pool[idx])} is up! 🎉`);confetti();renderAll()};
+  matchMedia('(prefers-reduced-motion:reduce)').matches?done():setTimeout(done,4300);
+}
+function mix(noise){
+  const up=S.upcoming,idea=ideaOf(up.idea);
+  up.guests=buildRoom(up.host,ui.size,noise);up.assign=assignBring(up.guests,up.host,idea);
+  $('#mix').innerHTML=renderMix();save();
+  document.querySelector('[data-act=mix]').textContent='✨ Reshuffle';
+}
+function finish(){
+  const up=S.upcoming,idea=ideaOf(up.idea),before=score(S.model,idea);
+  sgd(S.model,up.idea,ui.rate,.3);for(let i=0;i<3;i++)sgd(S.model,up.idea,ui.rate,.1);
+  const after=score(S.model,idea),locked=Object.keys(ui.met).filter(k=>ui.met[k]);
+  const A0=adj(),newc=up.guests.filter(id=>id!=='me'&&!knows(A0,'me',id)),me=byId('me');
+  newc.forEach(id=>trainPair(me,byId(id),locked.includes(id)?1:0));
+  up.guests.forEach(id=>{byId(id).points+=20+(id===up.host?60:0)});
+  const earned=10+15*locked.length+20+(up.host==='me'?60:0);me.points+=10+15*locked.length;me.prefs[up.idea]=ui.rate;
+  locked.forEach(id=>S.edges.push('me|'+id));
+  up.guests.forEach(id=>{S.attended[id]=(S.attended[id]||0)+1});
+  S.history.push({ym:up.ym,host:up.host,idea:up.idea,rating:ui.rate});
+  byId(up.host).hosted.push(up.ym);
+  if(!S.cycleHosted.includes(up.host))S.cycleHosted.push(up.host);
+  if(S.cycleHosted.length>=S.members.length){S.cycle++;S.cycleHosted=[]}
+  S.members.forEach(m=>m.skip=false);delete S.claims[up.ym];
+  S.nextYm=addM(up.ym,1);S.upcoming=null;
+  const claim=S.claims[S.nextYm];if(claim&&!S.cycleHosted.includes(claim))S.upcoming={host:claim,ym:S.nextYm,idea:null,guests:[],assign:{}};
+  ui.rate=0;ui.met={};
+  toast(`+${earned} pts · ${locked.length} new friend${locked.length===1?'':'s'} locked in · model: ${idea.name} ${Math.round(before*100)}% → ${Math.round(after*100)}%`);confetti();ui.tab='circle';renderAll();
+}
+function addMember(){
+  const h=$('#a-handle').value.trim();if(!h)return toast('Add a handle or phone number first');
+  if(S.members.length>=S.circle.cap)return toast('Circle is full. Raise the max size first.');
+  const tags=[...document.querySelectorAll('#a-tags .on')].map(e=>e.dataset.tag),plat=$('#a-plat').value,i=S.members.length;
+  const handle=plat==='phone'?'+•••'+h.replace(/\D/g,'').slice(-4):(h.startsWith('@')?h:'@'+h);
+  const id='m'+Date.now().toString(36);const m=enrich(mk(id,handle,plat,tags.length?tags:['food'],i));S.members.push(m);
+  toast(`${handle} joined the circle 🎊`);renderAll();
+}
+function inviteText(){
+  const up=S.upcoming,idea=ideaOf(up.idea),h=byId(up.host);
+  return `🍊 ${label(h)} is hosting ${idea.name} for ${S.circle.name} in ${mLabel(up.ym)}!\n${up.guests.length} people. Host provides: ${idea.host.join(', ')}.\nGuests bring one thing each: you can see yours in Turnout.\nThe game: ${idea.game}.`;
+}
+
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-act],[data-tab],[data-tag],[data-tier]');if(!t)return;
+  if(t.dataset.tab)return go(t.dataset.tab);
+  if(t.dataset.tier){ui.tier=+t.dataset.tier;return renderMoney()}
+  if(t.dataset.tag&&!t.dataset.act){t.classList.toggle('on');return}
+  const a=t.dataset.act;
+  if(a==='spin')spin();
+  else if(a==='goparty')go('party');
+  else if(a==='gocircle')go('circle');
+  else if(a==='pass'){const h=byId(S.upcoming.host);h.skip=true;S.upcoming=null;toast(`${label(h)} passes this month and stays in the pool`);renderAll()}
+  else if(a==='claim'){const ym=t.dataset.ym;S.claims[ym]='me';if(ym===S.nextYm&&!S.upcoming)S.upcoming={host:'me',ym,idea:null,guests:[],assign:{}};toast(`${mLabel(ym)} is yours 🙌`);confetti();renderAll()}
+  else if(a==='add')addMember();
+  else if(a==='setup')openSetup(+t.dataset.step,true);
+  else if(a==='cat'){ui.cat=t.dataset.cat;renderParty()}
+  else if(a==='idea'){S.upcoming.idea=t.dataset.id;S.upcoming.guests=[];ui.ideaMoney=IDEAS.find(i=>i.id===t.dataset.id).cat==='gather'?t.dataset.id:ui.ideaMoney;renderAll()}
+  else if(a==='mix')mix(S.upcoming.guests.length>0);
+  else if(a==='copy'){const tx=inviteText();(navigator.clipboard?navigator.clipboard.writeText(tx):Promise.reject()).then(()=>toast('Invite copied 📋'),()=>toast('Copy not available here'))}
+  else if(a==='rate'){ui.rate=+t.dataset.r;renderAfter()}
+  else if(a==='finish')finish();
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.dataset.act==='skipme'){byId('me').skip=t.checked;renderAll()}
+  else if(t.dataset.met){ui.met[t.dataset.met]=t.checked}
+  else if(t.id==='cap'){S.circle.cap=+t.value;renderAll()}
+  else if(t.id==='m-idea'){ui.ideaMoney=t.value;renderMoney()}
+});
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.id==='size'){ui.size=+t.value;$('#sz').textContent=t.value}
+  else if(t.id==='m-g'){ui.guests=+t.value;$('#l-g').textContent=t.value;updMoney()}
+  else if(t.id==='m-d'){ui.dues=+t.value;$('#l-d').textContent=t.value;updMoney()}
+  else if(t.id==='m-c'){ui.cap=+t.value;$('#l-c').textContent=t.value;updMoney()}
+});
+$('#reset').addEventListener('click',e=>{e.preventDefault();if(confirm('Reset the demo and clear everything saved on this device?')){try{localStorage.removeItem(KEY)}catch(x){}location.reload()}});
+
+/* ===================== setup flow (join, picks, vibe quiz) ===================== */
+let SU=null;
+function openSetup(step,editing){
+  const me=byId('me');
+  SU={step,editing:!!(editing&&me),handle:'',plat:me?me.platform:'instagram',tags:new Set(me?me.tags:[]),prefs:{...(me&&me.prefs||{})},vibe:{...(me&&me.vibe||{})},is:new Set(me&&me.is||[]),want:new Set(me&&me.want||[])};
+  DIMS.forEach(d=>{if(!SU.vibe[d.k])SU.vibe[d.k]=3});
+  drawSetup();$('#join').classList.add('on');
+}
+function drawSetup(){
+  const c=$('#join-card'),st=SU.step,ed=SU.editing,hearts=(id)=>[1,2,3,4,5].map(n=>`<button class="heart ${(SU.prefs[id]||0)>=n?'on':''}" data-rate="${id}|${n}" aria-label="${n} of 5">❤️</button>`).join('');
+  const dots=ed?'':`<div class="steps">${[1,2,3].map(n=>`<i class="${n<=st?'on':''}"></i>`).join('')}</div>`;
+  let h=dots;
+  if(st===1){
+    h+=`<h2>Join the circle 🍊</h2><p class="sub">Pick how friends will find you. In this demo it just labels you on this device.</p>
+    <div class="row">${Object.entries(PLATS).map(([k,v])=>`<span class="chip pick ${k===SU.plat?'on':''}" data-p="${k}">${v}</span>`).join('')}</div>
+    <label class="f" for="j-handle">Your handle or number</label><input type="text" id="j-handle" value="${esc(SU.handle)}" placeholder="${SU.plat==='phone'?'Phone number':'@yourname'}" autocomplete="off" maxlength="30">
+    <label class="f">What are you into? (pick a few)</label><div>${Object.entries(TAGS).map(([t,e])=>`<span class="chip pick ${SU.tags.has(t)?'on':''}" data-t="${t}">${e} ${t}</span>`).join('')}</div>`;
+  }else if(st===2){
+    h+=`<h2>Which parties would you show up for?</h2><p class="sub">Rate as many as you like. Skipped ones get estimated from people with similar taste. Your circle's top picks are built from everyone's votes.</p>
+    ${IDEAS.map(i=>`<div class="rrow"><b>${i.emoji} ${i.name}${i.cat==='move'?' <span class="chip b">move</span>':''}</b><span style="white-space:nowrap">${hearts(i.id)}</span></div>`).join('')}`;
+  }else{
+    h+=`<h2>Your vibe 🌈</h2><p class="sub">Be honest, there are no right answers. This is for finding people you'd genuinely click with as friends. Others only ever see a match %, never your raw answers.</p>
+    ${DIMS.map(d=>`<div class="vq"><b>${d.q}</b><input type="range" min="1" max="5" value="${SU.vibe[d.k]}" data-dim="${d.k}"><div class="lh"><span>${d.lo}</span><span>${d.hi}</span></div></div>`).join('')}
+    <label class="f">Friends would describe me as… (pick up to 3)</label><div>${Object.entries(QUAL).map(([k,e])=>`<span class="chip pick ${SU.is.has(k)?'on':''}" data-is="${k}">${e} ${k}</span>`).join('')}</div>
+    <label class="f">In new friends I look for… (pick up to 3)</label><div>${Object.entries(QUAL).map(([k,e])=>`<span class="chip pick ${SU.want.has(k)?'on':''}" data-want="${k}">${e} ${k}</span>`).join('')}</div>`;
+  }
+  h+=`<div class="row" style="margin-top:18px">${st>1&&!ed?'<button class="btn ghost sm" data-nav="back">Back</button>':''}${ed?'<button class="btn ghost sm" data-nav="close">Cancel</button>':''}<button class="btn" data-nav="${st===3||ed?'done':'next'}">${st===3||ed?'Save':'Next →'}</button></div>`;
+  c.innerHTML=h;
+}
+function finishSetup(){
+  let me=byId('me');
+  if(!me){
+    const raw=(SU.handle||'').trim(),handle=SU.plat==='phone'?'+•••'+raw.replace(/\D/g,'').slice(-4):(raw.startsWith('@')?raw:'@'+raw);
+    me=mk('me',handle,SU.plat,SU.tags.size?[...SU.tags]:['food','music'],S.members.length);me.av='😊';me.hue='#FFE3CF';me.points=0;me.hosted=[];
+    S.members.unshift(me);S.me=handle;
+  }
+  const before=Object.keys(me.prefs||{}).length;
+  me.prefs={...SU.prefs};me.vibe={...SU.vibe};me.is=[...SU.is];me.want=[...SU.want];
+  me.points+=3*Math.max(0,Object.keys(me.prefs).length-before);
+  if(SU.step===3&&!me.vibeDone){me.vibeDone=true;me.points+=20}
+  $('#join').classList.remove('on');toast(`Saved. You're at ${me.points} pts 🍊`);confetti();renderAll();
+}
+$('#join').addEventListener('click',e=>{
+  const t=e.target,q=s=>t.closest(s);
+  if(q('[data-p]')){SU.plat=q('[data-p]').dataset.p;drawSetup()}
+  else if(q('[data-t]')){const v=q('[data-t]').dataset.t;SU.tags.has(v)?SU.tags.delete(v):SU.tags.add(v);drawSetup()}
+  else if(q('[data-rate]')){const[id,n]=q('[data-rate]').dataset.rate.split('|');SU.prefs[id]=SU.prefs[id]===+n?0:+n;if(!SU.prefs[id])delete SU.prefs[id];drawSetup()}
+  else if(q('[data-is]')){const v=q('[data-is]').dataset.is;SU.is.has(v)?SU.is.delete(v):(SU.is.size<3&&SU.is.add(v));drawSetup()}
+  else if(q('[data-want]')){const v=q('[data-want]').dataset.want;SU.want.has(v)?SU.want.delete(v):(SU.want.size<3&&SU.want.add(v));drawSetup()}
+  else if(q('[data-nav]')){
+    const n=q('[data-nav]').dataset.nav;
+    if(n==='next'){if(SU.step===1&&!(SU.handle||'').trim())return toast('Add a handle or number so friends can find you');SU.step++;drawSetup();$('#join').scrollTop=0}
+    else if(n==='back'){SU.step--;drawSetup();$('#join').scrollTop=0}
+    else if(n==='close')$('#join').classList.remove('on');
+    else finishSetup();
+  }
+});
+$('#join').addEventListener('input',e=>{
+  if(e.target.id==='j-handle')SU.handle=e.target.value;
+  else if(e.target.dataset.dim)SU.vibe[e.target.dataset.dim]=+e.target.value;
+});
+window.openJoin=()=>openSetup(1,false);
+if(!byId('me'))openJoin();
+renderAll();
+</script>
+</body>
+</html>
