@@ -13,6 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <style>
 :root,:root[data-theme=day]{
   --bg:#EEF1DC; --paper:#FAFBF1; --ink:#1D2A21; --soft:#5C6B5A; --line:#D8E0BE;
@@ -83,6 +84,7 @@ main{padding:26px 0 40px}
 .card .sub{color:var(--soft);font-size:15px;margin-bottom:14px}
 .tint-o{background:linear-gradient(160deg,var(--t1),var(--paper) 70%)}
 .tint-g{background:linear-gradient(160deg,var(--t2),var(--paper) 70%)}
+.tint-t{background:linear-gradient(160deg,var(--t2),var(--paper) 70%)}
 .tint-b{background:linear-gradient(160deg,var(--t3),var(--paper) 70%)}
 .btn{background:var(--pri);color:var(--on-pri);font-weight:700;padding:12px 24px;border-radius:999px;box-shadow:0 12px 24px -14px var(--pri);transition:.2s;display:inline-block;letter-spacing:.01em}
 .btn:hover{transform:translateY(-2px);filter:brightness(1.06)} .btn:active{transform:translateY(0)}
@@ -666,7 +668,7 @@ function suggest(A){
 
 function renderMe(){
   const me=byId('me'),el=$('#pane-me');
-  if(!me){el.innerHTML='<div class="card tint-o" style="text-align:center"><h2>Join to unlock your profile</h2><button class="btn" data-act="setup" data-step="1">Join the circle</button></div>';return}
+  if(!me){el.innerHTML='<div class="card tint-o" style="text-align:center"><h2>Join to unlock your profile</h2><button class="btn" data-act="setup" data-step="1">Join the circle</button></div>'+accountCard();return}
   const rank=[...S.members].sort((a,b)=>b.points-a.points),pos=rank.findIndex(m=>m.id==='me')+1,mx=Math.max(1,rank[0].points);
   const top=S.members.filter(m=>m.id!=='me').map(m=>({m,p:pairProb(me,m)})).sort((a,b)=>b.p-a.p).slice(0,5);
   const w=FEAT_KEYS.map(k=>({k,v:S.pm.w[k]})).sort((a,b)=>b.v-a.v),wm=Math.max(...w.map(x=>Math.abs(x.v)),1);
@@ -682,7 +684,7 @@ function renderMe(){
   <div class="card tint-b"><h2>What the matcher has learned</h2>
     <p class="sub">Starts with sensible guesses. Every time you lock in (or skip) people after a party, it re-weights which traits actually predict that you'd click. Trained on ${S.pm.n} pair${S.pm.n===1?'':'s'} so far.</p>
     ${w.map(x=>`<div class="wbar"><span>${esc(FEAT_NAME[x.k])}</span><i style="width:${Math.max(4,Math.abs(x.v)/wm*55)}%;${x.v<0?'background:var(--pri)':''}"></i><span style="width:auto">${x.v.toFixed(2)}</span></div>`).join('')}
-    <p class="note" style="margin-top:8px">Demo note: the other members' answers here are simulated. In the real app they fill in their own.</p></div>`;
+    <p class="note" style="margin-top:8px">Demo note: the other members' answers here are simulated. In the real app they fill in their own.</p></div>${accountCard()}`;
 }
 function renderAll(){renderStats();renderCircle();renderParty();renderMoney();renderAfter();renderMe();
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.tab===ui.tab));
@@ -764,6 +766,14 @@ document.addEventListener('click',e=>{
   else if(a==='claim'){const ym=t.dataset.ym;S.claims[ym]='me';if(ym===S.nextYm&&!S.upcoming)S.upcoming={host:'me',ym,idea:null,guests:[],assign:{}};toast(`${mLabel(ym)} is yours`);confetti();renderAll()}
   else if(a==='add')addMember();
   else if(a==='setup')openSetup(+t.dataset.step,true);
+  else if(a==='signin'){const em=($('#c-email').value||'').trim();if(!/^\S+@\S+\.\S+$/.test(em))return toast('Enter a valid email');
+    cloudDo(async()=>{const r=await CLOUD.sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.origin+location.pathname}});if(r.error)throw r.error;toast('Check your email for the sign-in link')})}
+  else if(a==='signout')cloudDo(async()=>{await CLOUD.sb.auth.signOut();CLOUD.user=null;CLOUD.circle=null;CLOUD.roster=[]});
+  else if(a==='mkcircle'){const nm=($('#c-name').value||'').trim();if(!nm)return toast('Name your circle first');
+    cloudDo(async()=>{const r=await CLOUD.sb.rpc('create_circle',{p_name:nm,p_cap:S.circle.cap});if(r.error)throw r.error;await loadCircle();toast('Circle created. Share your invite link.')})}
+  else if(a==='copylink'){const l=inviteLink();(navigator.clipboard?navigator.clipboard.writeText(l):Promise.reject()).then(()=>toast('Invite link copied'),()=>toast('Copy not available here'))}
+  else if(a==='approve'||a==='decline'){const u=t.dataset.u;
+    cloudDo(async()=>{const r=await CLOUD.sb.rpc('approve_member',{p_circle:CLOUD.circle.circle_id,p_user:u,p_ok:a==='approve'});if(r.error)throw r.error;await loadCircle();toast(a==='approve'?'Approved':'Declined')})}
   else if(a==='cat'){ui.cat=t.dataset.cat;renderParty()}
   else if(a==='idea'){S.upcoming.idea=t.dataset.id;S.upcoming.guests=[];ui.ideaMoney=IDEAS.find(i=>i.id===t.dataset.id).cat==='gather'?t.dataset.id:ui.ideaMoney;renderAll()}
   else if(a==='mix')mix(S.upcoming.guests.length>0);
@@ -828,6 +838,7 @@ function finishSetup(){
   me.points+=3*Math.max(0,Object.keys(me.prefs).length-before);
   if(SU.step===3&&!me.vibeDone){me.vibeDone=true;me.points+=20}
   $('#join').classList.remove('on');toast(`Saved. You're at ${me.points} pts`);confetti();renderAll();
+  if(CLOUD.user)syncProfile().then(()=>joinPending()).then(()=>loadCircle()).then(renderMe).catch(cloudErr);
 }
 $('#join').addEventListener('click',e=>{
   const t=e.target,q=s=>t.closest(s);
@@ -850,6 +861,68 @@ $('#join').addEventListener('input',e=>{
 });
 window.openJoin=()=>openSetup(1,false);
 if(!byId('me')&&(function(){try{return sessionStorage.getItem('turnout.gate')}catch(e){return 0}})())openJoin();
+/* ===================== cloud (Supabase): optional ===================== */
+/* The URL and anon key are public by design; row-level security in the database protects the data. */
+const SB_URL='https://nmbrsdnopuhcbhxdgycu.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tYnJzZG5vcHVoY2JoeGRneWN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4NjU0OTgsImV4cCI6MjEwNjQ0MTQ5OH0.2SYfJKNbVU2EfJUyfY75iD-pjpCu6-8jYfORr8mmfrY';
+const CLOUD={sb:null,user:null,circle:null,roster:[],busy:false,msg:''};
+try{const q=new URLSearchParams(location.search);if(q.get('join'))localStorage.setItem('turnout.join',JSON.stringify({c:q.get('join'),by:q.get('by')||null}))}catch(e){}
+const cloudErr=e=>toast((e&&e.message)||'Something went wrong. Try again.');
+async function initCloud(){
+  if(!window.supabase){renderMe();return}
+  CLOUD.sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,detectSessionInUrl:true}});
+  const{data}=await CLOUD.sb.auth.getSession();CLOUD.user=data.session?data.session.user:null;
+  CLOUD.sb.auth.onAuthStateChange((ev,sess)=>{const u=sess?sess.user:null;if((u&&u.id)!==(CLOUD.user&&CLOUD.user.id)){CLOUD.user=u;onAuth()}});
+  await onAuth();
+}
+async function onAuth(){
+  if(CLOUD.user){try{await syncProfile();await joinPending();await loadCircle()}catch(e){cloudErr(e)}}
+  else{CLOUD.circle=null;CLOUD.roster=[]}
+  renderMe();
+}
+async function syncProfile(){
+  const me=byId('me');if(!CLOUD.user||!me)return;
+  const r=await CLOUD.sb.from('profiles').upsert({id:CLOUD.user.id,handle:me.handle,platform:me.platform,interests:me.tags,qualities:me.is||[],looking_for:me.want||[],vibe:me.vibe||{}});
+  if(r.error)throw r.error;
+  const rows=Object.entries(me.prefs||{}).map(([idea_id,rating])=>({user_id:CLOUD.user.id,idea_id,rating,source:'onboarding'}));
+  if(rows.length){const r2=await CLOUD.sb.from('idea_ratings').upsert(rows);if(r2.error)throw r2.error}
+}
+async function joinPending(){
+  let j=null;try{j=JSON.parse(localStorage.getItem('turnout.join')||'null')}catch(e){}
+  if(!j||!byId('me'))return;
+  const r=await CLOUD.sb.rpc('join_circle',{p_code:j.c,p_by:j.by});
+  try{localStorage.removeItem('turnout.join')}catch(e){}
+  if(r.error)throw r.error;toast(`Request sent to join ${r.data}. The owner will approve you.`);
+}
+async function loadCircle(){
+  const r=await CLOUD.sb.rpc('my_circles');if(r.error)throw r.error;
+  const list=r.data||[];CLOUD.circle=list.find(c=>c.status==='approved')||list[0]||null;CLOUD.roster=[];
+  if(CLOUD.circle&&CLOUD.circle.status==='approved'){const rr=await CLOUD.sb.rpc('circle_roster',{p_circle:CLOUD.circle.circle_id});if(rr.error)throw rr.error;CLOUD.roster=rr.data||[]}
+}
+async function cloudDo(fn){if(CLOUD.busy)return;CLOUD.busy=true;try{await fn()}catch(e){cloudErr(e)}CLOUD.busy=false;renderMe()}
+const inviteLink=()=>CLOUD.circle&&CLOUD.circle.invite_code?`${location.origin}${location.pathname}?join=${CLOUD.circle.invite_code}&by=${CLOUD.user.id}`:'';
+function accountCard(){
+  if(!CLOUD.sb)return `<div class="card"><h2>Your account</h2><p class="sub">Cloud sign-in isn't available right now. The demo above still works and saves on this device.</p></div>`;
+  if(!CLOUD.user)return `<div class="card tint-t"><h2>Save your profile</h2><p class="sub">Sign in with your email. We send you a one-time link, no password. Phone sign-in is coming.</p>
+    <div class="row"><input type="text" id="c-email" inputmode="email" autocomplete="email" placeholder="you@email.com" style="flex:1;min-width:200px" maxlength="120"><button class="btn sm" data-act="signin">Email me a link</button></div></div>`;
+  const c=CLOUD.circle,owner=c&&c.role==='owner';
+  let h=`<div class="card tint-t"><div class="row" style="justify-content:space-between"><div><h2>Your account</h2><p class="sub" style="margin:0">Signed in as ${esc(CLOUD.user.email||'your account')}</p></div><button class="btn ghost sm" data-act="signout">Sign out</button></div>`;
+  if(!byId('me'))h+=`<div class="warn">Finish joining (handle, picks, vibe) above, then your profile saves automatically.</div>`;
+  else if(!c)h+=`<h3 style="font-size:22px;margin:16px 0 6px">Start a real circle</h3><p class="note">Or open an invite link from a friend to ask to join theirs.</p>
+    <div class="row" style="margin-top:8px"><input type="text" id="c-name" placeholder="Name your circle" style="flex:1;min-width:180px" maxlength="60"><button class="btn sm g" data-act="mkcircle">Create</button></div>`;
+  else if(c.status==='pending')h+=`<div class="warn">Your request to join <b>${esc(c.name)}</b> is waiting for the owner to approve.</div>`;
+  else{
+    const pend=CLOUD.roster.filter(r=>r.status==='pending'),ok=CLOUD.roster.filter(r=>r.status==='approved');
+    h+=`<h3 style="font-size:22px;margin:16px 0 4px">${esc(c.name)}</h3><p class="note">${ok.length} of ${c.capacity} spots filled${owner?' · you are the owner':''}</p>
+      <label class="f">Your invite link (friends of friends join through it, and you approve them)</label>
+      <div class="row"><input type="text" readonly value="${esc(inviteLink())}" style="flex:1;min-width:200px"><button class="btn sm" data-act="copylink">Copy</button></div>
+      ${owner&&pend.length?`<h3 style="font-size:20px;margin:16px 0 6px">Waiting for your approval</h3>${pend.map(r=>`<div class="rrow"><b>${esc(r.handle)}</b><span><button class="btn sm g" data-act="approve" data-u="${esc(r.user_id)}">Approve</button> <button class="btn ghost sm" data-act="decline" data-u="${esc(r.user_id)}">Decline</button></span></div>`).join('')}`:''}
+      <h3 style="font-size:20px;margin:16px 0 6px">Members</h3>${ok.map(r=>`<div class="rrow"><b>${esc(r.handle)}</b><span class="chip ${r.role==='owner'?'g':''}">${esc(r.role)}</span></div>`).join('')}
+      <p class="note" style="margin-top:10px">Next phase: the rotation, matching and points above will run on these real members.</p>`;
+  }
+  return h+'</div>';
+}
+
 /* ===================== day / night + welcome ===================== */
 (function(){
   let t=null;try{t=localStorage.getItem('turnout.theme')}catch(e){}
@@ -864,6 +937,7 @@ if(!byId('me')&&(function(){try{return sessionStorage.getItem('turnout.gate')}ca
   if(seen)g.classList.add('out');
 })();
 renderAll();
+window.addEventListener('load',initCloud);
 </script>
 </body>
 </html>
