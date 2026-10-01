@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+  // Share the site's theme choice; follow the system until the visitor picks one.
+  (function () {
+    var t;
+    try { t = localStorage.getItem('mw-theme'); } catch (e) {}
+    if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.mwTheme = t;
+  })();
+</script>
+<title>Buddy · Mindy Wu</title>
+<meta name="description" content="Buddy is a wellness check-in for people who hate wearables: your classes, meals and sleep in one place, a monthly report on what's working for you, and a crew to keep you going.">
+<meta name="author" content="Mindy Wu">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='black'/><circle cx='50' cy='50' r='14' fill='white'/></svg>">
+<meta property="og:title" content="Buddy: Wellness Buddy">
+<meta property="og:description" content="A wearable-free wellness check-in. Classes, meals and sleep in one place, plus a crew.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mindy-portfolio.vercel.app/wellness.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff; --fg:#0a0a0a; --mute:#6b6b6b; --line:#e8e8e8; --card:#f5f5f5; --card2:#fafafa;
+  --inv:#0a0a0a; --inv-fg:#fff; --shadow:0 1px 2px rgba(0,0,0,.04),0 12px 32px rgba(0,0,0,.06);
+  --r:22px; --tabbar:68px;
+}
+html[data-mw-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0a0a0a; --fg:#f4f4f4; --mute:#9b9b9b; --line:#232323; --card:#141414; --card2:#101010;
+  --inv:#f4f4f4; --inv-fg:#0a0a0a; --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.5);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--fg);line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:calc(var(--tabbar) + env(safe-area-inset-bottom) + 12px)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--fg);outline-offset:2px;border-radius:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+h1,h2,h3{letter-spacing:-.035em;line-height:1.08;font-weight:700}
+
+/* ---------- portfolio nav ---------- */
+.pnav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0 1.25rem;min-height:54px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line)}
+.pnav a{text-decoration:none;color:var(--mute);font-size:14px;font-weight:500;transition:color .15s}
+.pnav a:hover{color:var(--fg)}
+.pnav .brand{color:var(--fg);font-weight:700;letter-spacing:-.02em;font-size:15px}
+.pnav .links{display:flex;align-items:center;gap:1.25rem}
+.theme{width:30px;height:30px;border:1px solid var(--line);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--mute)}
+.theme:hover{color:var(--fg);border-color:var(--fg)}
+.theme svg{width:15px;height:15px}.theme .sun{display:none}
+html[data-mw-theme="dark"] .theme .sun{display:block}html[data-mw-theme="dark"] .theme .moon{display:none}
+
+/* ---------- shell ---------- */
+.app{max-width:1080px;margin:0 auto;padding:0 1.25rem}
+.top{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:22px 0 8px}
+.logo{display:inline-flex;align-items:center;gap:9px;font-size:26px;font-weight:700;letter-spacing:-.05em}
+.logo i{width:22px;height:22px;border-radius:50%;background:var(--fg);position:relative;display:inline-block}
+.logo i::after{content:"";position:absolute;width:7px;height:7px;border-radius:50%;background:var(--bg);right:4px;top:4px}
+.pill{font-size:12px;font-weight:500;color:var(--mute);border:1px solid var(--line);border-radius:99px;padding:5px 11px;white-space:nowrap}
+.tabs{display:none}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;justify-content:space-around;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:saturate(1.4) blur(16px);-webkit-backdrop-filter:saturate(1.4) blur(16px);border-top:1px solid var(--line)}
+.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:500;color:var(--mute);padding:6px 0;border-radius:12px;min-height:48px}
+.tabbar svg{width:22px;height:22px}
+.tabbar button[aria-selected="true"]{color:var(--fg)}
+.tabbar button[aria-selected="true"] svg{stroke-width:2.4}
+@media(min-width:820px){
+  body{padding-bottom:48px}
+  .tabbar{display:none}
+  .tabs{display:inline-flex;background:var(--card);border-radius:99px;padding:4px;gap:2px}
+  .tabs button{padding:9px 20px;border-radius:99px;font-size:14px;font-weight:500;color:var(--mute);transition:background .2s,color .2s}
+  .tabs button[aria-selected="true"]{background:var(--inv);color:var(--inv-fg)}
+  .app{padding:0 2rem}
+}
+.view{display:none;animation:rise .45s cubic-bezier(.2,.7,.2,1)}
+.view.on{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.grid2{display:grid;gap:16px;margin-top:14px}
+@media(min-width:820px){.grid2{grid-template-columns:1fr 1fr;align-items:start;gap:20px}}
+.col{display:grid;gap:16px;min-width:0}
+.card{background:var(--card);border-radius:var(--r);padding:20px;min-width:0}
+.card.line{background:transparent;border:1px solid var(--line)}
+.card h2{font-size:21px;margin-bottom:4px}
+.eyebrow{font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.sub{color:var(--mute);font-size:14.5px}
+.hello{padding:18px 0 4px}
+.hello h1{font-size:clamp(34px,6vw,56px)}
+.hello p{margin-top:8px;color:var(--mute);font-size:16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--inv);color:var(--inv-fg);border-radius:99px;padding:12px 22px;font-weight:500;font-size:15px;min-height:46px;transition:transform .15s,opacity .15s}
+.btn:hover{opacity:.88}.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.btn.ghost:hover{border-color:var(--fg);opacity:1}
+.btn.sm{padding:8px 16px;min-height:38px;font-size:14px}
+.btn[disabled]{opacity:.35;pointer-events:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);border-radius:99px;padding:8px 14px;font-size:14px;font-weight:500;min-height:38px;background:transparent;transition:all .15s}
+.chip:hover{border-color:var(--fg)}
+.chip.on{background:var(--inv);color:var(--inv-fg);border-color:var(--inv)}
+.tag{display:inline-block;font-size:12px;font-weight:500;border:1px solid var(--line);border-radius:99px;padding:3px 10px;color:var(--mute)}
+.tag.solid{background:var(--inv);color:var(--inv-fg);border-color:var(--inv)}
+
+/* sliders */
+.sl{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center;margin-top:16px}
+.sl label{font-weight:500;font-size:15px}
+.sl output{font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+.sl input{grid-column:1/-1;width:100%;accent-color:var(--fg);height:30px}
+.sl small{grid-column:1/-1;display:flex;justify-content:space-between;color:var(--mute);font-size:12px}
+.bubble{margin-top:16px;background:var(--bg);border:1px solid var(--line);border-radius:18px 18px 18px 6px;padding:14px 16px;font-size:15px;animation:rise .4s}
+.bubble b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin-bottom:4px;font-weight:500}
+.dots span{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--mute);margin-right:4px;animation:blink 1s infinite}
+.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+@keyframes blink{0%,60%,100%{opacity:.25}30%{opacity:1}}
+
+/* rings */
+.rings{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.ring{position:relative;width:100%;max-width:112px;margin:0 auto;aspect-ratio:1}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:9;stroke-linecap:round}
+.ring .bg{stroke:var(--line)}.ring .fg{stroke:var(--fg);transition:stroke-dashoffset 1s cubic-bezier(.2,.7,.2,1)}
+.ring .v{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;font-size:20px;letter-spacing:-.03em}
+.ring .v small{font-size:11px;font-weight:500;color:var(--mute);letter-spacing:0}
+.rlabel{margin-top:6px;font-size:13px;font-weight:500}.rsub{font-size:12px;color:var(--mute)}
+
+/* lists */
+.list{display:grid;gap:8px;margin-top:12px}
+.row{display:flex;align-items:center;gap:12px;background:var(--bg);border-radius:16px;padding:12px 14px}
+.row .ic{width:38px;height:38px;border-radius:50%;background:var(--inv);color:var(--inv-fg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex:none}
+.row .t{font-weight:500;font-size:15px;line-height:1.25}.row .s{font-size:13px;color:var(--mute)}
+.row .r{margin-left:auto;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;font-size:15px}
+.dotsint{display:inline-flex;gap:3px;vertical-align:middle}.dotsint i{width:6px;height:6px;border-radius:50%;background:var(--line)}.dotsint i.on{background:var(--fg)}
+.formrow{display:grid;gap:12px;margin-top:14px}
+.field{display:grid;gap:6px}.field>span{font-size:13px;font-weight:500;color:var(--mute)}
+.input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:15px;min-height:46px}
+.input:focus{outline:none;border-color:var(--fg)}
+.hrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.int{display:flex;gap:6px}.int button{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);font-weight:500;font-size:14px}.int button.on{background:var(--inv);color:var(--inv-fg);border-color:var(--inv)}
+
+/* photos */
+.photo{position:relative;border-radius:var(--r);overflow:hidden;background:#d4d4d4;aspect-ratio:4/3;touch-action:manipulation;cursor:pointer;transform:perspective(800px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .25s ease,box-shadow .25s;user-select:none;-webkit-user-select:none}
+.photo svg,.photo img{width:100%;height:100%;display:block;object-fit:cover;pointer-events:none}
+.photo::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.35),transparent 55%);opacity:0;transition:opacity .25s;pointer-events:none}
+@media(hover:hover) and (pointer:fine){.photo:hover{box-shadow:var(--shadow)}.photo:hover::after{opacity:1}}
+.photo .expand{position:absolute;right:10px;top:10px;width:34px;height:34px;border-radius:50%;background:rgba(10,10,10,.6);color:#fff;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);z-index:2}
+.photo .expand svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2}
+.burst{position:absolute;left:50%;top:50%;width:90px;height:90px;margin:-45px;pointer-events:none;opacity:0;z-index:3}
+.burst svg{width:100%;height:100%;fill:#fff;filter:drop-shadow(0 4px 14px rgba(0,0,0,.4))}
+.burst.go{animation:pop .75s ease-out}
+@keyframes pop{0%{opacity:0;transform:scale(.3)}25%{opacity:1;transform:scale(1.15)}60%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.25) translateY(-14px)}}
+.grain{position:absolute;width:0;height:0}
+
+/* meal scanner */
+.plate{position:relative}
+.plate .photo{cursor:default}
+.hot{position:absolute;z-index:4;width:34px;height:34px;margin:-17px;border-radius:50%;background:var(--bg);border:2px solid var(--fg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--fg);animation:hotin .4s cubic-bezier(.2,.9,.3,1.4) both;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.hot::before{content:"";position:absolute;inset:-7px;border-radius:50%;border:1px solid var(--fg);opacity:.45;animation:ping 1.8s infinite}
+.hot.sel{background:var(--fg);color:var(--bg)}
+@keyframes hotin{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
+@keyframes ping{0%{transform:scale(.8);opacity:.6}100%{transform:scale(1.5);opacity:0}}
+.scanline{position:absolute;left:0;right:0;height:60px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.75),transparent);top:-60px;z-index:5;pointer-events:none;animation:scan 1.3s ease-in-out forwards}
+@keyframes scan{to{top:100%}}
+.scanning .photo{filter:contrast(1.1)}
+.mealpick{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
+.thumb{width:62px;height:62px;border-radius:16px;overflow:hidden;border:2px solid transparent;padding:0;background:#ccc;flex:none;transition:border-color .15s,transform .15s}
+.thumb:hover{transform:translateY(-2px)}
+.thumb.on{border-color:var(--fg)}.thumb svg,.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb.up{display:flex;align-items:center;justify-content:center;background:transparent;border:1.5px dashed var(--mute);color:var(--mute);font-size:24px}
+.big{font-size:clamp(34px,5vw,44px);font-weight:700;letter-spacing:-.045em;font-variant-numeric:tabular-nums;line-height:1}
+.big small{font-size:15px;font-weight:500;color:var(--mute);letter-spacing:0;margin-left:4px}
+.macros{display:grid;gap:10px;margin:14px 0}
+.mac{display:grid;grid-template-columns:62px 1fr auto;gap:10px;align-items:center;font-size:14px}
+.bar{height:8px;background:var(--line);border-radius:9px;overflow:hidden;position:relative}
+.bar i{display:block;height:100%;background:var(--fg);border-radius:9px;transition:width .7s cubic-bezier(.2,.7,.2,1)}
+.mac b{font-variant-numeric:tabular-nums;font-weight:500;font-size:13px}
+.detail{background:var(--bg);border-radius:16px;padding:14px;margin-top:12px;animation:rise .3s}
+.step{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:99px;padding:3px}
+.step button{width:34px;height:34px;border-radius:50%;font-size:18px;font-weight:500;display:flex;align-items:center;justify-content:center}
+.step button:hover{background:var(--inv);color:var(--inv-fg)}
+.step span{min-width:44px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums;font-size:14px}
+.note{font-size:12.5px;color:var(--mute);margin-top:10px}
+
+/* week */
+.wk{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:220px;margin-top:18px}
+.day{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%;border-radius:14px;padding:4px 0}
+.day .val{font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;height:16px}
+.day .col2{width:100%;max-width:46px;flex:1;display:flex;align-items:flex-end}
+.day .col2 i{display:block;width:100%;background:var(--line);border-radius:12px;min-height:6px;transition:height .7s cubic-bezier(.2,.7,.2,1),background .2s}
+.day:hover .col2 i{background:var(--mute)}
+.day[aria-pressed="true"] .col2 i{background:var(--fg)}
+.day .dn{font-size:12px;font-weight:500;color:var(--mute)}.day[aria-pressed="true"] .dn{color:var(--fg);font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+@media(min-width:600px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{background:var(--bg);border-radius:16px;padding:14px}
+.stat .big{font-size:30px}.stat .s{font-size:13px;color:var(--mute);margin-top:4px}
+
+/* report */
+.ins{background:var(--bg);border-radius:18px;overflow:hidden}
+.ins>button{display:flex;width:100%;text-align:left;gap:12px;padding:16px;align-items:flex-start}
+.ins .mk{width:28px;height:28px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;border:1.5px solid var(--fg)}
+.ins.good .mk{background:var(--fg);color:var(--bg)}
+.ins .tt{font-weight:700;font-size:16px;letter-spacing:-.02em;line-height:1.25}
+.ins .st{font-size:14px;color:var(--mute);margin-top:2px}
+.ins .chev{margin-left:auto;flex:none;transition:transform .25s;color:var(--mute)}
+.ins.open .chev{transform:rotate(180deg)}
+.ins .body{display:none;padding:0 16px 16px 56px;font-size:14.5px}
+.ins.open .body{display:block;animation:rise .3s}
+.cmp{display:grid;gap:8px;margin:12px 0}
+.cmp div{display:grid;grid-template-columns:96px 1fr 36px;gap:10px;align-items:center;font-size:13px}
+.cmp .bar{height:10px}.cmp .bar.alt i{background:var(--mute)}
+.gap{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center;padding:12px 0;border-top:1px solid var(--line);cursor:pointer;width:100%;text-align:left}
+.gap:first-of-type{border-top:0}
+.gap .nm{font-weight:500}.gap .pc{font-weight:700;font-variant-numeric:tabular-nums}
+.gap .bar{grid-column:1/-1;height:10px;overflow:visible}
+.gap .bar::after{content:"";position:absolute;left:100%;top:-3px;bottom:-3px;width:2px;background:var(--fg);opacity:0}
+.gap .foods{grid-column:1/-1;display:none;gap:6px;flex-wrap:wrap;padding-top:6px}
+.gap.open .foods{display:flex;animation:rise .3s}
+.recipe h3{font-size:24px;margin:4px 0 6px}
+.ing{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line);font-size:15px;cursor:pointer}
+.ing input{appearance:none;width:22px;height:22px;border:1.5px solid var(--mute);border-radius:50%;flex:none;cursor:pointer;display:grid;place-content:center;transition:all .15s}
+.ing input:checked{background:var(--fg);border-color:var(--fg)}
+.ing input:checked::after{content:"";width:6px;height:10px;border:solid var(--bg);border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.ing input:checked+span{text-decoration:line-through;color:var(--mute)}
+.steps{counter-reset:s;display:grid;gap:12px;margin-top:14px}
+.steps li{list-style:none;counter-increment:s;display:flex;gap:12px;font-size:14.5px}
+.steps li::before{content:counter(s);flex:none;width:26px;height:26px;border-radius:50%;background:var(--inv);color:var(--inv-fg);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+
+/* crew */
+.avs{display:flex}.av{width:36px;height:36px;border-radius:50%;background:var(--inv);color:var(--inv-fg);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:2px solid var(--bg);flex:none}
+.avs .av{margin-left:-8px}.avs .av:first-child{margin-left:0}
+.av.alt{background:var(--bg);color:var(--fg);border:1.5px solid var(--fg)}
+.lb{display:grid;gap:10px;margin-top:14px}
+.lbrow{display:grid;grid-template-columns:24px 36px 1fr 38px;gap:10px;align-items:center;font-size:14px;transition:transform .5s}
+.lbrow .nm{display:grid;gap:5px;font-weight:500}.lbrow .bar{height:8px}
+.lbrow b{font-variant-numeric:tabular-nums;text-align:right}.lbrow .rk{color:var(--mute);font-weight:700;text-align:center}
+.lbrow.me .nm{font-weight:700}
+.meet{display:flex;gap:14px;align-items:center;background:var(--bg);border-radius:18px;padding:14px}
+.meet .when{width:78px;flex:none;text-align:center;border-right:1px solid var(--line);padding-right:12px;white-space:nowrap}
+.meet .when b{display:block;font-size:17px;letter-spacing:-.03em;line-height:1.1}.meet .when span{font-size:12px;color:var(--mute)}
+.meet .t{font-weight:700;letter-spacing:-.02em}.meet .s{font-size:13px;color:var(--mute)}
+.meet .btn{margin-left:auto}
+.post{background:var(--card);border-radius:var(--r);padding:16px;display:grid;gap:12px}
+.post header{display:flex;gap:10px;align-items:center}
+.post header b{display:block;font-size:15px;line-height:1.2}.post header small{color:var(--mute);font-size:12.5px}
+.acts{display:flex;gap:6px;align-items:center}
+.act{display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border-radius:99px;font-size:14px;font-weight:500;border:1px solid var(--line);min-height:40px;transition:all .15s}
+.act:hover{border-color:var(--fg)}
+.act svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;transition:transform .2s}
+.act.on{background:var(--inv);color:var(--inv-fg);border-color:var(--inv)}.act.on svg.h{fill:currentColor}
+.act:active svg{transform:scale(1.3)}
+.cm{display:grid;gap:6px;font-size:14px}.cm p b{font-weight:700}
+.cmform{display:flex;gap:8px}
+.feed{display:grid;gap:16px}
+@media(min-width:820px){.feedgrid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}}
+
+/* dialogs & toast */
+dialog{border:0;border-radius:26px;padding:0;background:var(--bg);color:var(--fg);width:min(94vw,560px);max-height:92vh;overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
+.dlg{padding:18px;display:grid;gap:14px}
+.dlg .x{position:absolute;right:14px;top:14px;width:36px;height:36px;border-radius:50%;background:rgba(10,10,10,.6);color:#fff;font-size:20px;z-index:3;display:flex;align-items:center;justify-content:center}
+.dlg .photo{cursor:default;transform:none}
+.toast{position:fixed;left:50%;bottom:calc(var(--tabbar) + env(safe-area-inset-bottom) + 18px);transform:translate(-50%,20px);background:var(--inv);color:var(--inv-fg);padding:12px 20px;border-radius:99px;font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:all .3s;z-index:80;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media(min-width:820px){.toast{bottom:28px}}
+.foot{margin:40px 0 8px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--mute);max-width:70ch}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+<svg class="grain" aria-hidden="true"><filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter></svg>
+
+<nav class="pnav" aria-label="Mindy Wu">
+  <a class="brand" href="index.html">Mindy Wu</a>
+  <div class="links">
+    <a href="index.html#portfolio">Portfolio</a>
+    <a href="index.html#history">History</a>
+    <a href="about.html">About</a>
+    <button class="theme" type="button" id="theme" aria-label="Toggle dark mode" title="Toggle dark mode">
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </div>
+</nav>
+
+<main class="app">
+  <div class="top">
+    <span class="logo" aria-label="Buddy"><i></i>buddy</span>
+    <div class="tabs" role="tablist" aria-label="Sections">
+      <button role="tab" data-go="today">Today</button>
+      <button role="tab" data-go="week">Week</button>
+      <button role="tab" data-go="report">Report</button>
+      <button role="tab" data-go="crew">Crew</button>
+    </div>
+    <span class="pill">Demo · sample data</span>
+  </div>
+
+  <section class="view" id="v-today" aria-label="Today"></section>
+  <section class="view" id="v-week" aria-label="Week"></section>
+  <section class="view" id="v-report" aria-label="Report"></section>
+  <section class="view" id="v-crew" aria-label="Crew"></section>
+
+  <p class="foot">Buddy is a prototype by Mindy Wu. Everything here runs in your browser on sample data and pre-written insights, with no AI calls and nothing uploaded. Estimates are for general wellness, not medical advice, and photo-based calorie estimates run low and are only a guide. Not affiliated with any gym, studio or class app.</p>
+</main>
+
+<nav class="tabbar" role="tablist" aria-label="Sections">
+  <button role="tab" data-go="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/></svg>Today</button>
+  <button role="tab" data-go="week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V4M19 20v-6"/></svg>Week</button>
+  <button role="tab" data-go="report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg>Report</button>
+  <button role="tab" data-go="crew"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.7a3.5 3.5 0 0 1 0 6.6M18 14.3c2.2.6 3.5 2.6 3.5 5.7"/></svg>Crew</button>
+</nav>
+
+<dialog id="lightbox" aria-label="Photo"></dialog>
+<dialog id="share" aria-label="Share to crew"></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
+const round = (n, d = 0) => { const p = 10 ** d; return Math.round(n * p) / p; };
+const initials = n => n.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+
+/* ============================================================
+   SAMPLE DATA — everything below is pre-written for the demo.
+   ============================================================ */
+const todayStr = new Date().toDateString();
+const TYPES = ['Pilates','Yoga','Strength','Run','Cycle','Walk','Other'];
+
+const MEALS = [
+  { id:'bowl', name:'Salmon rice bowl', scene:'bowl', items:[
+    { n:'Salmon', x:62, y:42, g:110, k:230, p:25, c:0,  f:14, fi:0,   mic:['Omega-3','B12','Vitamin D'] },
+    { n:'Rice',   x:41, y:62, g:150, k:195, p:4,  c:42, f:.4, fi:.6,  mic:[] },
+    { n:'Avocado',x:68, y:68, g:50,  k:80,  p:1,  c:4,  f:7,  fi:3.4, mic:['Folate','Vitamin K'] },
+    { n:'Edamame',x:35, y:36, g:60,  k:70,  p:6,  c:5,  f:3,  fi:3,   mic:['Iron','Folate'] },
+    { n:'Greens', x:50, y:24, g:40,  k:8,   p:.5, c:2,  f:0,  fi:1,   mic:['Vitamin K'] } ]},
+  { id:'yog', name:'Yogurt, berries & granola', scene:'yogurt', items:[
+    { n:'Greek yogurt', x:50, y:50, g:200, k:130, p:20, c:8,  f:.7, fi:0, mic:['Calcium','B12'] },
+    { n:'Blueberries',  x:36, y:40, g:80,  k:46,  p:.6,c:12, f:.3, fi:2, mic:['Vitamin C','Vitamin K'] },
+    { n:'Granola',      x:63, y:62, g:30,  k:135, p:3, c:20, f:5,  fi:2, mic:['Magnesium'] },
+    { n:'Honey',        x:55, y:34, g:10,  k:30,  p:0, c:8,  f:0,  fi:0, mic:[] } ]},
+  { id:'chk', name:'Chickpea & chicken plate', scene:'plate', items:[
+    { n:'Chickpeas', x:36, y:55, g:100, k:160, p:9,  c:27, f:2.6, fi:8,  mic:['Iron','Folate','Magnesium'] },
+    { n:'Chicken',   x:65, y:50, g:100, k:165, p:31, c:0,  f:3.6, fi:0,  mic:['B12'] },
+    { n:'Spinach',   x:50, y:26, g:50,  k:12,  p:1.4,c:2,  f:.2,  fi:1.1,mic:['Iron','Vitamin K','Folate'] },
+    { n:'Feta',      x:52, y:72, g:25,  k:66,  p:3.5,c:1,  f:5.3, fi:0,  mic:['Calcium'] } ]}
+];
+const UPLOAD_ITEMS = [
+  { n:'Main dish (est.)', x:46, y:50, g:180, k:300, p:22, c:20, f:14, fi:2, mic:['B12'] },
+  { n:'Side (est.)',      x:68, y:38, g:100, k:120, p:3,  c:18, f:4,  fi:3, mic:['Vitamin C'] },
+  { n:'Greens (est.)',    x:32, y:34, g:50,  k:15,  p:1,  c:3,  f:0,  fi:1.5,mic:['Vitamin K','Folate'] } ];
+
+const WEEK = [ // oldest → yesterday (today is computed live)
+  { act:'Reformer Pilates · 45 min', min:45, sleep:7.2, en:4 },
+  { act:'Rest day',                  min:0,  sleep:6.1, en:3 },
+  { act:'Strength · 60 min',         min:60, sleep:7.8, en:5 },
+  { act:'Vinyasa · 35 min',          min:35, sleep:7.0, en:4 },
+  { act:'Run 5K · 50 min',           min:50, sleep:6.4, en:3 },
+  { act:'Walk · 20 min',             min:20, sleep:8.1, en:4 } ];
+
+const REPORTS = {
+  sep: { label:'September', blurb:'Your strongest month so far. Strength days are paying off, and Thursday still costs you.',
+    stats:[['Sessions',17,''],['Active days',19,''],['Avg sleep',7.1,' h'],['Avg protein',84,' g']],
+    ins:[
+      { good:1, t:'Strength days followed by 7h+ sleep', s:'Your energy runs about a point higher the next day.', conf:'Early signal · 11 days',
+        cmp:[['Strength + 7h+',4.3,5],['Other days',3.2,5]], why:'On days after a strength session and at least 7 hours of sleep, you rated energy 4.3 out of 5. Everything else averaged 3.2. This is a pattern in your own logs, not proof of cause, and it gets sturdier with more weeks.' },
+      { good:1, t:'Moving before 10am', s:'Afternoon mood is higher on early-movement days.', conf:'Early signal · 8 days',
+        cmp:[['Before 10am',4.0,5],['After 10am',3.4,5]], why:'Mornings are not magic for everyone, but in your data they line up with a steadier afternoon. Worth keeping two or three a week.' },
+      { good:0, t:'Three hard days in a row', s:'Energy tends to dip on day four.', conf:'Moderate · 3 streaks',
+        cmp:[['Day 4 of streak',2.6,5],['Typical day',3.8,5]], why:'Each time you stacked three intense sessions back to back, day four dropped to 2.6. A lighter day in the middle should help.' },
+      { good:0, t:'Dinner after 9pm', s:'Sleep runs about 38 minutes shorter on those nights.', conf:'Early signal · 6 nights',
+        cmp:[['Dinner after 9pm',6.4,9],['Earlier dinner',7.0,9]], why:'Late meals are not forbidden. They just come with a shorter night for you. Try one earlier-dinner week and compare.' } ],
+    next:['Swap one hard class for mobility or yoga mid-week.','Add about 20 g of protein at breakfast, since it is your lowest meal.','Keep a Sunday 11pm bedtime for two weeks and compare Monday energy.'],
+    gaps:[ { n:'Iron', pct:68, foods:['Lentils','Spinach','Pumpkin seeds','Chickpeas','Red meat'] },
+           { n:'Vitamin D', pct:41, foods:['Salmon','Eggs','Fortified milk','Mushrooms','Sunlight'] },
+           { n:'Omega-3', pct:55, foods:['Salmon','Sardines','Walnuts','Chia seeds'] },
+           { n:'Magnesium', pct:72, foods:['Pumpkin seeds','Almonds','Dark chocolate','Black beans'] },
+           { n:'Fiber', pct:78, foods:['Oats','Raspberries','Lentils','Chia seeds'] } ] },
+  aug: { label:'August', blurb:'Consistency was the story. Lots of sessions, but sleep slipped late in the month.',
+    stats:[['Sessions',14,''],['Active days',16,''],['Avg sleep',6.7,' h'],['Avg protein',76,' g']],
+    ins:[
+      { good:1, t:'Two yoga or Pilates days a week', s:'You reported better mood in weeks that included them.', conf:'Early signal · 4 weeks',
+        cmp:[['2+ gentle days',3.9,5],['0–1 gentle days',3.1,5]], why:'The weeks with at least two gentle sessions had a higher average mood. Four weeks is a small sample, so treat it as a lead.' },
+      { good:0, t:'Sleep under 6.5 hours', s:'Next-day energy fell by about a point and a half.', conf:'Moderate · 9 nights',
+        cmp:[['Under 6.5 h',2.7,5],['6.5 h or more',4.1,5]], why:'Short nights were the clearest drag on your month. Protecting bedtime is the cheapest lever you have.' } ],
+    next:['Aim for a 7-hour floor, even if you skip an evening plan.','Keep the two gentle days; they are working.'],
+    gaps:[ { n:'Iron', pct:61, foods:['Lentils','Spinach','Pumpkin seeds'] },
+           { n:'Vitamin D', pct:38, foods:['Salmon','Eggs','Fortified milk'] },
+           { n:'Magnesium', pct:66, foods:['Pumpkin seeds','Almonds','Black beans'] } ] }
+};
+const RECIPE = { name:'Lemon-miso salmon & lentil bowl', time:'25 min', helps:['Iron','Vitamin D','Omega-3'], base:2,
+  ing:[['Salmon fillet',140,'g'],['Cooked green lentils',150,'g'],['Baby spinach',60,'g'],['White miso',1,'tbsp'],['Lemon',.5,''],['Pumpkin seeds',15,'g'],['Olive oil',1,'tsp']],
+  steps:['Whisk the miso, lemon juice and olive oil. Brush half over the salmon.','Roast the salmon at 200°C for 9 to 11 minutes, until it flakes.','Warm the lentils with a splash of water, then fold in the spinach until it wilts.','Plate the lentils, top with salmon and pumpkin seeds, and spoon over the rest of the dressing.'] };
+
+const CREW = [
+  { n:'Priya S.', sub:'Reformer Lab · 6:02 am' },
+  { n:'Jonah K.', sub:'Riverside loop · 7:15 am' },
+  { n:'Ava R.',   sub:'Home · 12:40 pm' },
+  { n:'Leo M.',   sub:'Iron Room · yesterday' } ];
+const SEED_POSTS = [
+  { id:'p1', who:'Priya S.', sub:'Reformer Lab · 6:02 am', txt:'6am reformer. Nobody warns you the shaking is the point.', scene:'reformer', kudos:14, comments:[['Jonah K.','Respect for the 6am.'],['Ava R.','Take me next week?']] },
+  { id:'p2', who:'Jonah K.', sub:'Riverside loop · 7:15 am', txt:'5K at sunrise. Legs said no, head said yes.', scene:'sunrise', kudos:22, comments:[['Priya S.','Pace?!']] },
+  { id:'p3', who:'Ava R.', sub:'Home · 12:40 pm', txt:'Post-class bowl. Buddy says about 41 g protein, give or take.', scene:'bowl', kudos:9, comments:[] },
+  { id:'p4', who:'Leo M.', sub:'Iron Room · yesterday', txt:'New deadlift PR. Quiet gym, loud head.', scene:'kettle', kudos:31, comments:[['Ava R.','Beast.'],['Jonah K.','Teach me.']] } ];
+const MEETUPS = [
+  { id:'m1', d:'Tomorrow', tm:'7:00 AM', t:'Reformer Pilates', s:'Reformer Lab · Priya + 3 going', n:4 },
+  { id:'m2', d:'Sat',      tm:'9:30 AM', t:'Vinyasa flow',     s:'Sunrise Studio · Ava + 6 going', n:7 },
+  { id:'m3', d:'Sun',      tm:'8:00 AM', t:'Easy 5K',          s:'Riverside loop · Jonah + 10 going', n:11 } ];
+const FRIEND_MIN = [['Priya S.',188],['Jonah K.',164],['Ava R.',142],['Leo M.',96]];
+
+/* ============================================================
+   STATE (localStorage, demo-only)
+   ============================================================ */
+const KEY = 'buddy-demo-v1';
+const fresh = () => ({ day: todayStr, tab:'today', checkin:null,
+  acts:[{ id:'a0', type:'Pilates', studio:'Reformer Lab', min:50, int:3, src:'Manual' }],
+  meals:[{ name:'Oats & berries', k:380, p:14 }],
+  kudos:{}, comments:{}, going:{}, posts:[], joined:false, checks:{}, serv:2, rep:'sep', metric:'min', selDay:6 });
+let S;
+try { S = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { S = null; }
+if (!S) S = fresh();
+if (S.day !== todayStr) { const f = fresh(); S.day = f.day; S.checkin = null; S.acts = f.acts; S.meals = f.meals; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+
+/* ============================================================
+   ART — monochrome "photos" drawn in SVG, so they work offline
+   ============================================================ */
+let uid = 0;
+function rng(seed) { let s = seed; return () => (s = (s * 1664525 + 1013904223) % 4294967296) / 4294967296; }
+function dots(cx, cy, r, n, size, fill, seed) { const R = rng(seed); let o = ''; for (let i = 0; i < n; i++) { const a = R() * 6.283, d = Math.sqrt(R()) * r; o += `<ellipse cx="${(cx + Math.cos(a) * d).toFixed(1)}" cy="${(cy + Math.sin(a) * d).toFixed(1)}" rx="${size}" ry="${size * .55}" transform="rotate(${Math.round(R() * 180)} ${(cx + Math.cos(a) * d).toFixed(1)} ${(cy + Math.sin(a) * d).toFixed(1)})" fill="${fill}"/>`; } return o; }
+function table(id) { return `<defs><linearGradient id="${id}t" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e2e2e2"/><stop offset="1" stop-color="#b9b9b9"/></linearGradient></defs><rect width="400" height="300" fill="url(#${id}t)"/>`; }
+const SCENES = {
+  sunrise: id => `<defs><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3f3f3"/><stop offset="1" stop-color="#9c9c9c"/></linearGradient></defs><rect width="400" height="300" fill="url(#${id}g)"/><circle cx="262" cy="150" r="64" fill="#fff"/><rect y="190" width="400" height="110" fill="#141414"/><path d="M0 214H400M0 240H400M0 270H400" stroke="#3a3a3a" stroke-width="1.5"/><rect x="226" y="198" width="72" height="4" rx="2" fill="#fff" opacity=".8"/><rect x="238" y="210" width="48" height="3" rx="1.5" fill="#fff" opacity=".5"/><rect x="248" y="220" width="28" height="3" rx="1.5" fill="#fff" opacity=".3"/>`,
+  reformer: id => `<rect width="400" height="300" fill="#e7e7e7"/><rect y="228" width="400" height="72" fill="#cfcfcf"/><path d="M36 214L368 162" stroke="#111" stroke-width="12" stroke-linecap="round"/><path d="M36 238L368 186" stroke="#2c2c2c" stroke-width="10" stroke-linecap="round"/><rect x="164" y="150" width="96" height="30" rx="8" fill="#111" transform="rotate(-9 212 165)"/><rect x="56" y="110" width="10" height="110" rx="5" fill="#111"/><path d="M61 112C110 60 170 70 190 150" stroke="#555" stroke-width="3" fill="none"/><path d="M342 150v-60" stroke="#111" stroke-width="8" stroke-linecap="round"/>`,
+  mat: id => `<rect width="400" height="300" fill="#161616"/><path d="M110 300V140a90 90 0 0 1 180 0V300Z" fill="#f4f4f4"/><path d="M110 300L10 300 110 150ZM290 300L390 300 290 150Z" fill="#fff" opacity=".07"/><path d="M200 50V300" stroke="#d8d8d8" stroke-width="2"/><path d="M110 150H290" stroke="#d8d8d8" stroke-width="2"/><rect x="60" y="250" width="150" height="28" rx="14" fill="#555"/><circle cx="74" cy="264" r="12" fill="#777"/><circle cx="74" cy="264" r="5" fill="#161616"/>`,
+  track: id => { let o = '<rect width="400" height="300" fill="#efefef"/>'; for (let i = 0; i < 8; i++) { const a = -160 + i * 80, b = a + 80; o += `<path d="M200 70L${a} 300L${b} 300Z" fill="${i % 2 ? '#f7f7f7' : '#1c1c1c'}"/>`; } return o + '<rect y="0" width="400" height="70" fill="#d9d9d9"/><circle cx="200" cy="70" r="3" fill="#fff"/>'; },
+  kettle: id => `<rect width="400" height="300" fill="#dcdcdc"/><ellipse cx="200" cy="252" rx="96" ry="14" fill="#9a9a9a"/><path d="M148 150C148 60 252 60 252 150" stroke="#111" stroke-width="24" fill="none" stroke-linecap="round"/><circle cx="200" cy="184" r="72" fill="#111"/><path d="M158 160A52 52 0 0 1 206 130" stroke="#fff" stroke-width="5" opacity=".28" fill="none" stroke-linecap="round"/><rect x="178" y="170" width="44" height="22" rx="6" fill="#2a2a2a"/>`,
+  bowl: id => table(id) + `<circle cx="200" cy="154" r="124" fill="#fafafa" stroke="#c9c9c9" stroke-width="3"/><circle cx="200" cy="154" r="96" fill="#f0f0f0" stroke="#e1e1e1"/>` +
+    `<circle cx="164" cy="186" r="50" fill="#fff" stroke="#d6d6d6"/>` + dots(164, 186, 44, 70, 5, '#cfcfcf', 3) +
+    `<g transform="rotate(-18 250 126)"><rect x="214" y="108" width="76" height="34" rx="15" fill="#6c6c6c"/><path d="M224 118q12 7 24 0M246 118q12 7 24 0M224 130q12 7 24 0M246 130q12 7 24 0" stroke="#b0b0b0" stroke-width="2" fill="none"/></g>` +
+    `<path d="M240 196q34-22 56 10q-28 20-56-10z" fill="#2c2c2c"/><path d="M252 200q22-10 36 6" stroke="#8a8a8a" stroke-width="3" fill="none"/>` +
+    dots(140, 108, 24, 16, 6, '#1f1f1f', 11) + `<path d="M180 84q16-26 40-6q-12 24-40 6zM196 96q18-20 38-2" fill="#444" stroke="#222"/>`,
+  yogurt: id => table(id) + `<circle cx="200" cy="154" r="120" fill="#fff" stroke="#c9c9c9" stroke-width="3"/><circle cx="200" cy="154" r="92" fill="#f6f6f6" stroke="#dedede"/>` +
+    dots(176, 124, 30, 18, 9, '#1c1c1c', 5) + `<g fill="#9b9b9b">${[[240,180],[262,160],[226,200],[256,196],[214,176]].map(([x,y],i)=>`<rect x="${x}" y="${y}" width="22" height="12" rx="4" transform="rotate(${i*37} ${x} ${y})"/>`).join('')}</g>` +
+    `<path d="M196 112q26-14 40 0t-6 26t-34 8" stroke="#bdbdbd" stroke-width="6" fill="none" stroke-linecap="round"/>`,
+  plate: id => table(id) + `<circle cx="200" cy="154" r="124" fill="#f8f8f8" stroke="#c9c9c9" stroke-width="3"/><circle cx="200" cy="154" r="98" fill="#efefef" stroke="#e1e1e1"/>` +
+    dots(145, 168, 38, 32, 9, '#b9b9b9', 9) + `<g transform="rotate(14 258 150)"><rect x="224" y="128" width="72" height="22" rx="10" fill="#8d8d8d"/><rect x="230" y="156" width="72" height="22" rx="10" fill="#7a7a7a"/></g>` +
+    `<path d="M170 74q18-24 42-4q-14 24-42 4zM198 88q24-14 40 4q-16 18-40-4z" fill="#3b3b3b" stroke="#222"/>` +
+    `<g fill="#fff" stroke="#bbb">${[[190,214],[216,222],[200,236]].map(([x,y])=>`<rect x="${x}" y="${y}" width="18" height="18" rx="3"/>`).join('')}</g>`
+};
+const SCENE_LABEL = { sunrise:'Sunrise run', reformer:'Reformer Pilates', mat:'Yoga studio light', track:'Track', kettle:'Kettlebell', bowl:'Salmon rice bowl', yogurt:'Yogurt bowl', plate:'Chickpea and chicken plate' };
+function art(scene, label) {
+  const id = 'a' + (++uid);
+  return `<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${esc(label || SCENE_LABEL[scene] || 'Photo')}">${SCENES[scene](id)}<rect width="400" height="300" filter="url(#grain)" opacity=".22" style="mix-blend-mode:multiply"/></svg>`;
+}
+const HEART = '<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.7-9.3C.8 8.2 2.6 4.5 6.2 4.5c2 0 3.5 1.1 4.3 2.6l1.5 2.5 1.5-2.5c.8-1.500 2.300-2.600 4.300-2.600 3.600 0 5.400 3.700 3.900 7.200C19.500 16.400 12 21 12 21z"/></svg>';
+function photo(scene, extra = '', src) {
+  const inner = src ? `<img src="${src}" alt="Your photo">` : art(scene);
+  return `<figure class="photo" data-scene="${scene || ''}" ${extra}>${inner}<span class="burst">${HEART}</span><button class="expand" type="button" data-act="zoom" aria-label="Expand photo"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></button></figure>`;
+}
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+let toastT;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2400); }
+function countUp(el) {
+  const to = parseFloat(el.dataset.to), dec = to % 1 ? 1 : 0;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = to.toFixed(dec); return; }
+  const t0 = performance.now(), dur = 900;
+  (function f(t) { const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = (to * e).toFixed(dec); if (k < 1) requestAnimationFrame(f); })(t0);
+}
+function fileToData(file, max = 640) {
+  return new Promise(res => {
+    const fr = new FileReader();
+    fr.onerror = () => res(null);
+    fr.onload = () => {
+      const im = new Image();
+      im.onerror = () => res(null);
+      im.onload = () => {
+        const k = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement('canvas');
+        c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+        c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+        res(c.toDataURL('image/jpeg', .78));
+      };
+      im.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+const todayMin = () => S.acts.reduce((a, x) => a + x.min, 0);
+const todayProtein = () => S.meals.reduce((a, x) => a + x.p, 0);
+const todayKcal = () => S.meals.reduce((a, x) => a + x.k, 0);
+const dayLabel = i => { const d = new Date(); d.setDate(d.getDate() - (6 - i)); return d.toLocaleDateString(undefined, { weekday:'short' }); };
+function weekRows() {
+  const t = { act: S.acts.length ? S.acts.map(a => `${a.type} · ${a.min} min`).join(', ') : 'Nothing logged yet', min: todayMin(), sleep: S.checkin ? S.checkin.sleep : null, en: S.checkin ? S.checkin.energy : null };
+  return [...WEEK, t];
+}
+function myWeekMin() { return WEEK.slice(3).reduce((a, d) => a + d.min, 0) + todayMin(); } // this week so far
+
+/* ============================================================
+   TODAY
+   ============================================================ */
+const mealUI = { id:null, up:null, scanning:false, scanned:false, items:[], m:[], sel:0 };
+
+function renderToday() {
+  const h = new Date().getHours(), g = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  const ds = new Date().toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' });
+  $('#v-today').innerHTML = `
+  <div class="hello"><h1>${g}.<br><span style="color:var(--mute)">How are you, really?</span></h1><p>${ds}. Ten seconds is all Buddy needs.</p></div>
+  <div class="grid2">
+    <div class="col">
+      <div class="card" id="checkin"></div>
+      <div class="card" id="rings"></div>
+      <div class="card" id="acts"></div>
+    </div>
+    <div class="col">
+      <div class="card" id="meal"></div>
+    </div>
+  </div>`;
+  renderCheckin(); renderRings(); renderActs(); renderMeal();
+}
+
+function renderCheckin() {
+  const c = S.checkin;
+  $('#checkin').innerHTML = `
+    <div class="eyebrow">Daily check-in</div><h2>${c ? 'Checked in' : 'Quick check-in'}</h2>
+    <p class="sub">${c ? 'Update it any time today.' : 'Three sliders. This is the data Buddy learns you from.'}</p>
+    <div class="sl"><label for="s-sleep">Sleep</label><output id="o-sleep">${c ? c.sleep : 7} h</output><input id="s-sleep" type="range" min="4" max="10" step=".5" value="${c ? c.sleep : 7}"><small><span>4 h</span><span>10 h</span></small></div>
+    <div class="sl"><label for="s-energy">Energy</label><output id="o-energy">${c ? c.energy : 3} / 5</output><input id="s-energy" type="range" min="1" max="5" step="1" value="${c ? c.energy : 3}"><small><span>Drained</span><span>Wired</span></small></div>
+    <div class="sl"><label for="s-mood">Mood</label><output id="o-mood">${c ? c.mood : 3} / 5</output><input id="s-mood" type="range" min="1" max="5" step="1" value="${c ? c.mood : 3}"><small><span>Low</span><span>Great</span></small></div>
+    <div style="margin-top:18px"><button class="btn" data-act="checkin">${c ? 'Update check-in' : 'Check in'}</button></div>
+    <div id="reply">${c ? replyHTML(c) : ''}</div>`;
+}
+function reply(c) {
+  const out = [];
+  if (c.sleep < 6.5) out.push('Short night. I would keep today gentle. Mobility or a walk will do more for you than a hard class.');
+  else if (c.sleep >= 7.5) out.push('Solid sleep. Good day to push, since your best weeks start like this.');
+  else out.push('Decent rest. A normal session is on the table.');
+  if (c.energy <= 2) out.push('Energy is low, so get protein in early and water before coffee. Tell me tonight whether it helped.');
+  else if (c.energy >= 4) out.push('Energy is high, which is your window for strength or the harder class.');
+  if (c.mood <= 2) out.push('Mood is low too. In your history, even a 15-minute walk outside shows up as a better-mood day.');
+  return out.join(' ');
+}
+const replyHTML = c => `<div class="bubble"><b>Buddy</b>${esc(reply(c))}</div>`;
+
+function ring(pct, big, small, label, sub) {
+  const R = 44, C = 2 * Math.PI * R, off = C * (1 - clamp(pct, 0, 1));
+  return `<div><div class="ring"><svg viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="${R}"/><circle class="fg" cx="50" cy="50" r="${R}" stroke-dasharray="${C}" stroke-dashoffset="${C}" data-off="${off}"/></svg><div class="v">${big}<small>${small}</small></div></div><div class="rlabel">${label}</div><div class="rsub">${sub}</div></div>`;
+}
+function renderRings() {
+  const c = S.checkin;
+  $('#rings').innerHTML = `<div class="eyebrow">Today</div><div class="rings">
+    ${ring(todayMin() / 45, todayMin(), 'min', 'Move', 'goal 45')}
+    ${ring(todayProtein() / 100, Math.round(todayProtein()), 'g', 'Fuel', 'protein · goal 100')}
+    ${ring(c ? c.sleep / 8 : 0, c ? c.sleep : '–', 'h', 'Rest', c ? 'goal 8' : 'check in')}
+  </div>`;
+  requestAnimationFrame(() => requestAnimationFrame(() => $$('#rings .fg').forEach(e => e.setAttribute('stroke-dashoffset', e.dataset.off))));
+}
+
+const act = { type:'Pilates', min:45, int:3 };
+function renderActs() {
+  $('#acts').innerHTML = `
+    <div class="eyebrow">Movement</div><h2>Log a class or workout</h2>
+    <p class="sub">Any studio, gym or run, in about five seconds.</p>
+    <div class="chips" style="margin-top:14px" id="types">${TYPES.map(t => `<button class="chip ${t === act.type ? 'on' : ''}" data-act="type" data-v="${t}">${t}</button>`).join('')}</div>
+    <div class="formrow">
+      <label class="field"><span>Where (optional)</span><input class="input" id="studio" placeholder="Studio, gym or route" maxlength="40"></label>
+      <div class="field"><span>Duration · <b id="o-min" style="color:var(--fg)">${act.min} min</b></span><input id="s-min" type="range" min="10" max="120" step="5" value="${act.min}" style="accent-color:var(--fg);width:100%;height:30px"></div>
+      <div class="field"><span>Intensity</span><div class="int" id="int">${[1,2,3,4,5].map(i => `<button class="${i === act.int ? 'on' : ''}" data-act="int" data-v="${i}" aria-label="Intensity ${i}">${i}</button>`).join('')}</div></div>
+      <div class="hrow"><button class="btn" data-act="addact">Add to today</button><button class="btn ghost" data-act="import">Import from calendar</button></div>
+      <p class="note" style="margin:0">Calendar import is a sample here. In the full app it reads booking confirmations from any studio.</p>
+    </div>
+    <div class="list">${S.acts.length ? S.acts.map(a => `
+      <div class="row"><div class="ic">${esc(a.type.slice(0, 2))}</div><div><div class="t">${esc(a.type)}${a.studio ? ' · ' + esc(a.studio) : ''}</div><div class="s"><span class="dotsint">${[1,2,3,4,5].map(i => `<i class="${i <= a.int ? 'on' : ''}"></i>`).join('')}</span> · ${esc(a.src)}</div></div><div class="r">${a.min}<span class="sub" style="font-weight:400"> min</span></div></div>`).join('') : '<p class="sub">Nothing yet today.</p>'}</div>`;
+}
+
+function mealItems() { return mealUI.items; }
+function mealTotals() {
+  const t = { k:0, p:0, c:0, f:0, fi:0, mic:new Set() };
+  mealUI.items.forEach((it, i) => { const m = mealUI.m[i]; t.k += it.k * m; t.p += it.p * m; t.c += it.c * m; t.f += it.f * m; t.fi += it.fi * m; if (m > 0) it.mic.forEach(x => t.mic.add(x)); });
+  return t;
+}
+function renderMeal() {
+  const el = $('#meal'), u = mealUI;
+  const thumbs = MEALS.map(m => `<button class="thumb ${u.id === m.id ? 'on' : ''}" data-act="meal" data-v="${m.id}" aria-label="${esc(m.name)}">${art(m.scene, m.name)}</button>`).join('')
+    + (u.up ? `<button class="thumb on" aria-label="Your photo"><img src="${u.up}" alt=""></button>` : '')
+    + `<label class="thumb up" title="Use your own photo" aria-label="Upload your own meal photo">+<input class="sr" type="file" accept="image/*" id="mealfile"></label>`;
+  let body = '';
+  if (!u.id) {
+    body = `<div class="detail" style="margin-top:4px"><b>Pick a meal or add your own photo.</b><p class="sub" style="margin-top:4px">Buddy finds each item, estimates the portion, and shows ranges instead of fake precision. Tap a dot to correct anything it got wrong.</p></div>`;
+  } else {
+    const meal = u.up ? { name:'Your meal', scene:'', items:UPLOAD_ITEMS } : MEALS.find(m => m.id === u.id);
+    const visual = u.up ? `<figure class="photo" ${''}><img src="${u.up}" alt="Your meal photo"></figure>` : `<figure class="photo">${art(meal.scene, meal.name)}</figure>`;
+    const hots = u.scanned ? u.items.map((it, i) => `<button class="hot ${i === u.sel ? 'sel' : ''}" style="left:${it.x}%;top:${it.y}%;animation-delay:${i * 90}ms" data-act="hot" data-v="${i}" aria-label="${esc(it.n)}">${i + 1}</button>`).join('') : '';
+    body = `<div class="plate ${u.scanning ? 'scanning' : ''}">${visual}${u.scanning ? '<div class="scanline"></div>' : ''}${hots}</div>`;
+    if (u.scanning) body += `<div class="detail"><b>Looking at your plate…</b><p class="sub">Finding items and estimating portions.</p></div>`;
+    if (u.scanned) {
+      const t = mealTotals(), lo = Math.round(t.k * .82 / 10) * 10, hi = Math.round(t.k * 1.18 / 10) * 10, it = u.items[u.sel], m = u.m[u.sel];
+      const mac = (nm, v, mx) => `<div class="mac"><span>${nm}</span><div class="bar"><i style="width:${clamp(v / mx * 100, 0, 100)}%"></i></div><b>${round(v)} g</b></div>`;
+      body += `<div style="margin-top:16px"><div class="big">${lo}–${hi}<small>kcal · estimate</small></div>
+        <div class="macros">${mac('Protein', t.p, 60)}${mac('Carbs', t.c, 100)}${mac('Fat', t.f, 40)}${mac('Fiber', t.fi, 15)}</div>
+        <div class="chips" style="margin-bottom:4px">${t.mic.size ? [...t.mic].map(x => `<span class="tag">${esc(x)}</span>`).join('') : '<span class="sub">No standout micronutrients</span>'}</div>
+        <div class="detail"><div class="hrow" style="justify-content:space-between"><div><b>${u.sel + 1}. ${esc(it.n)}</b><div class="sub">about ${Math.round(it.g * m)} g · ${Math.round(it.k * m)} kcal</div></div>
+          <div class="step" aria-label="Portion"><button data-act="portion" data-v="-1" aria-label="Smaller portion">−</button><span>${m}×</span><button data-act="portion" data-v="1" aria-label="Bigger portion">+</button></div></div>
+          <p class="note" style="margin-top:8px">Looks off? Nudge the portion and the totals update.</p></div>
+        <div class="hrow" style="margin-top:14px"><button class="btn" data-act="logmeal">Log this meal</button></div>
+        <p class="note">${u.up ? 'Demo estimate: for your own photos this page shows placeholder items, since it makes no AI calls. ' : ''}Photo estimates tend to run low, so treat the range as a guide.</p></div>`;
+    }
+  }
+  el.innerHTML = `<div class="eyebrow">Food</div><h2>Snap your meal</h2><p class="sub">Photo in, rough macros and nutrients out.</p><div class="mealpick">${thumbs}</div>${body}
+    <div class="list" style="margin-top:18px"><div class="eyebrow" style="margin:0">Logged today · ${todayKcal()} kcal · ${Math.round(todayProtein())} g protein</div>${S.meals.map(m => `<div class="row"><div class="ic">${esc(m.name.slice(0, 1))}</div><div><div class="t">${esc(m.name)}</div></div><div class="r">${m.k}<span class="sub" style="font-weight:400"> kcal</span></div></div>`).join('')}</div>`;
+}
+function pickMeal(id, up) {
+  const u = mealUI;
+  u.id = id; u.up = up || null; u.sel = 0; u.scanned = false; u.scanning = true;
+  u.items = up ? UPLOAD_ITEMS : MEALS.find(m => m.id === id).items;
+  u.m = u.items.map(() => 1);
+  renderMeal();
+  clearTimeout(pickMeal.t);
+  pickMeal.t = setTimeout(() => { u.scanning = false; u.scanned = true; renderMeal(); }, 1400);
+}
+
+/* ============================================================
+   WEEK
+   ============================================================ */
+const METRICS = { min:{ label:'Move', unit:'min', max:70 }, sleep:{ label:'Sleep', unit:'h', max:10 }, en:{ label:'Energy', unit:'/5', max:5 } };
+function renderWeek() {
+  const rows = weekRows(), mt = METRICS[S.metric], sel = rows[S.selDay], tot = rows.reduce((a, d) => a + d.min, 0);
+  const sl = rows.filter(d => d.sleep != null), en = rows.filter(d => d.en != null);
+  const avg = (a, k) => a.length ? round(a.reduce((x, d) => x + d[k], 0) / a.length, 1) : '–';
+  $('#v-week').innerHTML = `
+  <div class="hello"><h1>Your week.</h1><p>Tap a day to see what happened. Switch the view to compare movement, sleep and energy.</p></div>
+  <div class="card" style="margin-top:14px">
+    <div class="chips">${Object.entries(METRICS).map(([k, v]) => `<button class="chip ${S.metric === k ? 'on' : ''}" data-act="metric" data-v="${k}">${v.label}</button>`).join('')}</div>
+    <div class="wk">${rows.map((d, i) => { const v = d[S.metric]; return `<button class="day" data-act="day" data-v="${i}" aria-pressed="${i === S.selDay}" aria-label="${dayLabel(i)}: ${v == null ? 'no data' : v + ' ' + mt.unit}"><span class="val">${v == null ? '–' : v}</span><span class="col2"><i data-h="${v == null ? 0 : clamp(v / mt.max * 100, 0, 100)}" style="height:0"></i></span><span class="dn">${i === 6 ? 'Today' : dayLabel(i)}</span></button>`; }).join('')}</div>
+  </div>
+  <div class="grid2">
+    <div class="card"><div class="eyebrow">${S.selDay === 6 ? 'Today' : dayLabel(S.selDay)}</div><h2>${esc(sel.act)}</h2>
+      <div class="stats" style="grid-template-columns:repeat(3,1fr)"><div class="stat"><div class="big">${sel.min}</div><div class="s">min moved</div></div><div class="stat"><div class="big">${sel.sleep ?? '–'}</div><div class="s">h sleep</div></div><div class="stat"><div class="big">${sel.en ?? '–'}</div><div class="s">energy</div></div></div>
+      <p class="note">${sel.sleep != null && sel.sleep < 6.5 ? 'A short night. Check how the next day felt.' : sel.min >= 55 ? 'A big day. Buddy would pair it with an easier one after.' : 'A steady day.'}</p></div>
+    <div class="card"><div class="eyebrow">7-day summary</div><h2>${tot} minutes</h2><p class="sub">Across ${rows.filter(d => d.min > 0).length} active days.</p>
+      <div class="stats" style="grid-template-columns:repeat(2,1fr)"><div class="stat"><div class="big">${avg(sl, 'sleep')}<small>h</small></div><div class="s">avg sleep</div></div><div class="stat"><div class="big">${avg(en, 'en')}<small>/5</small></div><div class="s">avg energy</div></div></div></div>
+  </div>`;
+  requestAnimationFrame(() => requestAnimationFrame(() => $$('#v-week .col2 i').forEach(e => e.style.height = e.dataset.h + '%')));
+}
+
+/* ============================================================
+   REPORT
+   ============================================================ */
+let openIns = new Set([0]), openGap = null;
+function renderReport() {
+  const R = REPORTS[S.rep], sv = S.serv, k = sv / RECIPE.base;
+  const fmt = n => { const v = round(n * k, 2); return v % 1 === 0 ? v : v.toFixed(2).replace(/0$/, ''); };
+  $('#v-report').innerHTML = `
+  <div class="hello"><div class="chips" style="margin-bottom:14px">${Object.entries(REPORTS).map(([id, r]) => `<button class="chip ${S.rep === id ? 'on' : ''}" data-act="rep" data-v="${id}">${r.label}</button>`).join('')}<span class="tag" style="align-self:center">Sample report</span></div>
+    <h1>Your ${R.label}.</h1><p>${esc(R.blurb)}</p></div>
+  <div class="stats">${R.stats.map(([l, v, u]) => `<div class="stat card" style="padding:16px"><div class="big"><span data-to="${v}">0</span><small>${u}</small></div><div class="s">${l}</div></div>`).join('')}</div>
+  <div class="grid2">
+    <div class="col">
+      <div class="card"><div class="eyebrow">What Buddy noticed</div><h2>Working and not working</h2><p class="sub">Patterns in your own logs. They show what goes together, not what causes what.</p>
+        <div class="list">${R.ins.map((x, i) => `<div class="ins ${x.good ? 'good' : ''} ${openIns.has(i) ? 'open' : ''}"><button data-act="ins" data-v="${i}" aria-expanded="${openIns.has(i)}"><span class="mk">${x.good ? '✓' : '!'}</span><span><span class="tt">${esc(x.t)}</span><br><span class="st">${esc(x.s)}</span></span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="body"><span class="tag">${esc(x.conf)}</span><div class="cmp">${x.cmp.map(([l, v, m], j) => `<div><span>${esc(l)}</span><span class="bar ${j ? 'alt' : ''}"><i style="width:${v / m * 100}%"></i></span><b>${v}</b></div>`).join('')}</div><p>${esc(x.why)}</p></div></div>`).join('')}</div></div>
+      <div class="card"><div class="eyebrow">Try next</div><h2>Your next month</h2><ol class="steps">${R.next.map(x => `<li>${esc(x)}</li>`).join('')}</ol></div>
+    </div>
+    <div class="col">
+      <div class="card"><div class="eyebrow">Nutrient check</div><h2>Likely gaps</h2><p class="sub">Estimated from 30 days of photo logs against typical targets. Tap one for foods that help.</p>
+        <div style="margin-top:10px">${R.gaps.map((g, i) => `<button class="gap ${openGap === i ? 'open' : ''}" data-act="gap" data-v="${i}"><span class="nm">${esc(g.n)} <span class="tag">${g.pct < 60 ? 'likely low' : g.pct < 85 ? 'a bit low' : 'fine'}</span></span><span class="pc">${g.pct}%</span><span class="bar"><i style="width:${g.pct}%"></i></span><span class="foods">${g.foods.map(f => `<span class="chip" style="cursor:default">${esc(f)}</span>`).join('')}</span></button>`).join('')}</div>
+        <p class="note">Photo logging runs low, and only a blood test can confirm a deficiency. Talk to a clinician before supplementing.</p></div>
+      <div class="card recipe"><div class="eyebrow">Cook this</div><h3>${RECIPE.name}</h3><div class="chips"><span class="tag solid">${RECIPE.time}</span>${RECIPE.helps.map(x => `<span class="tag">Helps · ${x}</span>`).join('')}</div>
+        <div class="hrow" style="justify-content:space-between;margin:14px 0 4px"><b>Ingredients</b><div class="step" aria-label="Servings"><button data-act="serv" data-v="-1" aria-label="Fewer servings">−</button><span>${sv}</span><button data-act="serv" data-v="1" aria-label="More servings">+</button></div></div>
+        <div>${RECIPE.ing.map((x, i) => `<label class="ing"><input type="checkbox" data-act="chk" data-v="${i}" ${S.checks[i] ? 'checked' : ''}><span>${fmt(x[1])}${x[2] ? ' ' + x[2] : ''} ${x[0]}</span></label>`).join('')}</div>
+        <ol class="steps">${RECIPE.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol></div>
+    </div>
+  </div>`;
+  $$('#v-report [data-to]').forEach(countUp);
+}
+
+/* ============================================================
+   CREW
+   ============================================================ */
+function posts() { return [...S.posts, ...SEED_POSTS]; }
+function renderCrew() {
+  const me = myWeekMin();
+  const board = [...FRIEND_MIN, ['You', me]].sort((a, b) => b[1] - a[1]);
+  const goal = 200;
+  $('#v-crew').innerHTML = `
+  <div class="hello"><h1>Your crew.</h1><p>A few friends, one weekly goal, and someone to show up with.</p></div>
+  <div class="grid2">
+    <div class="col">
+      <div class="card"><div class="hrow" style="justify-content:space-between"><div class="avs">${CREW.map(c => `<span class="av" title="${esc(c.n)}">${initials(c.n)}</span>`).join('')}<span class="av alt">You</span></div><button class="btn ghost sm" data-act="invite">Invite a friend</button></div>
+        <div class="eyebrow" style="margin-top:18px">This week</div><h2>200 active minutes</h2><p class="sub">${S.joined ? 'You are in. Every session counts.' : 'Join in and your logged time counts toward the crew board.'}</p>
+        <div class="lb">${board.map(([n, v], i) => `<div class="lbrow ${n === 'You' ? 'me' : ''}"><span class="rk">${i + 1}</span><span class="av ${n === 'You' ? '' : 'alt'}">${n === 'You' ? 'You' : initials(n)}</span><span class="nm"><span>${n}</span><span class="bar"><i style="width:${clamp(v / goal * 100, 0, 100)}%"></i></span></span><b>${v}</b></div>`).join('')}</div>
+        <div style="margin-top:16px"><button class="btn ${S.joined ? 'ghost' : ''}" data-act="join">${S.joined ? 'Joined ✓' : 'Join the challenge'}</button></div></div>
+      <div class="card"><div class="eyebrow">Show up together</div><h2>Class buddies</h2><p class="sub">Find someone to go with. It is easier to show up when someone is waiting.</p>
+        <div class="list">${MEETUPS.map(m => { const on = S.going[m.id]; return `<div class="meet"><div class="when"><b>${m.d}</b><span>${m.tm}</span></div><div><div class="t">${m.t}</div><div class="s">${m.s.replace(/\d+ going/, (m.n + (on ? 1 : 0)) + ' going')}</div></div><button class="btn sm ${on ? '' : 'ghost'}" data-act="going" data-v="${m.id}">${on ? 'You’re in' : 'I’m in'}</button></div>`; }).join('')}</div></div>
+    </div>
+    <div class="col">
+      <div class="card line" style="display:flex;gap:12px;align-items:center"><span class="av">You</span><button class="input" style="text-align:left;color:var(--mute);cursor:pointer" data-act="share">Share today's workout with your crew…</button></div>
+      <div class="feed">${posts().map(postHTML).join('')}</div>
+    </div>
+  </div>`;
+}
+function postHTML(p) {
+  const on = S.kudos[p.id], cm = [...p.comments, ...(S.comments[p.id] || [])];
+  const media = p.img ? photo('', `data-post="${p.id}"`, p.img) : photo(p.scene, `data-post="${p.id}"`);
+  return `<article class="post" data-id="${p.id}"><header><span class="av ${p.who === 'You' ? '' : 'alt'}">${p.who === 'You' ? 'You' : initials(p.who)}</span><div><b>${esc(p.who)}</b><small>${esc(p.sub)}</small></div></header>
+    ${media}<p>${esc(p.txt)}</p>
+    <div class="acts"><button class="act ${on ? 'on' : ''}" data-act="kudos" data-v="${p.id}" aria-pressed="${!!on}"><svg class="h" viewBox="0 0 24 24" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-9.7-9.3C.8 8.2 2.6 4.5 6.2 4.5c2 0 3.5 1.1 4.3 2.6l1.5 2.5 1.5-2.5c.8-1.5 2.3-2.6 4.3-2.6 3.6 0 5.4 3.7 3.9 7.2C19.500 16.400 12 21 12 21z"/></svg><span>${p.kudos + (on ? 1 : 0)}</span></button><span class="sub" style="font-size:13px">${cm.length} comment${cm.length === 1 ? '' : 's'} · double-tap the photo</span></div>
+    ${cm.length ? `<div class="cm">${cm.map(([n, t]) => `<p><b>${esc(n)}</b> ${esc(t)}</p>`).join('')}</div>` : ''}
+    <form class="cmform" data-id="${p.id}"><input class="input" placeholder="Say something kind…" maxlength="140" aria-label="Comment"><button class="btn sm ghost" type="submit">Post</button></form></article>`;
+}
+
+/* ============================================================
+   INTERACTIONS
+   ============================================================ */
+function like(id, fig) {
+  if (!S.kudos[id]) { S.kudos[id] = 1; save(); }
+  const b = fig && $('.burst', fig); if (b) { b.classList.remove('go'); void b.offsetWidth; b.classList.add('go'); }
+  const post = $(`.post[data-id="${id}"] .act`);
+  if (post) { post.classList.add('on'); post.setAttribute('aria-pressed', 'true'); const base = posts().find(p => p.id === id).kudos; $('span', post).textContent = base + 1; }
+}
+function openLightbox(fig) {
+  const dlg = $('#lightbox'), svg = $('svg,img', fig), id = fig.dataset.post, p = id && posts().find(x => x.id === id);
+  dlg.innerHTML = `<div class="dlg"><button class="x" data-act="close" aria-label="Close">×</button><figure class="photo">${svg.outerHTML}<span class="burst">${HEART}</span></figure>${p ? `<div><b>${esc(p.who)}</b> <span class="sub">· ${esc(p.sub)}</span><p style="margin-top:6px">${esc(p.txt)}</p></div>` : ''}${p ? `<div><button class="btn ${S.kudos[id] ? '' : 'ghost'}" data-act="lbkudos" data-v="${id}">${S.kudos[id] ? 'Kudos sent' : 'Send kudos'}</button></div>` : ''}</div>`;
+  dlg.showModal();
+}
+function openShare() {
+  const dlg = $('#share'), a = S.acts[0], scenes = ['reformer', 'sunrise', 'mat', 'track', 'kettle'];
+  share.scene = 'mat'; share.img = null;
+  dlg.innerHTML = `<div class="dlg"><button class="x" data-act="close" aria-label="Close">×</button><div class="eyebrow" style="margin:0">Share to your crew</div><h2>${a ? esc(a.type) + ' · ' + a.min + ' min' : 'Share an update'}</h2>
+    <div class="mealpick" id="sh-thumbs" style="margin:0">${scenes.map(s => `<button class="thumb ${s === share.scene ? 'on' : ''}" data-act="shscene" data-v="${s}" aria-label="${SCENE_LABEL[s]}">${art(s)}</button>`).join('')}<label class="thumb up" aria-label="Upload a photo">+<input class="sr" type="file" accept="image/*" id="shfile"></label></div>
+    <input class="input" id="sh-txt" maxlength="140" placeholder="How did it feel?" value="${a ? esc('Got my ' + a.type.toLowerCase() + ' in.') : ''}">
+    <p class="note" style="margin:0">Only your crew sees this. You choose every post.</p>
+    <button class="btn" data-act="post">Post to crew</button></div>`;
+  dlg.showModal();
+}
+const share = { scene:'mat', img:null };
+
+document.addEventListener('click', async e => {
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const a = el.dataset.act, v = el.dataset.v;
+  if (a === 'checkin') {
+    S.checkin = { sleep:+$('#s-sleep').value, energy:+$('#s-energy').value, mood:+$('#s-mood').value }; save();
+    $('#checkin .btn').textContent = 'Update check-in';
+    $('#reply').innerHTML = '<div class="bubble"><b>Buddy</b><span class="dots"><span></span><span></span><span></span></span></div>';
+    renderRings();
+    setTimeout(() => { $('#reply').innerHTML = replyHTML(S.checkin); }, 750);
+  }
+  else if (a === 'type') { act.type = v; $$('#types .chip').forEach(c => c.classList.toggle('on', c.dataset.v === v)); }
+  else if (a === 'int') { act.int = +v; $$('#int button').forEach(b => b.classList.toggle('on', +b.dataset.v === act.int)); }
+  else if (a === 'addact') { S.acts.unshift({ id:'a' + Date.now(), type:act.type, studio:$('#studio').value.trim(), min:act.min, int:act.int, src:'Manual' }); save(); renderActs(); renderRings(); toast('Logged. Nice work.'); }
+  else if (a === 'import') { S.acts.unshift({ id:'a' + Date.now(), type:'Yoga', studio:'Sunrise Studio', min:60, int:2, src:'From calendar' }); save(); renderActs(); renderRings(); toast('Sample import: found 1 booking'); }
+  else if (a === 'meal') pickMeal(v);
+  else if (a === 'hot') { mealUI.sel = +v; renderMeal(); }
+  else if (a === 'portion') { const i = mealUI.sel; mealUI.m[i] = clamp(round(mealUI.m[i] + .25 * +v, 2), 0, 2); renderMeal(); }
+  else if (a === 'logmeal') {
+    const t = mealTotals(), nm = mealUI.up ? 'Your meal' : MEALS.find(m => m.id === mealUI.id).name;
+    S.meals.push({ name:nm, k:Math.round(t.k), p:round(t.p, 1) }); save(); renderMeal(); renderRings(); toast('Meal logged');
+  }
+  else if (a === 'metric') { S.metric = v; save(); renderWeek(); }
+  else if (a === 'day') { S.selDay = +v; save(); renderWeek(); }
+  else if (a === 'rep') { S.rep = v; openIns = new Set([0]); openGap = null; save(); renderReport(); }
+  else if (a === 'ins') { openIns.has(+v) ? openIns.delete(+v) : openIns.add(+v); const box = el.parentElement; box.classList.toggle('open'); el.setAttribute('aria-expanded', box.classList.contains('open')); }
+  else if (a === 'gap') { openGap = openGap === +v ? null : +v; $$('#v-report .gap').forEach((g, i) => g.classList.toggle('open', i === openGap)); }
+  else if (a === 'serv') { S.serv = clamp(S.serv + +v, 1, 8); save(); renderReport(); }
+  else if (a === 'join') { S.joined = !S.joined; save(); renderCrew(); toast(S.joined ? 'You joined the challenge' : 'Left the challenge'); }
+  else if (a === 'going') { S.going[v] = !S.going[v]; save(); renderCrew(); toast(S.going[v] ? 'You’re in. Your crew will see you there.' : 'Removed'); }
+  else if (a === 'invite') {
+    const url = location.origin + location.pathname;
+    try { if (navigator.share) { await navigator.share({ title:'Buddy', text:'Join my wellness crew on Buddy', url }); return; } await navigator.clipboard.writeText(url); toast('Invite link copied'); } catch (err) { toast('Copy this page’s link to invite a friend'); }
+  }
+  else if (a === 'kudos') { if (S.kudos[v]) delete S.kudos[v]; else S.kudos[v] = 1; save(); const art2 = $(`.post[data-id="${v}"]`); const p = posts().find(x => x.id === v); el.classList.toggle('on', !!S.kudos[v]); el.setAttribute('aria-pressed', !!S.kudos[v]); $('span', el).textContent = p.kudos + (S.kudos[v] ? 1 : 0); if (S.kudos[v] && art2) { const b = $('.burst', art2); b.classList.remove('go'); void b.offsetWidth; b.classList.add('go'); } }
+  else if (a === 'zoom') { e.stopPropagation(); openLightbox(el.closest('.photo')); }
+  else if (a === 'lbkudos') { like(v, $('#lightbox .photo')); el.textContent = 'Kudos sent'; el.classList.remove('ghost'); }
+  else if (a === 'close') { el.closest('dialog').close(); }
+  else if (a === 'share') openShare();
+  else if (a === 'shscene') { share.scene = v; share.img = null; $$('#sh-thumbs .thumb').forEach(t => t.classList.toggle('on', t.dataset.v === v)); }
+  else if (a === 'post') {
+    const txt = $('#sh-txt').value.trim() || 'Got it done.', a0 = S.acts[0];
+    S.posts.unshift({ id:'u' + Date.now(), who:'You', sub:(a0 && a0.studio ? a0.studio : 'Today') + ' · just now', txt, scene:share.scene, img:share.img, kudos:0, comments:[] });
+    save(); $('#share').close(); renderCrew(); toast('Posted to your crew');
+  }
+});
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t.id === 's-sleep') $('#o-sleep').textContent = t.value + ' h';
+  else if (t.id === 's-energy') $('#o-energy').textContent = t.value + ' / 5';
+  else if (t.id === 's-mood') $('#o-mood').textContent = t.value + ' / 5';
+  else if (t.id === 's-min') { act.min = +t.value; $('#o-min').textContent = t.value + ' min'; }
+  else if (t.dataset && t.dataset.act === 'chk') { S.checks[t.dataset.v] = t.checked; save(); }
+});
+document.addEventListener('change', async e => {
+  const t = e.target;
+  if (t.id === 'mealfile' && t.files[0]) { const d = await fileToData(t.files[0]); if (d) pickMeal('up', d); else toast('Could not read that image'); }
+  if (t.id === 'shfile' && t.files[0]) { const d = await fileToData(t.files[0]); if (d) { share.img = d; $$('#sh-thumbs .thumb').forEach(x => x.classList.remove('on')); toast('Photo added'); } }
+});
+document.addEventListener('submit', e => {
+  const f = e.target.closest('.cmform'); if (!f) return;
+  e.preventDefault();
+  const i = $('input', f), t = i.value.trim(); if (!t) return;
+  const id = f.dataset.id; (S.comments[id] = S.comments[id] || []).push(['You', t]); save();
+  const y = scrollY; renderCrew(); scrollTo(0, y);
+});
+
+/* photo tilt + double-tap kudos */
+let lastTap = { t:0, el:null };
+document.addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse' || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const f = e.target.closest && e.target.closest('.post .photo'); if (!f) return;
+  const r = f.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+  f.style.setProperty('--ry', ((x - .5) * 7).toFixed(2) + 'deg'); f.style.setProperty('--rx', ((.5 - y) * 7).toFixed(2) + 'deg');
+  f.style.setProperty('--mx', (x * 100) + '%'); f.style.setProperty('--my', (y * 100) + '%');
+});
+document.addEventListener('pointerleave', e => { if (e.target.classList && e.target.classList.contains('photo')) { e.target.style.setProperty('--rx', '0deg'); e.target.style.setProperty('--ry', '0deg'); } }, true);
+document.addEventListener('pointerup', e => {
+  const f = e.target.closest && e.target.closest('.post .photo'); if (!f || e.target.closest('.expand')) return;
+  const now = Date.now();
+  if (lastTap.el === f && now - lastTap.t < 320) { like(f.dataset.post, f); lastTap = { t:0, el:null }; }
+  else lastTap = { t:now, el:f };
+});
+
+/* theme */
+$('#theme').addEventListener('click', () => {
+  const t = document.documentElement.dataset.mwTheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.mwTheme = t; try { localStorage.setItem('mw-theme', t); } catch (e) {}
+  $('meta[name="theme-color"]').content = t === 'dark' ? '#0a0a0a' : '#ffffff';
+});
+
+/* ============================================================
+   NAV
+   ============================================================ */
+const VIEWS = { today:renderToday, week:renderWeek, report:renderReport, crew:renderCrew };
+function go(tab, push) {
+  if (!VIEWS[tab]) tab = 'today';
+  S.tab = tab; save();
+  $$('.view').forEach(v => v.classList.toggle('on', v.id === 'v-' + tab));
+  $$('[data-go]').forEach(b => b.setAttribute('aria-selected', b.dataset.go === tab));
+  VIEWS[tab]();
+  if (push) { history.replaceState(null, '', '#' + tab); scrollTo({ top:0 }); }
+}
+$$('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go, true)));
+window.addEventListener('hashchange', () => go(location.hash.slice(1)));
+go(location.hash.slice(1) || 'today');
+})();
+</script>
+</body>
+</html>
