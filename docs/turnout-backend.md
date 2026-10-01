@@ -58,3 +58,10 @@ Points raising your invite priority can reward early joiners and quietly exclude
 ## Money, honestly
 
 Moving other people's money (the circle pot) triggers payment-compliance questions. Start with a ledger and manual settlement, then use Stripe Connect only after you have retention.
+
+## Setup status
+
+1. Run `docs/turnout-schema.sql`, then `docs/migration-002.sql` (adds the circle functions and seeds the 14 ideas).
+2. In Supabase: Authentication > URL Configuration, set the Site URL to your site and add your site plus `/**` as a redirect URL. Email sign-in works out of the box; phone needs an SMS provider.
+3. The site already contains the project URL and anon key (both public by design). Never put the `service_role` key in the repo.
+4. Phase 1 (done): email sign-in, profile and idea ratings saved, create a circle, invite link, owner approval. Phase 2: run rotation, matching and points on real members.
