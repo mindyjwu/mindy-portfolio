@@ -38,7 +38,7 @@ Young, health-conscious people who pay for fitness (ClassPass, Life Time, Chelse
 
 ## Prototype for the portfolio (matches this repo's style)
 
-Built as `wellness.html` ("Buddy"): plain HTML/CSS/JS with pre-written sample insights and no API calls, so it costs nothing to run or demo.
+Built as [Wellness Buddy](https://github.com/mindyjwu/wellness-buddy) ("Buddy"): plain HTML/CSS/JS with pre-written sample insights and no API calls, so it costs nothing to run or demo.
 
 Screens: (1) Today: log activity + 3-slider check-in + meal photo; (2) Week: calendar of activity with sleep/energy overlay; (3) Report: "what's working / what's not" with next-week recommendations and a recipe.
 
