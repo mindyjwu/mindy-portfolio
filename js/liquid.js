@@ -14,6 +14,7 @@
 
   initRows();
   initReveal();
+  initTimeline();
 
   var canvas = document.getElementById('liquid');
   if (!canvas) return;
@@ -154,13 +155,35 @@
     })(rows[n]);
   }
 
+  // ── History timeline: "now" tracks today; bars and cards light each other up ──
+  function initTimeline() {
+    var tl = document.querySelector('.tl');
+    if (!tl) return;
+    var now = tl.querySelector('.tl-now');
+    if (now) {   // axis runs Jan 2019 to Jan 2027
+      var t0 = Date.UTC(2019, 0, 1), t1 = Date.UTC(2027, 0, 1);
+      var pct = Math.min(100, Math.max(0, (Date.now() - t0) / (t1 - t0) * 100));
+      now.style.setProperty('--e', pct.toFixed(2) + '%');
+    }
+    var items = document.querySelectorAll('[data-k]');
+    function hot(k, on) {
+      for (var i = 0; i < items.length; i++) if (items[i].dataset.k === k) items[i].classList.toggle('is-hot', on);
+    }
+    for (var i = 0; i < items.length; i++) (function (el) {
+      el.addEventListener('pointerenter', function () { hot(el.dataset.k, true); });
+      el.addEventListener('pointerleave', function () { hot(el.dataset.k, false); });
+      el.addEventListener('focus', function () { hot(el.dataset.k, true); });
+      el.addEventListener('blur', function () { hot(el.dataset.k, false); });
+    })(items[i]);
+  }
+
   // ── Scroll reveal (only when motion is welcome and JS runs) ─────────────
   // The <head> script adds .js-reveal only when motion is welcome and
   // IntersectionObserver exists; a CSS fail-safe shows everything after 3s anyway.
   function initReveal() {
     if (!root.classList.contains('js-reveal')) return;
     root.classList.add('reveal-ready');
-    var items = document.querySelectorAll('.sec-h, .prow, .hrow, .about-wrap > *');
+    var items = document.querySelectorAll('.sec-h, .tl, .prow, .hrow, .about-wrap > *');
     if (!items.length) return;
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {

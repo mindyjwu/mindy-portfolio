@@ -1186,25 +1186,106 @@ body.liquid .prow a.pname:not([target])::after {
 body.liquid .prow:hover a.pname:not([target])::after { opacity: 1; transform: none; }
 body.liquid .prow:hover a.pname { color: var(--clay); }
 
-/* History: a silver timeline with glinting beads */
-body.liquid .hlist { border-top: none; position: relative; padding-left: 24px; }
+/* History: a journey timeline (2019 to now) above silver-edged glass cards */
+body.liquid .tl {
+  position: relative; margin: 2px 0 26px; padding: 18px 20px 12px; border-radius: 16px;
+  background: linear-gradient(120deg, rgba(255,255,255,.55), rgba(232,240,245,.35));
+  border: 1px solid rgba(47,102,144,.12); box-shadow: 0 10px 28px rgba(31,74,102,.07);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+body.liquid .tl-lane { display: grid; grid-template-columns: 56px 1fr; align-items: start; }
+body.liquid .tl-lane-name { font-size: 10.5px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-muted); padding-top: 1px; }
+body.liquid .tl-track {
+  position: relative; height: 42px;
+  background: repeating-linear-gradient(90deg, rgba(47,102,144,.10) 0 1px, transparent 1px 12.5%);
+}
+body.liquid .tl-bar { position: absolute; top: 0; left: var(--s); width: max(12px, calc(var(--e) - var(--s))); height: 38px; text-decoration: none; outline-offset: 3px; }
+body.liquid .tl-bar::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 1px; height: 10px; border-radius: 999px;
+  background: linear-gradient(90deg, #8FA9BC, #D7E3EA 45%, #A9BECB);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 2px 8px rgba(31,74,102,.15);
+  transform-origin: left center;
+  transition: transform 1.1s cubic-bezier(.2,.7,.2,1) calc(var(--i, 0) * 140ms + 150ms), box-shadow .3s ease, filter .3s ease;
+}
+body.liquid .tl-now::before { background: linear-gradient(90deg, #6F93AE, #2F6690 70%, #1F4A66); }
+body.liquid .tl-edu::before { background: linear-gradient(90deg, #B7C4CC, #E6EEF3 40%, #8FA9BC); }
+body.liquid .tl-dot::before { background: radial-gradient(circle at 35% 30%, #FFFFFF, #8FA9BC 60%, #5B7D93); }
+body.liquid .tl-now::after {
+  content: ''; position: absolute; right: -4px; top: -1px; width: 14px; height: 14px; border-radius: 50%;
+  background: #2F6690; box-shadow: 0 0 0 3px rgba(246,250,251,.95);
+  animation: tlPulse 2.4s ease-in-out infinite;
+}
+@keyframes tlPulse { 50% { box-shadow: 0 0 0 3px rgba(246,250,251,.95), 0 0 0 9px rgba(47,102,144,.18); } }
+body.liquid .tl-bar span { position: absolute; top: 16px; left: 0; white-space: nowrap; font-size: 11.5px; font-weight: 500; color: var(--ink-soft); transition: color .2s; }
+body.liquid .tl-bar span b { font-weight: 500; }
+body.liquid .tl-bar span .sm { display: none; }
+body.liquid .tl-bar:hover::before, body.liquid .tl-bar.is-hot::before { filter: brightness(1.08); box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 0 0 3px rgba(47,102,144,.16), 0 4px 14px rgba(31,74,102,.25); }
+body.liquid .tl-bar:hover span, body.liquid .tl-bar.is-hot span { color: var(--clay); }
+body.liquid .tl-axis { position: relative; height: 16px; margin-left: 56px; border-top: 1px solid var(--border); }
+body.liquid .tl-axis span { position: absolute; left: var(--p); top: 4px; font-size: 10.5px; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+/* bars draw in once the timeline scrolls into view (only when motion is welcome) */
+html.reveal-ready body.liquid .tl:not(.in) .tl-bar::before { transform: scaleX(0); }
+
+body.liquid .hlist { border-top: none; position: relative; padding-left: 52px; display: flex; flex-direction: column; gap: 14px; }
 body.liquid .hlist::before {
-  content: ''; position: absolute; left: 4px; top: 12px; bottom: 12px; width: 2px; border-radius: 2px;
-  background: linear-gradient(180deg, rgba(47,102,144,.55), rgba(183,196,204,.40) 65%, rgba(183,196,204,0));
+  content: ''; position: absolute; left: 17px; top: 26px; bottom: 26px; width: 2px; border-radius: 2px;
+  background: linear-gradient(180deg, rgba(47,102,144,.55), rgba(183,196,204,.45) 70%, rgba(183,196,204,.1));
 }
-html[data-mw-theme="dark"] body.liquid .hlist::before { background: linear-gradient(180deg, rgba(140,188,224,.6), rgba(140,188,224,.18) 65%, rgba(140,188,224,0)); }
-body.liquid .hrow { position: relative; }
+body.liquid .hrow {
+  position: relative; isolation: isolate; grid-template-columns: 118px 1fr; gap: 1.25rem;
+  padding: 18px 20px; border: 1px solid rgba(47,102,144,.12); border-radius: 16px;
+  background: linear-gradient(120deg, rgba(255,255,255,.55), rgba(236,243,247,.38));
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  box-shadow: 0 10px 28px rgba(31,74,102,.07); scroll-margin-top: 84px;
+  transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s ease, border-color .35s ease;
+}
 body.liquid .hrow::before {
-  content: ''; position: absolute; left: -24px; top: 23px; width: 10px; height: 10px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #FFFFFF, #B7C4CC 55%, #7C8E99);
-  box-shadow: 0 0 0 3px rgba(246,250,251,.95), 0 0 12px rgba(47,102,144,.35);
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; opacity: 0;
+  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.9), rgba(255,255,255,0) 62%);
+  transition: opacity .35s ease;
 }
-html[data-mw-theme="dark"] body.liquid .hrow::before {
-  background: radial-gradient(circle at 35% 30%, #FFFFFF, #8CBCE0 55%, #3B5466);
-  box-shadow: 0 0 0 3px rgba(14,22,29,.95), 0 0 14px rgba(140,188,224,.45);
+body.liquid .hrow:hover, body.liquid .hrow.is-hot, body.liquid .hrow:target {
+  transform: translateY(-2px); border-color: rgba(47,102,144,.28); box-shadow: 0 14px 34px rgba(31,74,102,.13);
 }
-body.liquid .hlist .hrow:first-child::before { animation: beadGlow 2.8s ease-in-out infinite; }
-@keyframes beadGlow { 50% { box-shadow: 0 0 0 3px rgba(246,250,251,.95), 0 0 22px rgba(47,102,144,.7); } }
+body.liquid .hrow:hover::before, body.liquid .hrow.is-hot::before, body.liquid .hrow:target::before { opacity: 1; }
+body.liquid .hbadge {
+  position: absolute; left: -52px; top: 16px; width: 36px; height: 36px; border-radius: 50%;
+  display: grid; place-items: center; font-family: 'Fraunces', serif; font-weight: 600; font-size: 13px; color: #16232E;
+  background: radial-gradient(circle at 32% 28%, #FFFFFF, #D7E3EA 45%, #9DB3C2 100%);
+  box-shadow: 0 0 0 4px rgba(246,250,251,.95), 0 4px 12px rgba(31,74,102,.22), inset 0 -2px 4px rgba(31,74,102,.15);
+}
+body.liquid .hbadge--sm { font-size: 10px; letter-spacing: .02em; }
+body.liquid .hbadge--now { animation: badgeGlow 2.8s ease-in-out infinite; }
+@keyframes badgeGlow { 50% { box-shadow: 0 0 0 4px rgba(246,250,251,.95), 0 0 20px rgba(47,102,144,.55), inset 0 -2px 4px rgba(31,74,102,.15); } }
+body.liquid .hmeta { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+body.liquid .htype { font-size: 10.5px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; border: 1px solid; }
+body.liquid .htype--work   { color: #1F4A66; border-color: rgba(47,102,144,.35); background: rgba(47,102,144,.08); }
+body.liquid .htype--intern { color: #3E6B80; border-color: rgba(91,143,168,.35); background: rgba(91,143,168,.08); }
+body.liquid .htype--edu    { color: #5C6E79; border-color: rgba(124,142,153,.4); background: rgba(183,196,204,.18); }
+body.liquid .hloc { font-size: 12.5px; color: var(--ink-muted); }
+body.liquid .hchips { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; padding: 0; }
+body.liquid .hchips li {
+  font-size: 12.5px; font-weight: 500; color: var(--clay-dark); padding: 4px 10px; border-radius: 999px;
+  background: linear-gradient(120deg, rgba(227,238,245,.9), rgba(255,255,255,.7)); border: 1px solid rgba(47,102,144,.14);
+}
+
+html[data-mw-theme="dark"] body.liquid .tl,
+html[data-mw-theme="dark"] body.liquid .hrow {
+  background: linear-gradient(120deg, rgba(38,58,74,.55), rgba(22,34,44,.42)); border-color: rgba(230,238,243,.09);
+  box-shadow: 0 10px 28px rgba(0,0,0,.25);
+}
+html[data-mw-theme="dark"] body.liquid .tl-track { background: repeating-linear-gradient(90deg, rgba(140,188,224,.10) 0 1px, transparent 1px 12.5%); }
+html[data-mw-theme="dark"] body.liquid .tl-bar::before { background: linear-gradient(90deg, #4A6478, #9FB8C9 45%, #5F7C90); box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 2px 8px rgba(0,0,0,.3); }
+html[data-mw-theme="dark"] body.liquid .tl-now::before { background: linear-gradient(90deg, #5B8FA8, #8CBCE0 70%, #B7D5EC); }
+html[data-mw-theme="dark"] body.liquid .tl-now::after { background: #8CBCE0; box-shadow: 0 0 0 3px rgba(14,22,29,.95); }
+html[data-mw-theme="dark"] body.liquid .hrow::before { background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(140,188,224,.18), rgba(140,188,224,0) 62%); }
+html[data-mw-theme="dark"] body.liquid .hrow:hover, html[data-mw-theme="dark"] body.liquid .hrow.is-hot, html[data-mw-theme="dark"] body.liquid .hrow:target { border-color: rgba(140,188,224,.3); box-shadow: 0 14px 34px rgba(0,0,0,.35); }
+html[data-mw-theme="dark"] body.liquid .hlist::before { background: linear-gradient(180deg, rgba(140,188,224,.6), rgba(140,188,224,.2) 70%, rgba(140,188,224,.05)); }
+html[data-mw-theme="dark"] body.liquid .hbadge { color: #0E161D; background: radial-gradient(circle at 32% 28%, #FFFFFF, #B7D5EC 45%, #5B8FA8 100%); box-shadow: 0 0 0 4px rgba(14,22,29,.95), 0 4px 12px rgba(0,0,0,.4); }
+html[data-mw-theme="dark"] body.liquid .htype--work   { color: #B7D5EC; border-color: rgba(140,188,224,.35); background: rgba(140,188,224,.10); }
+html[data-mw-theme="dark"] body.liquid .htype--intern { color: #9FC3D6; border-color: rgba(116,167,192,.35); background: rgba(116,167,192,.10); }
+html[data-mw-theme="dark"] body.liquid .htype--edu    { color: #AEC1CE; border-color: rgba(174,193,206,.3); background: rgba(174,193,206,.08); }
+html[data-mw-theme="dark"] body.liquid .hchips li { color: #B7D5EC; background: rgba(140,188,224,.10); border-color: rgba(140,188,224,.2); }
 
 /* About photo: a silver rim */
 body.liquid .about-wrap img.me {
@@ -1213,18 +1294,28 @@ body.liquid .about-wrap img.me {
 
 /* Scroll reveal. html.js-reveal is set in <head> only when motion is welcome;
    the fail-safe animation shows everything after 3s even if the script never runs. */
-html.js-reveal body.liquid :is(.sec-h, .prow, .hrow, .about-wrap > *) {
+html.js-reveal body.liquid :is(.sec-h, .tl, .prow, .hrow, .about-wrap > *) {
   opacity: 0; translate: 0 18px;
   transition: opacity .8s ease var(--d, 0ms), translate .9s cubic-bezier(.2,.7,.2,1) var(--d, 0ms), transform .35s cubic-bezier(.2,.7,.2,1);
 }
-html.js-reveal body.liquid :is(.sec-h, .prow, .hrow, .about-wrap > *).in { opacity: 1; translate: none; }
+html.js-reveal body.liquid :is(.sec-h, .tl, .prow, .hrow, .about-wrap > *).in { opacity: 1; translate: none; }
 /* Only if liquid.js never ran (it adds .reveal-ready at once). */
-html.js-reveal:not(.reveal-ready) body.liquid :is(.sec-h, .prow, .hrow, .about-wrap > *) { animation: revealFailsafe 0s linear 3s forwards; }
+html.js-reveal:not(.reveal-ready) body.liquid :is(.sec-h, .tl, .prow, .hrow, .about-wrap > *) { animation: revealFailsafe 0s linear 3s forwards; }
 @keyframes revealFailsafe { to { opacity: 1; translate: none; } }
 
 @media (max-width: 600px) {
   body.liquid .prow { margin: 0 -10px; padding: 16px 10px; }
   body.liquid .prow::after { left: 10px; right: 10px; }
-  body.liquid .hlist { padding-left: 20px; }
-  body.liquid .hrow::before { left: -20px; top: 21px; }
+  body.liquid .tl { padding: 14px 12px 10px; }
+  body.liquid .tl-lane { grid-template-columns: 44px 1fr; }
+  body.liquid .tl-axis { margin-left: 44px; }
+  body.liquid .tl-axis span { font-size: 9.5px; }
+  body.liquid .tl-bar span { font-size: 10.5px; }
+  body.liquid .tl-bar span .lg { display: none; }
+  body.liquid .tl-bar span .sm { display: inline; }
+  body.liquid .hlist { padding-left: 40px; gap: 12px; }
+  body.liquid .hlist::before { left: 13px; }
+  body.liquid .hrow { grid-template-columns: 1fr; gap: .3rem; padding: 16px; }
+  body.liquid .hbadge { left: -40px; width: 28px; height: 28px; font-size: 11px; }
+  body.liquid .hbadge--sm { font-size: 8px; }
 }

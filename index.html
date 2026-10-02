@@ -232,39 +232,73 @@ html[data-mw-theme="dark"] .mpnav__theme .moon{display:none;}
 <!-- ===================== HISTORY ===================== -->
 <section class="sec" id="history">
   <h2 class="sec-h">History</h2>
+
+  <div class="tl" role="group" aria-label="History timeline">
+    <div class="tl-lane">
+      <span class="tl-lane-name">Work</span>
+      <div class="tl-track">
+        <a class="tl-bar tl-dot" href="#h-twm" data-k="twm" style="--s:18.75%;--e:20.83%;--i:1"><span><b class="lg">TWM · NVIDIA</b><b class="sm">NVIDIA</b></span></a>
+        <a class="tl-bar tl-dot" href="#h-kpmg" data-k="kpmg" style="--s:42.71%;--e:45.83%;--i:2"><span>KPMG</span></a>
+        <a class="tl-bar tl-now" href="#h-qvest" data-k="qvest" style="--s:57.29%;--e:96.9%;--i:3"><span>Qvest</span></a>
+      </div>
+    </div>
+    <div class="tl-lane">
+      <span class="tl-lane-name">School</span>
+      <div class="tl-track">
+        <a class="tl-bar tl-edu" href="#h-nyu" data-k="nyu" style="--s:7.29%;--e:54.17%;--i:0"><span>NYU</span></a>
+      </div>
+    </div>
+    <div class="tl-axis" aria-hidden="true">
+      <span style="--p:0%">2019</span><span style="--p:12.5%">2020</span><span style="--p:25%">2021</span><span style="--p:37.5%">2022</span>
+      <span style="--p:50%">2023</span><span style="--p:62.5%">2024</span><span style="--p:75%">2025</span><span style="--p:87.5%">2026</span>
+    </div>
+  </div>
+
   <div class="hlist">
 
-    <div class="hrow">
+    <article class="hrow" id="h-qvest" data-k="qvest">
+      <div class="hbadge hbadge--now" aria-hidden="true">Q</div>
       <div class="hyear">2023 to present</div>
       <div>
+        <div class="hmeta"><span class="htype htype--work">Work</span><span class="hloc">New York</span></div>
         <div class="htitle">Technology Consultant, <span class="org">Qvest.US</span></div>
         <div class="hdesc">Deploy agentic AI and RAG systems for Fortune 500 media &amp; entertainment clients. Drove 4,000+ enterprise apps to 100% mapping completion during a $110B M&amp;A separation, and built AI contract-intelligence and multi-agent platform prototypes from design through production.</div>
+        <ul class="hchips"><li>4,000+ apps mapped</li><li>$110B M&amp;A separation</li><li>96% extraction accuracy</li><li>Multi-agent AI</li></ul>
       </div>
-    </div>
+    </article>
 
-    <div class="hrow">
+    <article class="hrow" id="h-kpmg" data-k="kpmg">
+      <div class="hbadge" aria-hidden="true">K</div>
       <div class="hyear">Summer 2022</div>
       <div>
+        <div class="hmeta"><span class="htype htype--intern">Internship</span><span class="hloc">Taipei</span></div>
         <div class="htitle">Data Analytics Consultant Intern, <span class="org">KPMG</span></div>
         <div class="hdesc">Built 6+ BI dashboards and customer-segmentation models for enterprise clients in Taipei, turning multi-million-dollar sales data into recommendations that informed $10M+ in capital decisions and a $15M+ revenue-optimization roadmap.</div>
+        <ul class="hchips"><li>6+ BI dashboards</li><li>$10M+ capital decisions</li><li>$15M+ revenue roadmap</li></ul>
       </div>
-    </div>
+    </article>
 
-    <div class="hrow">
+    <article class="hrow" id="h-twm" data-k="twm">
+      <div class="hbadge" aria-hidden="true">TM</div>
       <div class="hyear">Summer 2020</div>
       <div>
+        <div class="hmeta"><span class="htype htype--intern">Internship</span><span class="hloc">Taipei</span></div>
         <div class="htitle">GTM Solutions Intern, <span class="org">Taiwan Mobile &amp; NVIDIA</span></div>
         <div class="hdesc">Supported the 5G GeForce NOW launch by running product demos and technical deep-dives with partners like Acer, ASUS and Razer, and presented edge-computing ROI analysis to C-suite executives.</div>
+        <ul class="hchips"><li>5G GeForce NOW launch</li><li>Acer · ASUS · Razer</li><li>C-suite ROI analysis</li></ul>
       </div>
-    </div>
+    </article>
 
-    <div class="hrow">
+    <article class="hrow" id="h-nyu" data-k="nyu">
+      <div class="hbadge hbadge--sm" aria-hidden="true">NYU</div>
       <div class="hyear">2019 to 2023</div>
       <div>
+        <div class="hmeta"><span class="htype htype--edu">Education</span><span class="hloc">New York · Paris</span></div>
         <div class="htitle">B.A. Computer Science &amp; Data Science, <span class="org">New York University</span></div>
         <div class="hdesc">Minors in Economics and Business of Entertainment, Media &amp; Technology; studied abroad at NYU Paris. Co-founded the NYU Data Science Club and served as President of the Taiwanese American Student Society.</div>
+        <ul class="hchips"><li>Minors: Economics, BEMT</li><li>NYU Paris 2022</li><li>Data Science Club co-founder</li><li>TASS president</li></ul>
       </div>
-    </div>
+    </article>
 
   </div>
 </section>
