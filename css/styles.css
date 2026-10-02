@@ -1132,6 +1132,10 @@ html[data-mw-theme="dark"] body.liquid .about-wrap h1 {
   background-image: linear-gradient(105deg, #AEC1CE 0%, #E6EEF3 30%, #8CBCE0 44%, #FFFFFF 50%, #8CBCE0 56%, #E6EEF3 70%, #AEC1CE 100%);
 }
 body.liquid .intro h1 { font-size: clamp(46px, 8.5vw, 92px); letter-spacing: -0.02em; line-height: 1.02; }
+/* background-clip:text only paints inside the box, so give descenders (the "y") room below
+   and pull the following text back up by the same amount so the layout doesn't shift. */
+body.liquid .intro h1 { padding-bottom: 0.16em; margin-bottom: calc(1rem - 0.16em); }
+body.liquid .about-wrap h1 { padding-bottom: 0.16em; margin-bottom: calc(1.5rem - 0.16em); }
 @keyframes silverSheen { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0% 0; } }
 
 /* Section headings trail off into a silver hairline */
