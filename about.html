@@ -34,9 +34,9 @@
   <style>
     .about-wrap { max-width: 640px; margin: 0 auto; padding: 76px 2rem 64px; }
     .about-wrap img.me {
-      width: 116px; height: 116px;
+      float: right; width: 220px; height: 275px;
       object-fit: cover; object-position: center top;
-      border-radius: 16px; display: block; margin-bottom: 1.75rem;
+      border-radius: 18px; display: block; margin: 6px 0 1.25rem 2rem;
     }
     .about-wrap h1 {
       font-family: 'Fraunces', serif;
@@ -59,7 +59,7 @@
     .about-wrap .ab-proj a { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; color: var(--ink); text-decoration: none; }
     .about-wrap .ab-proj a:hover { color: var(--clay); }
     .about-wrap .ab-proj p { font-size: 15.5px; line-height: 1.65; margin: 4px 0 0; }
-    .about-wrap .ab-video { position: relative; aspect-ratio: 16 / 9; max-width: 100%; margin: 1.5rem 0 0.5rem; border-radius: 14px; overflow: hidden; background: #0E161D; box-shadow: 0 0 0 1px rgba(255,255,255,.6), 0 0 0 5px rgba(183,196,204,.3), 0 18px 40px rgba(31,74,102,.16); }
+    .about-wrap .ab-video { position: relative; aspect-ratio: 16 / 9; max-width: 100%; margin: 1.25rem 0; border-radius: 14px; overflow: hidden; background: #0E161D; box-shadow: 0 0 0 1px rgba(255,255,255,.6), 0 0 0 5px rgba(183,196,204,.3), 0 18px 40px rgba(31,74,102,.16); }
     .about-wrap .ab-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
     .about-wrap .ab-h3 { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-muted); margin: 2.25rem 0 .75rem; }
     .about-wrap .ab-more { list-style: none; padding: 0; margin: 0; }
@@ -67,7 +67,10 @@
     .about-wrap .ab-more a { color: var(--ink); font-weight: 500; text-decoration: none; border-bottom: 1px solid rgba(47,102,144,.3); }
     .about-wrap .ab-more a:hover { color: var(--clay); border-color: var(--clay); }
     .about-wrap p a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
-    @media (max-width: 600px) { .about-wrap { padding: 52px 1.5rem 48px; } }
+    @media (max-width: 600px) {
+      .about-wrap { padding: 52px 1.5rem 48px; }
+      .about-wrap img.me { float: none; width: 168px; height: 210px; margin: 0 0 1.5rem; }
+    }
   </style>
 </head>
 <body class="liquid">
@@ -134,7 +137,7 @@ html[data-mw-theme="dark"] .mpnav__theme .moon{display:none;}
     <iframe src="https://www.youtube-nocookie.com/embed/BFul90BFjGc?start=891&amp;rel=0" title="Jacob Collier Improvises With Orchestra (Live in San Francisco)" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
   </div>
 
-  <p>Most of us are not Jacob Collier. We were not born with perfect pitch or his kind of musical gift, but every one of us is talented in our own way: how we see a problem, how we read a room, the taste we have built over a lifetime. That is why I care about building AI tools, and about helping people understand how to work with them well. I do not see AI as the star of the show. I see it as the orchestra and the crowd that harmonize around him. He is still the one conducting. He picks the key, sets the feeling and decides where the music goes, and everyone around him turns one voice into something far bigger than it could be alone. That is what I hope AI can be for all of us: not a replacement for our taste and judgment, but an amplifier that helps each of us do our best work.</p>
+  <p>Most of us are not Jacob Collier. We were not born with his kind of musical gift, but every one of us is unique in our own way: how we see a problem, how we read a room, the taste we have built over a lifetime. That is why I care about building AI tools, and about helping people understand how to work with them well. AI is not the star of the show, it is the orchestra and the crowd that harmonize around him. He is still the one conducting. He picks the key, sets the feeling and decides where the music goes, and everyone around him turns one voice into something far bigger than it could be alone. That is what I hope AI can be for all of us: not a replacement for our taste and judgment, but an amplifier that helps each of us do our best work.</p>
 
 
   <h2 class="ab-h">What I am building</h2>
