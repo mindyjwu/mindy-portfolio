@@ -158,7 +158,8 @@
     box-shadow: 0 0 0 1px var(--silver-3), 0 10px 26px -14px rgba(255,255,255,.5), inset 0 1px 0 rgba(255,255,255,.14);
   }
   .step-btn.active .step-num { background: var(--silver-grad); background-size: 200%; color: #17161a; border: none; animation: sheen 4s linear infinite; }
-  .step-btn:disabled { opacity: .38; cursor: not-allowed; }
+  .step-btn:disabled, .step-btn.is-locked { opacity: .42; }
+  .step-btn.is-locked { cursor: pointer; }
 
   /* --- cards --- */
   .card {
@@ -206,6 +207,10 @@
   .btn-primary:hover::after { animation: glare .8s ease; }
   @keyframes glare { from { left:-60%; } to { left:130%; } }
   .btn-ghost { background: transparent; }
+  /* "already loaded" state: must also reset btn-primary's dark ink, or it's dark-on-dark */
+  .btn-primary.is-loaded { background: transparent; background-image: none; color: var(--ink-dim);
+    border: 1px solid var(--line-2); box-shadow: none; animation: none; font-weight: 700; }
+  .btn-primary.is-loaded::after { display: none; }
   .btn-block { width: 100%; }
   .btn-sm { min-height: 38px; font-size: 0.82rem; padding: 0 12px; }
 
@@ -477,7 +482,7 @@ html[data-mw-theme="dark"] .mpnav__theme .moon{display:none;}
   <section id="view-prioritize" hidden>
     <div class="card">
       <h2 class="section-title">⭐ Artist Prioritization</h2>
-      <p class="section-sub">Tap the star to add a set to your plan, then set its priority.</p>
+      <p class="section-sub">Tap <b>H</b>, <b>M</b> or <b>L</b> to add an artist to your plan at that priority — or tap the star to add one and set it later.</p>
       <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:0.78rem;color:var(--ink-dim);margin-bottom:14px;">
         <span><span class="pill pill-high">H · Must See</span></span>
         <span><span class="pill pill-medium">M · Want to See</span></span>
@@ -1530,7 +1535,7 @@ const UI = {
     ["setup", "prioritize", "dashboard"].forEach(name => { UI.el("view-" + name).hidden = (name !== v); });
     document.querySelectorAll(".step-btn").forEach(b => {
       b.classList.toggle("active", b.dataset.view === v);
-      b.disabled = (b.dataset.view !== "setup" && !state.festival);
+      b.classList.toggle("is-locked", b.dataset.view !== "setup" && !state.festival);
     });
     const sec = UI.el("view-" + v);
     if (v === "prioritize") UI.renderPrioritize();
@@ -1623,7 +1628,7 @@ const UI = {
           <div class="set-info"><div class="set-artist">${UI.esc(s.artist)}</div>
           <div class="set-time">${UI.esc(s.start)}–${UI.esc(s.end)} · ${Time.dur(s.iv.len)}</div></div>
           <div class="prio-group">
-            ${["high", "medium", "low"].map(lv => `<button class="prio-btn ${on && p.level === lv ? "sel-" + lv : ""}" data-prio="${s.id}" data-level="${lv}" ${on ? "" : "disabled"} title="${PRIO[lv].label}">${PRIO[lv].short}</button>`).join("")}
+            ${["high", "medium", "low"].map(lv => `<button class="prio-btn ${on && p.level === lv ? "sel-" + lv : ""}" data-prio="${s.id}" data-level="${lv}" title="${PRIO[lv].label}${on ? "" : " — also adds this set to your plan"}">${PRIO[lv].short}</button>`).join("")}
           </div></div>`;
       }
       html += `</div>`;
@@ -1642,7 +1647,13 @@ const UI = {
     else state.priorities[id] = { starred: true, level: p.level || "medium" };
     Store.save(state); UI.renderPrioritize();
   },
-  setPriority(id, level) { const p = state.priorities[id]; if (!p || !p.starred) return; p.level = level; Store.save(state); UI.renderPrioritize(); },
+  setPriority(id, level) {
+    // Clicking H/M/L is the natural way to prioritize, so it stars the set too.
+    const p = state.priorities[id];
+    if (p && p.starred) p.level = level;
+    else state.priorities[id] = { starred: true, level: level };
+    Store.save(state); UI.renderPrioritize();
+  },
 
   renderDashboard() {
     if (!UI.days().includes(state.activeDay)) state.activeDay = UI.days()[0];
@@ -1903,11 +1914,22 @@ function init() {
 
   const saved = Store.load();
   if (saved && saved.festival) { state = Object.assign(state, saved); state.priorities = state.priorities || {}; state.transit = state.transit || {}; }
+  else if (Data.byId[sel.value]) { loadLibraryEntry(Data.byId[sel.value]); }   // first visit: load the shown event so nothing is a dead end
+
+  function syncLoadBtn() {
+    const e = Data.byId[sel.value], btn = UI.el("loadSampleBtn");
+    const isLoaded = !!(state.festival && e && state.festival.name === e.name);
+    btn.textContent = isLoaded ? "✓ Loaded" : "Load Event";
+    btn.classList.toggle("is-loaded", isLoaded);
+  }
+  sel.addEventListener("change", syncLoadBtn);
+  window.syncLoadBtn = syncLoadBtn;
 
   UI.el("loadSampleBtn").addEventListener("click", () => {
     const entry = Data.byId[sel.value];
     if (!entry) { UI.toast("Pick an event first."); return; }
     loadLibraryEntry(entry);
+    syncLoadBtn();
     UI.el("parseMsg").innerHTML = `<span style="color:var(--ok)">✓ Loaded “${UI.esc(entry.name)}”.</span>`;
     UI.toast("Event loaded 🎉");
   });
@@ -1928,7 +1950,11 @@ function init() {
   UI.el("festName").addEventListener("input", e => { if (state.festival) { state.festival.name = e.target.value; Store.save(state); } });
   UI.el("resetBtn").addEventListener("click", resetAll);
 
-  document.querySelectorAll(".step-btn").forEach(b => b.addEventListener("click", () => { if (!b.disabled) UI.setView(b.dataset.view); }));
+  document.querySelectorAll(".step-btn").forEach(b => b.addEventListener("click", () => {
+    // Never fail silently: say what's missing instead of looking like a dead button.
+    if (b.dataset.view !== "setup" && !state.festival) { UI.toast("Pick an event, then press Load Event"); UI.setView("setup"); return; }
+    UI.setView(b.dataset.view);
+  }));
   UI.el("toPrioritize").addEventListener("click", () => UI.setView("prioritize"));
   UI.el("backToSetup").addEventListener("click", () => UI.setView("setup"));
   UI.el("toDashboard").addEventListener("click", () => UI.setView("dashboard"));
@@ -1944,6 +1970,7 @@ function init() {
   }
 
   UI.renderSetup();
+  syncLoadBtn();
   UI.setView(state.festival ? (state.view || "setup") : "setup");
 }
 
