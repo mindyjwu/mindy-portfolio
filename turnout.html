@@ -429,7 +429,7 @@ function roomScore(ids,A,fair){
   return s;
 }
 function buildRoom(hostId,size,noise){
-  const A=adj(),all=S.members.map(m=>m.id),must=[...new Set([hostId,'me'])];
+  const A=adj(),all=S.members.map(m=>m.id),must=[...new Set([hostId,...(byId('me')?['me']:[])])];
   const att=all.map(id=>S.attended[id]||0),mx=Math.max(...att,0);
   const fair={};all.forEach(id=>fair[id]=.6*(mx-(S.attended[id]||0))/(mx+1)+.8*Math.min(byId(id).points||0,250)/250+((S.attended[id]||0)===0?.4:0)+(noise?Math.random()*.5:0));
   size=Math.min(size,all.length);
@@ -511,7 +511,7 @@ function renderCircle(){
         <div class="row" style="justify-content:center;margin-top:10px"><button class="btn g" data-act="goparty">Plan the party →</button><button class="btn ghost sm" data-act="pass">Can't this month</button></div></div>`
       :`<div style="text-align:center"><button class="btn" data-act="spin" ${ui.spinning||!pool.length?'disabled':''}>Spin for ${mLabel(S.nextYm)}</button>
         <p class="note" style="margin-top:10px">Longer since someone last hosted means a slightly bigger chance. Everyone eligible gets a real shot.</p></div>`}
-      ${byId('me')?`<label class="check" style="margin-top:14px"><input type="checkbox" data-act="skipme" ${meSkip?'checked':''}> <span>Skip me this month (I stay in the pool for later)</span></label>`:''}
+      ${byId('me')?`<label class="check" style="margin-top:14px"><input type="checkbox" data-act="skipme" ${meSkip?'checked':''}> <span>Skip me this month (I stay in the pool for later)</span></label>`:`<p class="note" style="margin-top:14px;text-align:center">You're exploring a sample circle. Spin, plan a party, look around. <button class="btn sm g" data-act="setup" data-step="1">Join to get your turn</button></p>`}
     </div>
     <div class="card tint-g">
       <h2>Next six months</h2>
@@ -721,6 +721,7 @@ function mix(noise){
   document.querySelector('[data-act=mix]').textContent='Reshuffle';
 }
 function finish(){
+  if(!byId('me')){toast('Join the circle to lock in the people you met');openSetup(1,true);return}
   const up=S.upcoming,idea=ideaOf(up.idea),before=score(S.model,idea);
   sgd(S.model,up.idea,ui.rate,.3);for(let i=0;i<3;i++)sgd(S.model,up.idea,ui.rate,.1);
   const after=score(S.model,idea),locked=Object.keys(ui.met).filter(k=>ui.met[k]);
@@ -823,7 +824,7 @@ function drawSetup(){
     <label class="f">Friends would describe me as… (pick up to 3)</label><div>${Object.entries(QUAL).map(([k,e])=>`<span class="chip pick ${SU.is.has(k)?'on':''}" data-is="${k}">${e} ${k}</span>`).join('')}</div>
     <label class="f">In new friends I look for… (pick up to 3)</label><div>${Object.entries(QUAL).map(([k,e])=>`<span class="chip pick ${SU.want.has(k)?'on':''}" data-want="${k}">${e} ${k}</span>`).join('')}</div>`;
   }
-  h+=`<div class="row" style="margin-top:18px">${st>1&&!ed?'<button class="btn ghost sm" data-nav="back">Back</button>':''}${ed?'<button class="btn ghost sm" data-nav="close">Cancel</button>':''}<button class="btn" data-nav="${st===3||ed?'done':'next'}">${st===3||ed?'Save':'Next →'}</button></div>`;
+  h+=`<div class="row" style="margin-top:18px">${st>1&&!ed?'<button class="btn ghost sm" data-nav="back">Back</button>':''}<button class="btn ghost sm" data-nav="close">${ed?'Cancel':'Not now'}</button><button class="btn" data-nav="${st===3||ed?'done':'next'}">${st===3||ed?'Save':'Next →'}</button></div>`;
   c.innerHTML=h;
 }
 function finishSetup(){
@@ -860,7 +861,6 @@ $('#join').addEventListener('input',e=>{
   else if(e.target.dataset.dim)SU.vibe[e.target.dataset.dim]=+e.target.value;
 });
 window.openJoin=()=>openSetup(1,false);
-if(!byId('me')&&(function(){try{return sessionStorage.getItem('turnout.gate')}catch(e){return 0}})())openJoin();
 /* ===================== cloud (Supabase): optional ===================== */
 /* The URL and anon key are public by design; row-level security in the database protects the data. */
 const SB_URL='https://nmbrsdnopuhcbhxdgycu.supabase.co';
@@ -932,7 +932,7 @@ function accountCard(){
   document.documentElement.dataset.theme=t;$('#theme').textContent=t==='day'?'☾ Night mode':'☀︎ Day mode';
   let seen=false;try{seen=sessionStorage.getItem('turnout.gate')}catch(e){}
   const g=$('#gate');
-  const open=()=>{g.classList.add('out');try{sessionStorage.setItem('turnout.gate','1')}catch(e){}if(!byId('me'))openJoin()};
+  const open=()=>{g.classList.add('out');try{sessionStorage.setItem('turnout.gate','1')}catch(e){}};
   $('#enter').addEventListener('click',open);
   if(seen)g.classList.add('out');
 })();
