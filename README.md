@@ -39,7 +39,7 @@ vercel dev
 
 ## Content snapshots (demos and credit control)
 
-Both the Mood Wall and SIGNAL commit their last real result to the repo, so they load instantly, cost nothing during demos, and fall back gracefully if the Anthropic account is out of credits — always labelled with its real date, never as "today".
+Both the Mood Wall and SIGNAL commit their last real result to the repo, so they load instantly, cost nothing during demos, and fall back gracefully if the Anthropic account is out of credits. Anything that isn't today's data is labelled with its real date, never passed off as "today".
 
 ```bash
 # Mood Wall
@@ -49,13 +49,23 @@ node scripts/snapshot-moods.mjs unfreeze
 node scripts/snapshot-moods.mjs status
 
 # SIGNAL
-node scripts/snapshot-signal.mjs capture     # pull today's sweeps and save them (the only command that spends credits)
+node scripts/snapshot-signal.mjs capture     # pull a fresh sweep and save it (the only command that spends credits)
 node scripts/snapshot-signal.mjs freeze      # page serves the snapshot only, never calls the API
 node scripts/snapshot-signal.mjs unfreeze
-node scripts/snapshot-signal.mjs status
+node scripts/snapshot-signal.mjs status      # what's saved, and how many days old it is
 ```
 
 Commit and push after any of these. Freeze before a demo: zero API calls, instant load, no cold-start wait.
+
+### SIGNAL refreshes itself daily
+
+`.github/workflows/signal-snapshot.yml` runs `capture --scheduled` every morning (10:17 UTC, about 6am ET), commits the result, and Vercel redeploys. Visitors only ever read the committed file, so traffic never costs credits. This job is the one thing that spends: three Claude calls a day.
+
+- **Refresh now:** Actions tab → *Refresh SIGNAL snapshot* → *Run workflow*.
+- **No secrets to set up.** The job calls the public endpoint; the Anthropic key stays in Vercel.
+- **It never replaces good data with worse.** The run fails, and the previous snapshot stays live, if a sweep errors (including out-of-credits), if the edge returns a stale cached sweep, or if the result has fewer than 8 stories or 5 industries.
+- **The page tells you when it stops.** The badge reads `DAILY` while the snapshot is within two days old. At three days it flips to an amber `STALE` and says *"Daily refresh has stopped"*. GitHub's default notifications also email the account that last edited the schedule when a scheduled run fails.
+- If a run fails with a credit-balance error, it is billing, not code. Top up under Plans & Billing and re-run.
 
 ## Environment variables
 

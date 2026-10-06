@@ -1,0 +1,55 @@
+name: Refresh SIGNAL snapshot
+
+# Once a day, ask the deployed API for a fresh sweep and commit it as
+# data/signal-snapshot.json. The page serves that file statically, so visitors
+# never trigger an Anthropic call, and this job is the only thing that spends.
+#
+# No secrets are needed: the Anthropic key lives in Vercel, and this job only
+# calls the public endpoint. If the account is out of credits the run fails
+# and the previous snapshot stays live (the page labels it as aging).
+
+on:
+  schedule:
+    # 10:17 UTC = 6:17am ET in summer, 5:17am in winter. Fresh before the day
+    # starts, and off the top of the hour, when GitHub's scheduler is busiest.
+    - cron: '17 10 * * *'
+  workflow_dispatch:   # the "Run workflow" button, for refreshing on demand
+
+# The repo's default token is read-only, so writing back has to be asked for.
+permissions:
+  contents: write
+
+# Never let two captures race, and never cancel one mid-sweep and waste the spend.
+concurrency:
+  group: signal-snapshot
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12   # a sweep takes ~90s; this only catches a hang
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Capture a fresh sweep
+        run: node scripts/snapshot-signal.mjs capture --scheduled
+
+      - name: Commit and push if it changed
+        run: |
+          if git diff --quiet -- data/signal-snapshot.json; then
+            echo "Snapshot unchanged, nothing to commit."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/signal-snapshot.json
+          git commit -m "chore(signal): daily snapshot $(date -u +%F)"
+          # Other people and sessions push to main too; replay on top of theirs.
+          git pull --rebase origin main
+          git push origin HEAD:main

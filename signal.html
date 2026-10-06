@@ -35,6 +35,7 @@
     .brand span{color:var(--sage)}
     .lvbg{font-size:9px;font-weight:800;letter-spacing:2px;color:var(--sage);border:1.5px solid var(--sage);padding:2px 7px;border-radius:4px}
     .lvbg.snap{color:#b45309;border-color:#b45309}
+    .lvbg.daily{color:var(--sd);border-color:var(--sd)}
     .lvbg.sample{color:var(--mu);border-color:var(--br)}
     .ldot.off{animation:none;background:var(--sm)}
     .hsub{font-size:11.5px;color:var(--mu)}
@@ -69,6 +70,7 @@
     .stbar.demo{background:#f8faff;color:#3b5a9a;border-bottom:1px solid #c7d8f7}
     .stbar.arch{background:#f5f3ff;color:#5b21b6;border-bottom:1px solid #ddd6fe}
     .stbar.snap{background:#fff7ed;color:#9a3412;border-bottom:1px solid #fed7aa}
+    .stbar.daily{background:#f0f6f1;color:var(--sd);border-bottom:1px solid #cfe0d1}
     .stdt{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 
     /* ── Grid & Cards ── */
@@ -365,23 +367,36 @@ function coveredCount(){return new Set(todayStories.map(s=>s.industry)).size;}
    page can never say LIVE over stories that aren't. */
 function fmtDay(iso){return new Date(iso+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});}
 function feedDate(){return mode==='snapshot'&&SNAP?new Date(SNAP.date+'T12:00:00'):new Date();}
+// A daily snapshot is healthy for two days, which tolerates one missed run.
+// Past that, the page says so instead of letting old news pass as current.
+function snapAge(){return Math.max(0,Math.round((Date.parse(TODAY+'T00:00:00Z')-Date.parse(SNAP.date+'T00:00:00Z'))/864e5));}
+function snapDaily(){return !!(SNAP&&SNAP.refresh==='daily');}
+function snapStale(){return snapDaily()&&snapAge()>2;}
+function snapHealthy(){return snapDaily()&&!snapStale();}
 function dateLabel(){
-  if(mode==='snapshot'&&SNAP)return 'Sweep from '+fmtDay(SNAP.date);
+  if(mode==='snapshot'&&SNAP)return snapDaily()&&snapAge()===0?'Today — '+fmtDay(SNAP.date):'Sweep from '+fmtDay(SNAP.date);
   if(mode==='sample')return 'Sample stories';
   return 'Today — '+fmtDay(TODAY);
 }
 function setMode(m){
   mode=m;
   const b=document.getElementById('lvbg'),d=document.getElementById('ldot');
-  b.className='lvbg'+(m==='live'?'':m==='snapshot'?' snap':' sample');
-  b.textContent=m==='live'?'LIVE':m==='snapshot'?'SNAPSHOT':'SAMPLE';
+  b.className='lvbg'+(m==='live'?'':m==='snapshot'?(snapHealthy()?' daily':' snap'):' sample');
+  b.textContent=m==='live'?'LIVE':m==='snapshot'?(snapDaily()?(snapStale()?'STALE':'DAILY'):'SNAPSHOT'):'SAMPLE';
   d.classList.toggle('off',m!=='live');
 }
 function snapStatus(){
+  if(snapDaily()){
+    const age=snapAge();
+    return age>2
+      ? 'Daily refresh has stopped · latest sweep '+fmtDay(SNAP.date)+' ('+age+' days old)'
+      : 'Updated daily · latest sweep '+fmtDay(SNAP.date);
+  }
   return SNAP.frozen
     ? 'Frozen snapshot · sweep from '+fmtDay(SNAP.date)+' · live refresh off'
     : 'Live refresh unavailable · showing the '+fmtDay(SNAP.date)+' sweep';
 }
+function snapBar(){setSt(snapHealthy()?'daily':'snap',snapHealthy()?'#3a5c40':'#b45309',snapStatus());}
 
 /* ═══ Story helpers ═══════════════════════════════════════ */
 function keyOf(s){return (s.url||'')+'|'+String(s.headline||'').toLowerCase().replace(/\W+/g,'');}
@@ -563,7 +578,7 @@ function switchView(v){
   document.getElementById('t-arch').classList.toggle('active',v==='archive');
   if(v==='archive')setSt('arch','#8b5cf6','Viewing archive — past stories stored locally');
   else if(mode==='live'&&todayStories.length)setSt('live','#15803d',`✓ ${todayStories.length} stories today · ${coveredCount()} industries · ${TODAY}`);
-  else if(mode==='snapshot'&&SNAP)setSt('snap','#b45309',snapStatus());
+  else if(mode==='snapshot'&&SNAP)snapBar();
   renderView();
 }
 
@@ -689,7 +704,7 @@ async function fetchAll(){
     if(sweepsDone<3&&mode==='live')setSt('loading','#d97706',`${todayStories.length} stories in · sweep ${sweepsDone} of 3 done…`);
   }));
   if(mode==='live')setSt('live','#15803d',`✓ ${todayStories.length} live stories · ${coveredCount()} of ${IND_COUNT} industries · ${TODAY}`);
-  else if(hasSnap)setSt('snap','#b45309',snapStatus());
+  else if(hasSnap)snapBar();
   else setSt('demo','#3b82f6','Showing sample stories · live data unavailable');
   updStats();renderView();
 }
@@ -751,7 +766,7 @@ async function init(){
   // Zero credits, zero cold start — this is the demo switch.
   if(hasSnap&&SNAP.frozen){
     useSnapshot();
-    setSt('snap','#b45309',snapStatus());
+    snapBar();
     return;
   }
   const stored=loadDay();
