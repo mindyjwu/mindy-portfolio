@@ -98,22 +98,24 @@ async function capture() {
     try {
       const r = await fetch(url, { signal: AbortSignal.timeout(280_000) });
       const j = await r.json().catch(() => ({}));
-      if (!r.ok || j.error) throw new Error(j.error || `HTTP ${r.status}`);
+      if (!r.ok || j.error) throw Object.assign(new Error(j.error || `HTTP ${r.status}`), { status: r.status });
       const cache = r.headers.get('x-vercel-cache') || '?';
       if (cache === 'STALE') throw new Error('edge served a STALE cached sweep, so its date cannot be trusted');
       console.log(`  batch ${n}: ${j.stories?.length ?? 0} stories  (edge ${cache})`);
       return { ok: true, stories: j.stories || [], meta: j.meta || {} };
     } catch (e) {
       console.log(`  batch ${n}: FAILED — ${String(e.message).slice(0, 200)}`);
-      return { ok: false, error: String(e.message), stories: [], meta: {} };
+      return { ok: false, error: String(e.message), status: e.status, stories: [], meta: {} };
     }
   }));
 
   const failed = results.filter(r => !r.ok);
   if (failed.length) {
-    const credit = failed.some(f => /credit balance|billing/i.test(f.error));
+    // api/signal.js swaps Anthropic's billing text for "Live sweeps are paused"
+    // + a 503 and says so only for a credit-balance error, so that is the tell.
+    const credit = failed.some(f => f.status === 503 || /credit balance|billing|sweeps are paused/i.test(f.error));
     abort(`${failed.length} of 3 sweeps failed.`,
-      credit ? 'The Anthropic account is out of credits. Top up under Plans & Billing; no code change is needed.'
+      credit ? 'The API reports live sweeps are paused, which it only does when the Anthropic account is out of credits. Top up under Plans & Billing and re-run; no code change is needed.'
              : failed.map(f => `- ${f.error.slice(0, 200)}`).join('\n'));
   }
 
