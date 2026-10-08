@@ -1,0 +1,51 @@
+{
+  "_note": "Mindy's 'On repeat' songs. 30-second previews from the iTunes Search API; the page re-looks-up a track by id if its preview URL ever stops working.",
+  "updatedAt": "2026-10-07",
+  "tracks": [
+    {
+      "id": 193532153,
+      "title": "By Your Side",
+      "artist": "Sade",
+      "album": "Lovers Rock",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/85/d9/05/85d9053a-565b-723d-0823-c0c2a0dbff87/mzi.ifrkjjuc.jpg/300x300bb.jpg",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/74/9f/11/749f11b3-e2e6-1a56-5617-55f3168cf111/mzaf_11144361815339635021.plus.aac.p.m4a",
+      "link": "https://music.apple.com/us/album/by-your-side/193532145"
+    },
+    {
+      "id": 1671667306,
+      "title": "Superpowers",
+      "artist": "Daniel Caesar",
+      "album": "NEVER ENOUGH",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/24/4f/ec/244fec58-ea20-e0b0-eea6-e06c6aff948b/23UMGIM14483.rgb.jpg/300x300bb.jpg",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2d/2b/61/2d2b6102-157b-dd97-f5a9-1e6014b40dfc/mzaf_14408745609786889918.plus.aac.p.m4a",
+      "link": "https://music.apple.com/us/album/superpowers/1671667136"
+    },
+    {
+      "id": 1441460622,
+      "title": "Violent Crimes",
+      "artist": "Kanye West",
+      "album": "ye",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/f8/92/62/f892628e-bfd5-2437-c1f5-0ebbd366de09/00602577303098.rgb.jpg/300x300bb.jpg",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/9d/51/f3/9d51f38d-1cd5-25c0-e9aa-82fd32d24ac6/mzaf_16404482173401780505.plus.aac.p.m4a",
+      "link": "https://music.apple.com/us/album/violent-crimes/1441460375"
+    },
+    {
+      "id": 1739659149,
+      "title": "L’AMOUR DE MA VIE",
+      "artist": "Billie Eilish",
+      "album": "HIT ME HARD AND SOFT",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/92/9f/69/929f69f1-9977-3a44-d674-11f70c852d1b/24UMGIM36186.rgb.jpg/300x300bb.jpg",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1d/d9/1f/1dd91f91-cbd2-87de-643d-e450e839ee2d/mzaf_10919437608751775820.plus.aac.p.m4a",
+      "link": "https://music.apple.com/us/album/lamour-de-ma-vie/1739659134"
+    },
+    {
+      "id": 1781316963,
+      "title": "gloria",
+      "artist": "Kendrick Lamar & SZA",
+      "album": "GNX",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/54/28/14/54281424-eece-0935-299d-fdd2ab403f92/24UM1IM28978.rgb.jpg/300x300bb.jpg",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/91/b6/ea/91b6ea9e-b7a5-b8a1-c4d8-b2de9ef2fe52/mzaf_2418430311276662632.plus.aac.p.m4a",
+      "link": "https://music.apple.com/us/album/gloria/1781316864"
+    }
+  ]
+}
