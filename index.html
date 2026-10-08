@@ -176,63 +176,119 @@ html[data-mw-theme="dark"] .mpnav__theme .moon{display:none;}
 <section class="intro">
   <h1>Mindy Wu</h1>
   <p>Based in New York. I love a complex problem and the creative fix hiding inside it. By day I help media and entertainment companies rethink how they work with AI; on my own time I explore ideas and build from scratch. <a class="inline" href="about.html">More about me →</a></p>
+  <div class="np" id="np" hidden>
+    <button type="button" class="np-disc" aria-label="Play">
+      <span class="np-vinyl"><span class="np-label"><img class="np-art" alt=""></span></span>
+      <span class="np-icon" aria-hidden="true"></span>
+    </button>
+    <div class="np-meta">
+      <div class="np-kicker">On repeat <span class="np-eq" aria-hidden="true"><i></i><i></i><i></i></span></div>
+      <a class="np-title" target="_blank" rel="noopener"></a>
+      <div class="np-artist"></div>
+      <div class="np-bar"><i></i></div>
+    </div>
+    <div class="np-list" role="group" aria-label="Songs on repeat"></div>
+  </div>
 </section>
 
 <!-- ===================== PORTFOLIO ===================== -->
 <section class="sec" id="portfolio">
   <h2 class="sec-h">Portfolio</h2>
+  <div class="pick" role="group" aria-label="Find your project">
+    <span class="pick-q">What are you into?</span>
+    <button type="button" class="pick-chip" data-tag="music" aria-pressed="false">Music</button>
+    <button type="button" class="pick-chip" data-tag="travel" aria-pressed="false">Travel</button>
+    <button type="button" class="pick-chip" data-tag="art" aria-pressed="false">Art &amp; film</button>
+    <button type="button" class="pick-chip" data-tag="money" aria-pressed="false">Money</button>
+    <button type="button" class="pick-chip" data-tag="people" aria-pressed="false">People</button>
+    <button type="button" class="pick-chip" data-tag="wellness" aria-pressed="false">Wellness</button>
+    <button type="button" class="pick-chip" data-tag="ai" aria-pressed="false">AI &amp; tech</button>
+    <span class="pick-note" aria-live="polite"></span>
+    <button type="button" class="pick-clear" hidden>Clear</button>
+  </div>
   <div class="plist">
 
-    <div class="prow">
-      <a class="pname" href="https://ai-eco-diagram.vercel.app" target="_blank" rel="noopener">The AI Money Map <span class="arw">↗</span></a>
+    <div class="prow" data-k="ai-ecosystem" data-shot="assets/previews/ai-ecosystem.jpg" data-tags="ai money">
+      <a class="pname" href="https://ai-eco-diagram.vercel.app" target="_blank" rel="noopener">The AI Ecosystem <span class="arw">↗</span></a>
       <div class="pfocus">An interactive supply chain of who funds AI, from your playlist and credit card down through apps, labs, clouds, chips, fabs, energy and rockets to a quartz mine.</div>
     </div>
 
-    <div class="prow">
+    <div class="prow" data-k="global-explorer" data-shot="assets/previews/global-explorer.jpg" data-tags="travel art">
       <a class="pname" href="https://global-explorer-ivory.vercel.app" target="_blank" rel="noopener">Global Explorer <span class="arw">↗</span></a>
       <div class="pfocus">A 3D globe you click to explore any country's cities, each tagged by what makes it worth visiting.</div>
     </div>
 
-    <div class="prow">
+    <div class="prow" data-k="genai" data-shot="assets/previews/genai.jpg" data-tags="people ai">
       <a class="pname" href="https://gender-ai.vercel.app" target="_blank" rel="noopener">GenAI <span class="arw">↗</span></a>
       <div class="pfocus">Ask anything and get two perspectives in distinct voices, then see what your choices reveal about you.</div>
     </div>
 
-    <div class="prow">
+    <div class="prow" data-k="turnout" data-shot="assets/previews/turnout.jpg" data-tags="people">
       <a class="pname" href="turnout.html">Turnout</a>
       <div class="pfocus">A rotating-host circle for real-life gatherings: fair turns, shared costs, a guest list that mixes friends with new faces, and a network built in person.</div>
     </div>
 
-    <div class="prow">
+    <div class="prow" data-k="stock-advisor" data-shot="assets/previews/stock-advisor.jpg" data-tags="money ai">
       <a class="pname" href="stock-advisor.html">Stock Advisor</a>
       <div class="pfocus">Scores stocks on fundamentals, technicals and news sentiment, then grades its own calls. Educational, not advice.</div>
     </div>
 
-    <div class="prow">
+    <div class="prow" data-k="buddy" data-shot="assets/previews/buddy.jpg" data-tags="wellness">
       <a class="pname" href="https://wellness-buddy-chi.vercel.app" target="_blank" rel="noopener">Buddy <span class="arw">↗</span></a>
       <div class="pfocus">Wellness Buddy: a no-wearable health check-in that turns your classes, meals and sleep into one monthly report, with a crew to keep you going.</div>
     </div>
 
-    <div class="prow">
+    <div class="prow" data-k="mood-wall" data-shot="assets/previews/mood-wall.jpg" data-tags="music art">
       <a class="pname" href="mood.html">Mood Wall</a>
       <div class="pfocus">Name a feeling or a place and get back real art, books, music and film that match the moment.</div>
     </div>
 
-    <div class="prow">
+    <div class="prow" data-k="signal" data-shot="assets/previews/signal.jpg" data-tags="ai">
       <a class="pname" href="signal.html">SIGNAL</a>
       <div class="pfocus">A live feed that turns AI-industry news into short, sourced reads instead of endless scrolling.</div>
     </div>
 
-    <div class="prow">
+    <div class="prow" data-k="people-like-me" data-shot="assets/previews/people-like-me.jpg" data-tags="wellness people">
       <a class="pname" href="people-like-me.html">People Like Me</a>
       <div class="pfocus">Vetted beauty and body providers, ranked by people who share your hair, skin type and budget.</div>
     </div>
 
-    <div class="prow">
+    <div class="prow" data-k="festival" data-shot="assets/previews/festival.jpg" data-tags="music travel">
       <a class="pname" href="festival-clash-resolver.html">Festival Clash Resolver</a>
       <div class="pfocus">An offline-first set-clash resolver and route planner for electronic-music festivals.</div>
     </div>
 
+  </div>
+</section>
+
+<!-- ===================== HOW I BUILD ===================== -->
+<section class="sec" id="skills">
+  <h2 class="sec-h">How I build</h2>
+  <p class="sk-sub">Hover or tap a skill to see where I have used it, or a project to see what went into it.</p>
+  <div class="sk">
+    <svg class="sk-lines" aria-hidden="true"></svg>
+    <div class="sk-col sk-skills">
+      <button type="button" class="sk-skill" data-sk="llm" data-p="genai mood-wall signal stock-advisor" aria-pressed="false">LLMs &amp; agents</button>
+      <button type="button" class="sk-skill" data-sk="rec" data-p="turnout mood-wall people-like-me" aria-pressed="false">Recommendations &amp; matching</button>
+      <button type="button" class="sk-skill" data-sk="ml" data-p="stock-advisor turnout people-like-me" aria-pressed="false">Data science &amp; ML</button>
+      <button type="button" class="sk-skill" data-sk="viz" data-p="ai-ecosystem global-explorer stock-advisor buddy" aria-pressed="false">Data visualization</button>
+      <button type="button" class="sk-skill" data-sk="web" data-p="global-explorer genai turnout" aria-pressed="false">Full-stack web</button>
+      <button type="button" class="sk-skill" data-sk="api" data-p="mood-wall global-explorer signal" aria-pressed="false">APIs &amp; integrations</button>
+      <button type="button" class="sk-skill" data-sk="algo" data-p="festival turnout" aria-pressed="false">Algorithms &amp; optimization</button>
+      <button type="button" class="sk-skill" data-sk="ux" data-p="buddy people-like-me festival turnout" aria-pressed="false">Product &amp; UX</button>
+    </div>
+    <div class="sk-col sk-projs">
+      <a class="sk-proj" data-k="ai-ecosystem" href="https://ai-eco-diagram.vercel.app" target="_blank" rel="noopener">The AI Ecosystem</a>
+      <a class="sk-proj" data-k="global-explorer" href="https://global-explorer-ivory.vercel.app" target="_blank" rel="noopener">Global Explorer</a>
+      <a class="sk-proj" data-k="genai" href="https://gender-ai.vercel.app" target="_blank" rel="noopener">GenAI</a>
+      <a class="sk-proj" data-k="turnout" href="turnout.html">Turnout</a>
+      <a class="sk-proj" data-k="stock-advisor" href="stock-advisor.html">Stock Advisor</a>
+      <a class="sk-proj" data-k="buddy" href="https://wellness-buddy-chi.vercel.app" target="_blank" rel="noopener">Buddy</a>
+      <a class="sk-proj" data-k="mood-wall" href="mood.html">Mood Wall</a>
+      <a class="sk-proj" data-k="signal" href="signal.html">SIGNAL</a>
+      <a class="sk-proj" data-k="people-like-me" href="people-like-me.html">People Like Me</a>
+      <a class="sk-proj" data-k="festival" href="festival-clash-resolver.html">Festival Clash Resolver</a>
+    </div>
   </div>
 </section>
 
@@ -322,6 +378,8 @@ html[data-mw-theme="dark"] .mpnav__theme .moon{display:none;}
 </footer>
 
 <script src="js/liquid.js" defer></script>
+<script src="js/home.js" defer></script>
+<script src="js/now-playing.js" defer></script>
 
 <!-- Theme toggle -->
 <script>
