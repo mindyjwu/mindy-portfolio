@@ -21,7 +21,7 @@
   --acc:#6C86F0; --cool:#2F6690;
   --t1:#EAF2F8; --t2:#E3EEF5; --t3:#EDF2F4; --t4:#DCE6FA; --t5:#E7E0F5; --t6:#F5E4EA;
   --poster:linear-gradient(135deg,#BFD8EE 0%,#D6D3F3 55%,#F1D6E2 100%);
-  --shadow:0 1px 2px rgba(22,35,46,.05),0 22px 44px -26px rgba(22,35,46,.30); --veil:rgba(11,19,26,.5);
+  --danger:#B4432F; --shadow:0 1px 2px rgba(22,35,46,.05),0 22px 44px -26px rgba(22,35,46,.30); --veil:rgba(11,19,26,.5);
   --glow:radial-gradient(900px 480px at 12% -8%,rgba(160,196,230,.55),transparent 60%),radial-gradient(760px 460px at 96% 4%,rgba(214,200,244,.55),transparent 58%);
   --gate:var(--glow),linear-gradient(#F5F9FC,#E8F0F6);
 }
@@ -31,7 +31,7 @@
   --acc:#93A6FF; --cool:#8CBCE0;
   --t1:#15212C; --t2:#1A2A37; --t3:#19242D; --t4:#1D2A4A; --t5:#292346; --t6:#382637;
   --poster:linear-gradient(135deg,#16405F 0%,#312F6E 55%,#592D5A 100%);
-  --shadow:0 1px 2px rgba(0,0,0,.4),0 24px 48px -28px rgba(0,0,0,.8); --veil:rgba(3,7,12,.72);
+  --danger:#FF9C86; --shadow:0 1px 2px rgba(0,0,0,.4),0 24px 48px -28px rgba(0,0,0,.8); --veil:rgba(3,7,12,.72);
   --glow:radial-gradient(900px 480px at 12% -8%,rgba(40,90,140,.5),transparent 60%),radial-gradient(760px 460px at 96% 4%,rgba(88,60,150,.45),transparent 58%);
   --gate:var(--glow),linear-gradient(#0A1219,#0D1822);
 }
@@ -97,6 +97,11 @@ main{padding:18px 0 40px}
 .chip.pick.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 input[type=text],select{font:inherit;padding:11px 14px;border-radius:14px;border:1px solid var(--line);background:var(--paper2);color:var(--ink);width:100%}
 input[type=text]:focus,select:focus{outline:2px solid var(--sec);outline-offset:1px}
+textarea{font:inherit;padding:11px 14px;border-radius:14px;border:1px solid var(--line);background:var(--paper2);color:var(--ink);width:100%;min-height:84px;resize:vertical}
+textarea:focus{outline:2px solid var(--sec);outline-offset:1px}
+.linkbtn{font-size:12.5px;font-weight:600;color:var(--soft);text-decoration:underline;text-underline-offset:3px;padding:2px 0}
+.linkbtn:hover{color:var(--ink)}
+.btn.danger{color:var(--danger);border-color:var(--danger)}
 input[type=range]{width:100%;accent-color:var(--sec)}
 label.f{display:block;font-weight:600;font-size:13px;margin:14px 0 5px;color:var(--soft);text-transform:uppercase;letter-spacing:.06em}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
@@ -268,6 +273,7 @@ footer{text-align:center;color:var(--soft);font-size:13px;padding:20px 18px 48px
 <footer>Demo build. Everything runs in your browser and saves on this device only. No accounts, no server, no data leaves the page. <a href="#" id="reset">Reset demo</a></footer>
 
 <div class="modal" id="join"><div class="card tint-o" id="join-card"></div></div>
+<div class="modal" id="safety"><div class="card" id="safety-card"></div></div>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
@@ -445,7 +451,8 @@ function buildRoom(hostId,size,noise){
   const att=all.map(id=>S.attended[id]||0),mx=Math.max(...att,0);
   const fair={};all.forEach(id=>fair[id]=.6*(mx-(S.attended[id]||0))/(mx+1)+.8*Math.min(byId(id).points||0,250)/250+((S.attended[id]||0)===0?.4:0)+(noise?Math.random()*.5:0));
   size=Math.min(size,all.length);
-  let room=[...must];const pool=all.filter(id=>!room.includes(id)).sort(()=>Math.random()-.5);
+  const avoid=new Set(REAL.on&&hostId==='me'?S.members.filter(m=>m.blocked).map(m=>m.id):[]);
+  let room=[...must];const pool=all.filter(id=>!room.includes(id)&&!avoid.has(id)).sort(()=>Math.random()-.5);
   while(room.length<size&&pool.length)room.push(pool.pop());
   let cur=roomScore(room,A,fair);
   for(let it=0;it<400;it++){
@@ -547,8 +554,8 @@ function renderCircle(){
       ${REAL.on?'':`<div class="row"><label class="note">Max size</label><select id="cap" style="width:auto">${[12,20,30,50].map(c=>`<option ${c===S.circle.cap?'selected':''}>${c}</option>`).join('')}</select></div>`}</div>
     <div class="capbar"><i style="width:${S.members.length/S.circle.cap*100}%"></i></div>
     <div class="members" style="margin-top:14px">${S.members.map(m=>`<div class="mem ${up&&up.host===m.id?'up':''}">${avatar(m)}<div class="h">${esc(label(m))}</div><div class="note">${PLATS[m.platform]||''}</div>
-      <div>${S.cycleHosted.includes(m.id)?'<span class="chip g">hosted ✓</span>':'<span class="chip">in the pool</span>'}${m.skip?'<span class="chip b">skipping</span>':''}</div>
-      <div>${m.tags.map(t=>TAGS[t]).join(' ')}</div></div>`).join('')}</div>
+      <div>${S.cycleHosted.includes(m.id)?'<span class="chip g">hosted ✓</span>':'<span class="chip">in the pool</span>'}${m.skip?'<span class="chip b">skipping</span>':''}${REAL.on&&m.verified?'<span class="chip g">verified</span>':''}</div>
+      <div>${m.tags.map(t=>TAGS[t]).join(' ')}</div>${REAL.on&&m.id!=='me'?`<div style="margin-top:6px"><button class="linkbtn" data-act="safety" data-u="${esc(m.id)}">${m.blocked?'Blocked · manage':'Report or block'}</button></div>`:''}</div>`).join('')}</div>
     ${REAL.on?'<p class="note" style="margin-top:18px">To add people, share your invite link from the Me tab. You approve each new person.</p>':`<h3 style="font-size:22px;margin:22px 0 4px">Invite someone</h3>
     <div class="row"><select id="a-plat" style="width:auto">${Object.entries(PLATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select><input type="text" id="a-handle" placeholder="@handle or phone" style="flex:1;min-width:140px" maxlength="30">
       <button class="btn sm g" data-act="add">Add</button></div>
@@ -564,7 +571,7 @@ function renderParty(){
   const list=ranked(ui.cat),gl=up.guests||[],max=Math.max(REAL.on?2:6,Math.min(15,S.members.length)),min=REAL.on?2:6;
   ui.size=Math.max(min,Math.min(ui.size,max));
   const my=REAL.on&&up.rsvps&&up.rsvps.me;
-  let html=`${modeBar()}<div class="poster"><span class="chip">${mLabel(up.ym)}</span><span class="chip">${gl.length?gl.length+(REAL.on?' invited':' going'):ui.size+' people'}</span>
+  let html=`${modeBar()}<div class="poster"><span class="chip">${mLabel(up.ym)}</span><span class="chip">${gl.length?gl.length+(REAL.on?' invited':' going'):ui.size+' people'}</span>${REAL.on&&up.loc&&up.loc.area?`<span class="chip">Near ${esc(up.loc.area)}</span>`:''}
     <div class="poster-title">${idea?esc(idea.name):'Pick a theme'}</div>
     <div class="poster-sub">Hosted by ${dot(host)}${esc(label(host))}${idea?' · '+esc(idea.game):''}</div>
     ${gl.length?`<div class="stack">${gl.slice(0,8).map(id=>dot(byId(id))).join('')}${gl.length>8?`<span class="more">+${gl.length-8}</span>`:''}</div>`:''}</div>`;
@@ -586,14 +593,38 @@ function renderParty(){
       <label class="f">Party size: <b id="sz">${ui.size}</b> people (including the host)</label>
       <input type="range" id="size" min="${min}" max="${max}" value="${ui.size}">
       <div class="row" style="margin-top:12px"><button class="btn" data-act="mix">${up.guests&&up.guests.length>(REAL.on?1:0)?'Reshuffle':REAL.on?'Match and invite':'Match my guests'}</button></div>
-      <div id="mix">${renderMix()}</div></div>`;
+      <div id="mix">${renderMix()}</div></div>${locationCard(up)}`;
     }else{
       html+=`${my?`<div class="card tint-b"><h2>Your RSVP</h2><p class="sub">${my.status==='going'||my.status==='attended'?"You're in.":my.status==='declined'?"You said you can't make it. Changed your mind?":'Can you make it?'}${up.assign&&up.assign.me?` You're bringing <b>${esc(up.assign.me)}</b>.`:''}</p>
         <div class="row"><button class="btn ${my.status==='going'?'g':''}" data-act="rsvp" data-s="going">I'm going</button><button class="btn ghost" data-act="rsvp" data-s="declined">Can't make it</button></div></div>`:''}
+      ${locationCard(up)}
       ${gl.length?`<div class="card"><h2>The guest list</h2><div id="mix">${renderMix()}</div></div>`:''}`;
     }
   }
+  if(!idea)html+=locationCard(up);
   el.innerHTML=html;
+}
+function locationCard(up){
+  if(!REAL.on||!up)return'';
+  const L=up.loc||{area:'',has:false,address:null,notes:null},host=up.host==='me',involved=host||!!(up.rsvps&&up.rsvps.me)||isOwner();
+  if(!involved)return'';
+  if(host){
+    const going=Object.entries(up.rsvps||{}).filter(([id,r])=>id!=='me'&&['going','attended'].includes(r.status)).length;
+    return `<div class="card tint-t"><h2>Where is it?</h2>
+      <p class="sub">Everyone invited sees the neighborhood. The exact address and how to get in stay hidden until a guest says they're going, and only guests who are going can see them. Not even the circle owner can.</p>
+      <label class="f" for="loc-area">Neighborhood (shown to invited guests)</label><input type="text" id="loc-area" value="${esc(L.area)}" maxlength="80" placeholder="e.g. East Village">
+      <label class="f" for="loc-addr">Address (private)</label><input type="text" id="loc-addr" value="${esc(L.address||'')}" maxlength="200" placeholder="Street, unit, city" autocomplete="off">
+      <label class="f" for="loc-notes">Getting in (private)</label><textarea id="loc-notes" maxlength="300" placeholder="Buzzer, door code, parking, floor">${esc(L.notes||'')}</textarea>
+      <div class="row" style="margin-top:12px"><button class="btn sm" data-act="saveloc">Save location</button></div>
+      <p class="note" style="margin-top:8px">${L.has?`${going} guest${going===1?'':'s'} who said they're going can see the address.`:'No address saved yet.'} It is deleted when you close the party.</p></div>`;
+  }
+  if(L.address){
+    return `<div class="card tint-g"><h2>Where</h2>${L.area?`<p class="sub">${esc(L.area)}</p>`:''}
+      <div style="font-size:19px;font-weight:600">${esc(L.address)}</div>${L.notes?`<p style="margin-top:8px">${esc(L.notes)}</p>`:''}
+      <div class="row" style="margin-top:12px"><a class="btn sm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(L.address)}" target="_blank" rel="noopener noreferrer">Open in Maps</a></div>
+      <p class="note" style="margin-top:8px">Please keep this address among the guests. Opening Maps sends it to Google. If something feels off, use Report or block.</p></div>`;
+  }
+  return `<div class="card tint-t"><h2>Where</h2><p class="sub">${L.area?`Near ${esc(L.area)}. `:''}${L.has?'The exact address is shared once you RSVP that you\'re going.':'The host hasn\'t added the address yet. It will be shared once you RSVP that you\'re going.'}</p></div>`;
 }
 function renderMix(){
   const up=S.upcoming;if(!up||!up.guests||!up.guests.length)return'';
@@ -603,8 +634,8 @@ function renderMix(){
   return `<div style="margin-top:16px"><b>Your view of the room</b><div class="mixbar"><i style="width:${kn/tot*100}%;background:var(--sec)"></i><i style="width:${nw/tot*100}%;background:var(--pri)"></i></div>
     <div class="note">🟢 ${kn} you know · 🟠 ${nw} new faces</div></div>
     <div style="margin-top:10px">${room.map((id,k)=>{const m=byId(id),isK=knows(A,'me',id);
-      return `<div class="guest" style="animation-delay:${k*.05}s">${avatar(m)}<div><b>${esc(label(m))}</b> ${id===up.host?'<span class="chip">host</span>':id==='me'?'<span class="chip b">you</span>':isK?'<span class="chip g">friend</span>':'<span class="chip">new</span>'}${REAL.on&&up.rsvps&&up.rsvps[id]?`<span class="chip ${up.rsvps[id].status==='declined'?'':'g'}">${esc(up.rsvps[id].status)}</span>`:''}
-        <p>${id===up.host?'Hosting. Brings: '+esc(idea.host[0]):'Brings: <b>'+esc((up.assign&&up.assign[id])||'')+'</b>'}</p><p class="note">${icebreaker(id,room,A)}</p></div></div>`}).join('')}</div>
+      return `<div class="guest" style="animation-delay:${k*.05}s">${avatar(m)}<div><b>${esc(label(m))}</b> ${REAL.on&&m.verified?'<span class="chip g">verified</span>':''}${id===up.host?'<span class="chip">host</span>':id==='me'?'<span class="chip b">you</span>':isK?'<span class="chip g">friend</span>':'<span class="chip">new</span>'}${REAL.on&&up.rsvps&&up.rsvps[id]?`<span class="chip ${up.rsvps[id].status==='declined'?'':'g'}">${esc(up.rsvps[id].status)}</span>`:''}
+        <p>${id===up.host?'Hosting. Brings: '+esc(idea.host[0]):'Brings: <b>'+esc((up.assign&&up.assign[id])||'')+'</b>'}</p><p class="note">${icebreaker(id,room,A)}</p>${REAL.on&&id!=='me'?`<button class="linkbtn" data-act="safety" data-u="${esc(id)}">Report or block</button>`:''}</div></div>`}).join('')}</div>
     <div class="row" style="margin-top:14px"><button class="btn g sm" data-act="copy">Copy invite text</button></div>`;
 }
 function assignBring(room,host,idea){
@@ -718,6 +749,7 @@ function suggest(A){
 }
 
 function renderMe(){
+  const safe=safetyCard();
   const me=byId('me'),el=$('#pane-me');
   if(!me){el.innerHTML='<div class="card tint-o" style="text-align:center"><h2>Join to unlock your profile</h2><button class="btn" data-act="setup" data-step="1">Join the circle</button></div>'+accountCard();return}
   const rank=[...S.members].sort((a,b)=>b.points-a.points),pos=rank.findIndex(m=>m.id==='me')+1,mx=Math.max(1,rank[0].points);
@@ -735,7 +767,7 @@ function renderMe(){
   <div class="card tint-b"><h2>What the matcher has learned</h2>
     <p class="sub">Starts with sensible guesses. Every time you lock in (or skip) people after a party, it re-weights which traits actually predict that you'd click. Trained on ${S.pm.n} pair${S.pm.n===1?'':'s'} so far.</p>
     ${w.map(x=>`<div class="wbar"><span>${esc(FEAT_NAME[x.k])}</span><i style="width:${Math.max(4,Math.abs(x.v)/wm*55)}%;${x.v<0?'background:var(--pri)':''}"></i><span style="width:auto">${x.v.toFixed(2)}</span></div>`).join('')}
-    <p class="note" style="margin-top:8px">${REAL.on?'Members of this circle can see each other\'s answers; that is how matching works. Nobody outside the circle can.':'Demo note: the other members in the sample circle are simulated.'}</p></div>${accountCard()}`;
+    <p class="note" style="margin-top:8px">${REAL.on?'Members of this circle can see each other\'s answers; that is how matching works. Nobody outside the circle can.':'Demo note: the other members in the sample circle are simulated.'}</p></div>${accountCard()}${safe}`;
 }
 function renderAll(){renderStats();renderCircle();renderParty();renderMoney();renderAfter();renderMe();
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.tab===ui.tab));
@@ -819,10 +851,14 @@ document.addEventListener('click',e=>{
   else if(a==='claim'){const ym=t.dataset.ym;S.claims[ym]='me';if(ym===S.nextYm&&!S.upcoming)S.upcoming={host:'me',ym,idea:null,guests:[],assign:{}};toast(`${mLabel(ym)} is yours`);confetti();renderAll()}
   else if(a==='add')addMember();
   else if(a==='setup')openSetup(+t.dataset.step,true);
+  else if(a==='signmode'){CLOUD.signMode=t.dataset.v;CLOUD.otp=null;renderMe()}
+  else if(a==='ps-send'||a==='pv-send')sendCode(a.slice(0,2));
+  else if(a==='ps-verify'||a==='pv-verify')verifyCode(a.slice(0,2));
+  else if(a==='ps-reset'||a==='pv-reset'){CLOUD.otp=null;renderMe()}
   else if(a==='signin'){const em=($('#c-email').value||'').trim();if(!/^\S+@\S+\.\S+$/.test(em))return toast('Enter a valid email');
     cloudDo(async()=>{const r=await CLOUD.sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.origin+location.pathname}});if(r.error)throw r.error;toast('Check your email for the sign-in link')})}
-  else if(a==='signout')cloudDo(async()=>{await CLOUD.sb.auth.signOut();CLOUD.user=null;CLOUD.circle=null;CLOUD.roster=[];if(REAL.on)leaveReal()});
-  else if(a==='mkcircle'){const nm=($('#c-name').value||'').trim();if(!nm)return toast('Name your circle first');
+  else if(a==='signout')cloudDo(async()=>{await CLOUD.sb.auth.signOut();CLOUD.user=null;CLOUD.circle=null;CLOUD.roster=[];CLOUD.ps=null;CLOUD.otp=null;if(REAL.on)leaveReal()});
+  else if(a==='mkcircle'){const nm=($('#c-name').value||'').trim();if(!nm)return toast('Name your circle first');if(needPhone())return toast('Verify your phone first. It only takes a minute.');
     cloudDo(async()=>{const r=await CLOUD.sb.rpc('create_circle',{p_name:nm,p_cap:S.circle.cap});if(r.error)throw r.error;await loadCircle();toast('Circle created. Share your invite link.')})}
   else if(a==='copylink'){const l=inviteLink();(navigator.clipboard?navigator.clipboard.writeText(l):Promise.reject()).then(()=>toast('Invite link copied'),()=>toast('Copy not available here'))}
   else if(a==='approve'||a==='decline'){const u=t.dataset.u;
@@ -916,7 +952,7 @@ window.openJoin=()=>openSetup(1,false);
 /* ===================== real circle mode ===================== */
 /* When you are signed in and approved into a circle, the screen is built from the server's
    copy (circle_state) and every action is a server call. The sample circle stays available. */
-const REAL={on:false,demo:null,snap:null,busy:false};
+const REAL={on:false,demo:null,snap:null,busy:false,reports:null};
 const cid=()=>CLOUD.circle.circle_id;
 const rid=u=>REAL.snap&&u===REAL.snap.me?'me':u;
 const did=id=>id==='me'?REAL.snap.me:id;
@@ -928,15 +964,15 @@ const isOwner=()=>!!(REAL.on&&REAL.snap&&REAL.snap.circle.owner_id===REAL.snap.m
 const canPlan=()=>!REAL.on||!!(S.upcoming&&(S.upcoming.host==='me'||isOwner()));
 async function rpc(name,args){if(!CLOUD.sb)throw new Error('Sign in first');const r=await CLOUD.sb.rpc(name,args);if(r.error)throw r.error;return r.data}
 function buildReal(snap){
-  REAL.snap=snap;
-  const ms=snap.members.map((m,i)=>({id:rid(m.user_id),handle:m.handle,platform:m.platform||'other',tags:m.interests||[],is:m.qualities||[],want:m.looking_for||[],vibe:{...(m.vibe||{})},prefs:{...(m.ratings||{})},points:m.points||0,skip:!!m.skip,hosted:(m.hosted||[]).map(ym7),av:'',hue:HUES[i%6],inCycle:!!m.in_cycle,att:m.attended||0}));
+  REAL.snap=snap;const bl=new Set(snap.my_blocks||[]);
+  const ms=snap.members.map((m,i)=>({id:rid(m.user_id),handle:m.handle,platform:m.platform||'other',tags:m.interests||[],is:m.qualities||[],want:m.looking_for||[],vibe:{...(m.vibe||{})},prefs:{...(m.ratings||{})},points:m.points||0,skip:!!m.skip,hosted:(m.hosted||[]).map(ym7),av:'',hue:HUES[i%6],inCycle:!!m.in_cycle,att:m.attended||0,blocked:bl.has(m.user_id),verified:!!m.verified}));
   const ev=snap.event,asg={};if(ev)Object.entries(ev.assign||{}).forEach(([k,v])=>asg[rid(k)]=v);
   const rs={};if(ev)(ev.rsvps||[]).forEach(r=>rs[rid(r.user_id)]={status:r.status,rated:!!r.rated});
   return{me:snap.me,circle:{name:snap.circle.name,cap:snap.circle.capacity},members:ms,
     edges:(snap.connections||[]).map(([a,b])=>rid(a)+'|'+rid(b)),
     history:(snap.history||[]).map(h=>({ym:ym7(h.month),host:rid(h.host_id),idea:h.idea_id,rating:null})),
     cycle:snap.circle.cycle,cycleHosted:ms.filter(m=>m.inCycle).map(m=>m.id),nextYm:ym7(snap.slot),
-    upcoming:ev?{id:ev.id,host:rid(ev.host_id),ym:ym7(ev.month),idea:ev.idea_id||null,status:ev.status,size:ev.size,guests:Object.keys(rs),rsvps:rs,assign:asg}:null,
+    upcoming:ev?{id:ev.id,host:rid(ev.host_id),ym:ym7(ev.month),idea:ev.idea_id||null,status:ev.status,size:ev.size,guests:Object.keys(rs),rsvps:rs,assign:asg,loc:{area:ev.area||'',has:!!ev.has_address,address:ev.address?ev.address.address:null,notes:ev.address?ev.address.notes:null}}:null,
     claims:Object.fromEntries((snap.future||[]).map(f=>[ym7(f.month),rid(f.host_id)])),
     model:{w:{},b:0},pm:PM0(),attended:Object.fromEntries(ms.map(m=>[m.id,m.att]))};
 }
@@ -950,6 +986,7 @@ async function refreshReal(){
   const snap=await rpc('circle_state',{p_circle:cid()});
   S=buildReal(snap);replayModels(snap.feedback||{});
   const mine=byId('me');if(mine&&mine.vibe&&Object.keys(mine.vibe).length)mine.vibeDone=true;
+  REAL.reports=null;if(REAL.snap.circle.owner_id===REAL.snap.me){try{REAL.reports=await rpc('circle_reports',{p_circle:cid()})}catch(e){REAL.reports=[]}}
 }
 async function enterReal(){
   if(!CLOUD.circle||CLOUD.circle.status!=='approved')return;
@@ -988,7 +1025,9 @@ async function mixReal(noise){
   const up=S.upcoming;if(!up||!up.idea)return;
   const room=buildRoom(up.host,ui.size,noise||up.guests.length>1),asg=assignBring(room,up.host,ideaOf(up.idea)),a={};
   Object.entries(asg).forEach(([k,v])=>a[did(k)]=v);
-  if(await realDo(()=>rpc('set_party',{p_event:up.id,p_size:ui.size,p_guests:room.map(did),p_assign:a})))toast('Guests invited');
+  let dropped=0;
+  if(await realDo(async()=>{dropped=await rpc('set_party',{p_event:up.id,p_size:ui.size,p_guests:room.map(did),p_assign:a})}))
+    toast(dropped?`Guests invited. ${dropped} member${dropped>1?'s':''} couldn't be placed in this party.`:'Guests invited');
 }
 async function rateReal(){
   const up=S.upcoming,me=byId('me'),A=adj(),here=id=>up.rsvps[id]&&['going','attended'].includes(up.rsvps[id].status);
@@ -1010,14 +1049,128 @@ function realClick(a,t){
     finish:()=>rateReal(),
     close:()=>realDo(()=>rpc('close_event',{p_event:S.upcoming.id})).then(ok=>{if(ok){toast('Party closed. The next turn is open.');ui.tab='circle';renderAll()}}),
     mode:()=>{if(t.dataset.mode==='demo'){setMode('demo');leaveReal()}else{setMode('real');enterReal()}},
-    refresh:()=>realDo(async()=>{})};
+    refresh:()=>realDo(async()=>{}),
+    saveloc:()=>{const v=id=>(document.getElementById(id)||{}).value||'';realDo(()=>rpc('set_location',{p_event:S.upcoming.id,p_area:v('loc-area'),p_address:v('loc-addr'),p_notes:v('loc-notes')})).then(ok=>ok&&toast('Location saved'))},
+    safety:()=>openSafety(t.dataset.u),
+    safetypick:()=>{const v=$('#sf-pick');if(v)openSafety(v.value)},
+    unblock:()=>realDo(()=>rpc('unblock_member',{p_user:did(t.dataset.u)})).then(ok=>ok&&toast('Unblocked')),
+    resolve:()=>realDo(()=>rpc('resolve_report',{p_report:+t.dataset.r,p_status:'resolved'})).then(ok=>ok&&toast('Marked resolved')),
+    dismiss:()=>realDo(()=>rpc('resolve_report',{p_report:+t.dataset.r,p_status:'dismissed'})).then(ok=>ok&&toast('Dismissed')),
+    removemem:()=>{if(confirm(`Remove ${t.dataset.h} from the circle? They lose access and any invites.`))realDo(()=>rpc('remove_member',{p_circle:cid(),p_user:t.dataset.u})).then(ok=>ok&&toast('Removed from the circle'))}};
   if(!T[a])return false;T[a]();return true;
+}
+/* ===================== safety: report and block ===================== */
+const CATS={unsafe:'Made me feel unsafe',harassment:'Harassment or unwanted contact',inappropriate:'Inappropriate behavior',fake:'Fake or misleading profile',other:'Something else'};
+let SF=null;
+function openSafety(id){const m=byId(id);if(!REAL.on||!m||id==='me')return;SF={id,mode:'block',cat:'',note:'',also:true,busy:false};drawSafety();$('#safety').classList.add('on')}
+function drawSafety(){
+  const m=byId(SF.id),isB=!!m.blocked,blockedNow=SF.mode==='block'&&isB;
+  $('#safety-card').innerHTML=`<h2>${esc(label(m))}</h2><p class="sub">Neither choice tells ${esc(label(m))} it was you.</p>
+   <div class="segs" style="margin-bottom:14px"><button data-s="mode" data-v="block" class="${SF.mode==='block'?'on':''}">Block</button><button data-s="mode" data-v="report" class="${SF.mode==='report'?'on':''}">Report</button></div>
+   ${SF.mode==='block'
+     ?`<p>${isB?'You have already blocked them. You can undo it in the Me tab.':'You two will never be placed in the same party and won\'t be matched with each other. You can undo this any time in the Me tab.'}</p>`
+     :`<label class="f">What happened?</label><div>${Object.entries(CATS).map(([k,v])=>`<span class="chip pick ${SF.cat===k?'on':''}" data-s="cat" data-v="${k}">${v}</span>`).join('')}</div>
+       <label class="f" for="sf-note">Details (optional)</label><textarea id="sf-note" maxlength="500" placeholder="Keep it factual. This helps the circle owner understand.">${esc(SF.note)}</textarea>
+       <label class="check" style="margin-top:12px"><input type="checkbox" data-s="also" ${SF.also?'checked':''}><span>Also block them</span></label>
+       <p class="note">The circle owner can see this report and who it is about, but not who sent it. Reports about the owner go to the Turnout team.</p>`}
+   <p class="note" style="margin-top:10px"><b>In immediate danger?</b> Contact local emergency services first (911 in the US). Turnout can't respond to emergencies.</p>
+   <div class="row" style="margin-top:16px"><button class="btn ghost sm" data-s="close">Cancel</button><button class="btn" data-s="go" ${SF.busy||blockedNow||(SF.mode==='report'&&!SF.cat)?'disabled':''}>${SF.mode==='block'?'Block':'Send report'}</button></div>`;
+}
+async function submitSafety(){
+  if(!SF||SF.busy)return;const id=SF.id,mode=SF.mode,also=SF.also,together=!!(S.upcoming&&S.upcoming.guests.includes(id)&&S.upcoming.guests.includes('me'));
+  SF.busy=true;drawSafety();let shared=false;
+  const ok=await realDo(async()=>{
+    if(mode==='block')shared=await rpc('block_member',{p_user:did(id)});
+    else{await rpc('report_member',{p_circle:cid(),p_user:did(id),p_category:SF.cat,p_note:SF.note||null,p_also_block:also});shared=also&&together}
+  });
+  if(ok){
+    $('#safety').classList.remove('on');SF=null;
+    toast((mode==='block'?'Blocked. You won\'t be placed in the same party.':'Report sent. Thank you for telling us.'+(also?' They are blocked too.':''))+(shared?' You\'re both invited to the current party, so you may want to decline it.':''));
+  }else if(SF){SF.busy=false;drawSafety()}
+}
+$('#safety').addEventListener('click',e=>{
+  const t=e.target.closest('[data-s]');if(!t||!SF)return;const k=t.dataset.s;
+  if(k==='mode'){SF.mode=t.dataset.v;drawSafety()}
+  else if(k==='cat'){SF.cat=t.dataset.v;drawSafety()}
+  else if(k==='also'){SF.also=t.checked}
+  else if(k==='close'){$('#safety').classList.remove('on');SF=null}
+  else if(k==='go')submitSafety();
+});
+$('#safety').addEventListener('input',e=>{if(e.target.id==='sf-note'&&SF)SF.note=e.target.value});
+function safetyCard(){
+  if(!REAL.on)return'';
+  const blocked=S.members.filter(m=>m.blocked),others=S.members.filter(m=>m.id!=='me');
+  let h=`<div class="card"><h2>Safety</h2><p class="sub">Blocking and reporting are private. The person is never told it was you.</p>
+    <h3 style="font-size:20px">Blocked</h3>
+    ${blocked.length?blocked.map(m=>`<div class="rrow"><b>${esc(label(m))}</b><button class="btn ghost sm" data-act="unblock" data-u="${esc(m.id)}">Unblock</button></div>`).join(''):'<p class="note">Nobody blocked.</p>'}
+    <h3 style="font-size:20px;margin-top:16px">Report or block someone</h3>
+    ${others.length?`<div class="row"><select id="sf-pick" style="flex:1;min-width:160px">${others.map(m=>`<option value="${esc(m.id)}">${esc(label(m))}</option>`).join('')}</select><button class="btn sm" data-act="safetypick">Continue</button></div>`:'<p class="note">No other members yet.</p>'}
+    <p class="note" style="margin-top:10px"><b>In immediate danger?</b> Contact local emergency services first (911 in the US).</p>`;
+  if(isOwner()){
+    const rs=REAL.reports||[],open=REAL.snap.open_reports||0;
+    h+=`<h3 style="font-size:20px;margin-top:22px">Reports in your circle ${open?`<span class="chip">${open} open</span>`:''}</h3>
+      <p class="note">You can see who a report is about but not who sent it. Nothing happens automatically: you decide.</p>
+      ${rs.length?rs.map(r=>`<div class="rrow" style="align-items:flex-start"><div><b>${esc(r.handle)}</b> <span class="chip ${r.status==='open'?'':'g'}">${esc(CATS[r.category]||r.category)}</span>${r.open_for_member>1&&r.status==='open'?` <span class="chip">${r.open_for_member} open reports</span>`:''}
+        <div class="note">${r.note?esc(r.note):'No details given'} · ${esc(new Date(r.created_at).toLocaleDateString())} · ${esc(r.status)}</div></div>
+        <div style="text-align:right">${r.status==='open'?`<button class="btn ghost sm" data-act="resolve" data-r="${esc(r.id)}">Resolved</button> <button class="btn ghost sm" data-act="dismiss" data-r="${esc(r.id)}">Dismiss</button> `:''}<button class="btn ghost sm danger" data-act="removemem" data-u="${esc(r.reported)}" data-h="${esc(r.handle)}">Remove from circle</button></div></div>`).join(''):'<p class="note">No reports. Good.</p>'}`;
+  }
+  return h+'</div>';
 }
 /* ===================== cloud (Supabase): optional ===================== */
 /* The URL and anon key are public by design; row-level security in the database protects the data. */
 const SB_URL='https://nmbrsdnopuhcbhxdgycu.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tYnJzZG5vcHVoY2JoeGRneWN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4NjU0OTgsImV4cCI6MjEwNjQ0MTQ5OH0.2SYfJKNbVU2EfJUyfY75iD-pjpCu6-8jYfORr8mmfrY';
-const CLOUD={sb:null,user:null,circle:null,roster:[],busy:false,msg:''};
+const CLOUD={sb:null,user:null,circle:null,roster:[],busy:false,msg:'',ps:null,otp:null,signMode:'email',phoneLast:''};
+/* ===================== phone verification ===================== */
+/* Supabase Auth sends and checks the text-message code. The server decides what a verified phone is
+   needed for (switch in docs/migration-007.sql); this is just the screens. The number is never shown to
+   other members, and we only ever display its last two digits. */
+function normPhone(raw){
+  const t=String(raw||'').trim(),d=t.replace(/\D/g,'');
+  if(t.startsWith('+'))return d.length>=8&&d.length<=15?'+'+d:null;
+  if(d.length===10)return '+1'+d;
+  if(d.length===11&&d[0]==='1')return '+'+d;
+  return null;
+}
+const maskNum=p=>'\u2022\u2022\u2022\u2022 '+String(p||'').slice(-2);
+const isVerified=()=>CLOUD.ps?!!CLOUD.ps.verified:!!(CLOUD.user&&CLOUD.user.phone_confirmed_at);
+const needPhone=()=>!!(CLOUD.ps&&CLOUD.ps.required&&!CLOUD.ps.verified);
+async function loadPhoneStatus(){try{const r=await CLOUD.sb.rpc('phone_status');CLOUD.ps=r.error?null:r.data}catch(e){CLOUD.ps=null}}
+function phoneSection(){
+  if(isVerified()){const ph=(CLOUD.user&&CLOUD.user.phone)||CLOUD.phoneLast;return `<div class="row" style="margin-top:10px"><span class="chip g">Phone verified${ph?' '+esc(maskNum(ph)):''}</span></div>`}
+  const req=!!(CLOUD.ps&&CLOUD.ps.required),o=CLOUD.otp&&CLOUD.otp.mode==='verify'?CLOUD.otp:null,cool=o&&Date.now()-o.at<45000;
+  return `<div class="${req?'warn':''}" style="margin-top:14px"><h3 style="font-size:20px;margin-bottom:4px">Verify your phone</h3>
+    <p class="note">${req?'Circles need a verified phone number to create or join. ':'A verified number tells your circle you\'re a real person. '}We text you a 6-digit code. Your number is never shown to other members.</p>
+    ${!o?`<div class="row" style="margin-top:8px"><input type="text" id="pv-phone" inputmode="tel" autocomplete="tel" placeholder="+1 555 123 4567" maxlength="20" style="flex:1;min-width:170px"><button class="btn sm" data-act="pv-send">Text me a code</button></div><p class="note" style="margin-top:6px">Outside the US, start with your country code, like +44.</p>`
+     :`<p class="note" style="margin-top:8px">Code sent to ${esc(maskNum(o.phone))}.</p><div class="row"><input type="text" id="pv-code" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="6" style="width:140px"><button class="btn sm g" data-act="pv-verify">Verify</button><button class="btn ghost sm" data-act="pv-send" ${cool?'disabled':''}>Send again</button><button class="btn ghost sm" data-act="pv-reset">Use another number</button></div>`}</div>`;
+}
+function sendCode(kind){
+  const el=document.getElementById(kind+'-phone');let phone;
+  if(el){phone=normPhone(el.value);if(!phone)return toast('Enter a valid phone number. Outside the US, start with your country code.')}
+  else if(CLOUD.otp){phone=CLOUD.otp.phone;if(Date.now()-CLOUD.otp.at<45000)return toast('Please wait a moment before asking for another code.')}
+  else return;
+  cloudDo(async()=>{
+    const r=kind==='ps'?await CLOUD.sb.auth.signInWithOtp({phone}):await CLOUD.sb.auth.updateUser({phone});
+    if(r.error)throw r.error;
+    CLOUD.otp={mode:kind==='ps'?'signin':'verify',phone,at:Date.now()};toast('Code sent. Check your texts.');
+    setTimeout(()=>{if(CLOUD.otp&&CLOUD.otp.phone===phone)renderMe()},46000);
+  });
+}
+function verifyCode(kind){
+  const c=((document.getElementById(kind+'-code')||{}).value||'').replace(/\D/g,'');
+  if(c.length!==6||!CLOUD.otp)return toast('Enter the 6-digit code from the text.');
+  const phone=CLOUD.otp.phone;
+  cloudDo(async()=>{
+    const r=await CLOUD.sb.auth.verifyOtp({phone,token:c,type:kind==='ps'?'sms':'phone_change'});
+    if(r.error)throw new Error(/expired|invalid/i.test(r.error.message||'')?'That code didn\'t work or has expired. Ask for a new one.':r.error.message);
+    CLOUD.otp=null;
+    if(kind==='pv'){
+      CLOUD.phoneLast=phone.slice(-2);await loadPhoneStatus();
+      try{await joinPending();await loadCircle();if(REAL.on)await refreshReal()}catch(e){cloudErr(e)}
+      toast('Phone verified');
+    }
+  });
+}
 try{const q=new URLSearchParams(location.search);if(q.get('join'))localStorage.setItem('turnout.join',JSON.stringify({c:q.get('join'),by:q.get('by')||null}))}catch(e){}
 const cloudErr=e=>toast((e&&e.message)||'Something went wrong. Try again.');
 async function initCloud(){
@@ -1028,8 +1181,8 @@ async function initCloud(){
   await onAuth();
 }
 async function onAuth(){
-  if(CLOUD.user){try{await syncProfile();await joinPending();await loadCircle()}catch(e){cloudErr(e)}}
-  else{CLOUD.circle=null;CLOUD.roster=[]}
+  if(CLOUD.user){try{await loadPhoneStatus();await syncProfile();await joinPending();await loadCircle()}catch(e){cloudErr(e)}}
+  else{CLOUD.circle=null;CLOUD.roster=[];CLOUD.ps=null}
   if(CLOUD.circle&&CLOUD.circle.status==='approved'){if(modePref()!=='demo'&&!REAL.on)await enterReal()}
   else if(REAL.on)leaveReal();
   renderAll();
@@ -1044,7 +1197,9 @@ async function syncProfile(){
 async function joinPending(){
   let j=null;try{j=JSON.parse(localStorage.getItem('turnout.join')||'null')}catch(e){}
   if(!j||!byId('me'))return;
+  if(needPhone()){toast('Verify your phone to join. Your invite is saved.');return}
   const r=await CLOUD.sb.rpc('join_circle',{p_code:j.c,p_by:j.by});
+  if(r.error&&/verify your phone/i.test(r.error.message||'')){await loadPhoneStatus();toast('Verify your phone to join. Your invite is saved.');return}
   try{localStorage.removeItem('turnout.join')}catch(e){}
   if(r.error)throw r.error;toast(`Request sent to join ${r.data}. The owner will approve you.`);
 }
@@ -1057,10 +1212,17 @@ async function cloudDo(fn){if(CLOUD.busy)return;CLOUD.busy=true;try{await fn()}c
 const inviteLink=()=>CLOUD.circle&&CLOUD.circle.invite_code?`${location.origin}${location.pathname}?join=${CLOUD.circle.invite_code}&by=${CLOUD.user.id}`:'';
 function accountCard(){
   if(!CLOUD.sb)return `<div class="card"><h2>Your account</h2><p class="sub">Cloud sign-in isn't available right now. The demo above still works and saves on this device.</p></div>`;
-  if(!CLOUD.user)return `<div class="card tint-t"><h2>Save your profile</h2><p class="sub">Sign in with your email. We send you a one-time link, no password. Phone sign-in is coming.</p>
-    <div class="row"><input type="text" id="c-email" inputmode="email" autocomplete="email" placeholder="you@email.com" style="flex:1;min-width:200px" maxlength="120"><button class="btn sm" data-act="signin">Email me a link</button></div></div>`;
+  if(!CLOUD.user){
+    const ph=CLOUD.signMode==='phone',o=CLOUD.otp&&CLOUD.otp.mode==='signin'?CLOUD.otp:null,cool=o&&Date.now()-o.at<45000;
+    return `<div class="card tint-t"><h2>Save your profile</h2><p class="sub">Sign in with your email (we send a one-time link) or your phone (we text a code). No password either way.</p>
+      <div class="segs"><button data-act="signmode" data-v="email" class="${ph?'':'on'}">Email</button><button data-act="signmode" data-v="phone" class="${ph?'on':''}">Phone</button></div>
+      ${!ph?`<div class="row"><input type="text" id="c-email" inputmode="email" autocomplete="email" placeholder="you@email.com" style="flex:1;min-width:200px" maxlength="120"><button class="btn sm" data-act="signin">Email me a link</button></div>`
+       :!o?`<div class="row"><input type="text" id="ps-phone" inputmode="tel" autocomplete="tel" placeholder="+1 555 123 4567" maxlength="20" style="flex:1;min-width:190px"><button class="btn sm" data-act="ps-send">Text me a code</button></div><p class="note" style="margin-top:6px">Outside the US, start with your country code, like +44. Message and data rates may apply.</p>`
+       :`<p class="note">Code sent to ${esc(maskNum(o.phone))}.</p><div class="row"><input type="text" id="ps-code" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="6" style="width:140px"><button class="btn sm g" data-act="ps-verify">Verify</button><button class="btn ghost sm" data-act="ps-send" ${cool?'disabled':''}>Send again</button><button class="btn ghost sm" data-act="ps-reset">Use another number</button></div>`}</div>`;
+  }
   const c=CLOUD.circle,owner=c&&c.role==='owner';
-  let h=`<div class="card tint-t"><div class="row" style="justify-content:space-between"><div><h2>Your account</h2><p class="sub" style="margin:0">Signed in as ${esc(CLOUD.user.email||'your account')}</p></div><button class="btn ghost sm" data-act="signout">Sign out</button></div>`;
+  let h=`<div class="card tint-t"><div class="row" style="justify-content:space-between"><div><h2>Your account</h2><p class="sub" style="margin:0">Signed in as ${esc(CLOUD.user.email||(CLOUD.user.phone?'phone '+maskNum(CLOUD.user.phone):'your account'))}</p></div><button class="btn ghost sm" data-act="signout">Sign out</button></div>`;
+  h+=phoneSection();
   if(!byId('me')&&!c)h+=`<div class="warn">Finish joining (handle, picks, vibe) above, then your profile saves automatically.</div>`;
   else if(!c)h+=`<h3 style="font-size:22px;margin:16px 0 6px">Start a real circle</h3><p class="note">Or open an invite link from a friend to ask to join theirs.</p>
     <div class="row" style="margin-top:8px"><input type="text" id="c-name" placeholder="Name your circle" style="flex:1;min-width:180px" maxlength="60"><button class="btn sm g" data-act="mkcircle">Create</button></div>`;
@@ -1072,7 +1234,7 @@ function accountCard(){
       <div class="row"><input type="text" readonly value="${esc(inviteLink())}" style="flex:1;min-width:200px"><button class="btn sm" data-act="copylink">Copy</button></div>
       ${owner&&pend.length?`<h3 style="font-size:20px;margin:16px 0 6px">Waiting for your approval</h3>${pend.map(r=>`<div class="rrow"><b>${esc(r.handle)}</b><span><button class="btn sm g" data-act="approve" data-u="${esc(r.user_id)}">Approve</button> <button class="btn ghost sm" data-act="decline" data-u="${esc(r.user_id)}">Decline</button></span></div>`).join('')}`:''}
       <h3 style="font-size:20px;margin:16px 0 6px">Members</h3>${ok.map(r=>`<div class="rrow"><b>${esc(r.handle)}</b><span class="chip ${r.role==='owner'?'g':''}">${esc(r.role)}</span></div>`).join('')}
-      <p class="note" style="margin-top:10px">Next phase: the rotation, matching and points above will run on these real members.</p>`;
+`;
   }
   return h+'</div>';
 }
