@@ -61,13 +61,13 @@ Moving other people's money (the circle pot) triggers payment-compliance questio
 
 ## Setup status
 
-Run these in the Supabase SQL editor, in order: `docs/turnout-schema.sql`, `docs/migration-002.sql`, `docs/migration-003.sql`, `docs/migration-004.sql`, `docs/migration-005.sql`. Each is safe to re-run.
+Run these in the Supabase SQL editor, in order: `docs/turnout-schema.sql`, `docs/migration-002.sql`, `docs/migration-003.sql`, `docs/migration-004.sql`, `docs/migration-005.sql`, `docs/migration-006.sql`. Each is safe to re-run.
 
 1. In Supabase: Authentication > URL Configuration, set the Site URL to your site and add your site plus `/**` as a redirect URL. Email sign-in works out of the box; phone needs an SMS provider.
 2. The site already contains the project URL and anon key (both public by design). Never put the `service_role` key in the repo.
 3. **Phase 1 (done):** email sign-in, profile and idea ratings saved, create a circle, invite link, owner approval.
 4. **Phase 2 (done):** rotation, parties and matching run on real circle members (see below).
-5. **Safety (done):** report and block, and a hidden host address (see below).
+5. **Safety (done):** report and block, a hidden host address, and an email alert to you for reports (see below).
 
 ## Phase 2: how a real circle works
 
@@ -106,7 +106,7 @@ When you are signed in and approved into a circle, the Circle tab shows a **Samp
 - Reasons: made me feel unsafe, harassment or unwanted contact, inappropriate behavior, fake or misleading profile, something else.
 - The **circle owner** sees reports about other members (who it's about, reason, note, how many open reports that member has) in the Me tab, and can mark them resolved or dismissed, or remove the member. The owner does **not** see who sent a report.
 - Removing a member cuts their access, deletes their invites, and cancels a party they were hosting.
-- **Reports about the owner can only be read by whoever runs the database** (you, as the app operator). Nothing emails you yet. To review them, run this in the Supabase SQL editor:
+- **Reports about the owner can only be read by whoever runs the database** (you, as the app operator). Every report also emails you (`docs/migration-006.sql`; setup in [`docs/turnout-alerts.md`](turnout-alerts.md)). The email is a nudge, not the record. To review reports, run this in the Supabase SQL editor:
 
 ```sql
 select r.id, r.created_at, r.status, r.reason, r.note,
@@ -125,7 +125,7 @@ order by (r.status = 'open') desc, r.created_at desc;
 - Blocking doesn't hide your profile answers from the person (circle members can see each other's answers), and doesn't remove either of you from the circle. Only the owner can remove someone.
 - A report can't be edited or withdrawn after it's sent.
 - Turnout can't respond to emergencies. The report screen says to call local emergency services first.
-- Still to build before strangers come to homes: phone-verified accounts, and an email alert to you when a safety report comes in.
+- Still to build before strangers come to homes: phone-verified accounts.
 
 ## Hidden host address
 
@@ -146,9 +146,13 @@ order by (r.status = 'open') desc, r.created_at desc;
 - **The owner never sees the address** unless they are hosting or going. That's deliberate: owners moderate, they don't need to know where people live.
 - **Limits.** Anyone who is going can copy the address. The "Open in Maps" link sends it to Google if tapped. There's no timed reveal yet (for example, only within a few hours of the party); that's a possible next step.
 
+## Email alert for reports
+
+`docs/migration-006.sql`, `api/turnout-report-alert.js`, and the setup guide `docs/turnout-alerts.md` (about 15 minutes, once). Every new report triggers an email to you with the category, who it's about, who filed it, the circle, and the note (handles only: no emails, ids or addresses). It is sent by a database trigger through Supabase's HTTP queue to a small Vercel function, which emails you through Resend. A failure to send can never stop a report from being saved, but it can mean a missed email, because the queue doesn't retry; so the guide also shows how to check the open reports yourself.
+
 ### Tests
 
-`docs/sql-tests/` has 137 database checks and the stub that lets them run on plain PostgreSQL (permissions, privacy, rotation fairness, cycle rollover, claims, passing, points, and direct-write attempts that must fail). To run them: start a local PostgreSQL, then `docs/sql-tests/run.sh`.
+`docs/sql-tests/` has 156 database checks (plus 13 for the email function in `tests/`, run with `npm test`) and the stub that lets them run on plain PostgreSQL (permissions, privacy, rotation fairness, cycle rollover, claims, passing, points, and direct-write attempts that must fail). To run them: start a local PostgreSQL, then `docs/sql-tests/run.sh`.
 
 ### Known limits
 

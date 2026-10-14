@@ -6,3 +6,16 @@ grant usage on schema public, auth to anon, authenticated;
 alter default privileges in schema public grant all on tables to anon, authenticated;
 alter default privileges in schema public grant all on sequences to anon, authenticated;
 alter default privileges in schema public grant execute on functions to anon, authenticated;
+
+-- Stand-in for Supabase's pg_net: records each call instead of sending it.
+create schema if not exists net;
+create table if not exists net.calls (id bigserial primary key, url text, body jsonb, headers jsonb);
+create or replace function net.http_post(url text, body jsonb default '{}'::jsonb, params jsonb default '{}'::jsonb,
+                                         headers jsonb default '{"Content-Type":"application/json"}'::jsonb,
+                                         timeout_milliseconds integer default 5000)
+returns bigint language plpgsql as $$
+declare i bigint;
+begin
+  insert into net.calls (url, body, headers) values (url, body, headers) returning id into i;
+  return i;
+end $$;

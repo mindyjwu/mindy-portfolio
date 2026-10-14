@@ -1,0 +1,22 @@
+{
+  "kind": "report",
+  "test": false,
+  "circle": {
+    "name": "The Sunday Table"
+  },
+  "report": {
+    "id": 1,
+    "note": "Made comments about where I live and asked me to stay after.",
+    "category": "unsafe",
+    "created_at": "2026-10-14T19:34:15.430622+00:00",
+    "event_month": null
+  },
+  "reported": {
+    "handle": "@maya.eats",
+    "is_owner": true,
+    "open_reports": 1
+  },
+  "reporter": {
+    "handle": "@jordan.runs"
+  }
+}
