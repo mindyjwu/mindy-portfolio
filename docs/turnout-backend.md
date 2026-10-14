@@ -61,7 +61,40 @@ Moving other people's money (the circle pot) triggers payment-compliance questio
 
 ## Setup status
 
-1. Run `docs/turnout-schema.sql`, then `docs/migration-002.sql` (adds the circle functions and seeds the 14 ideas).
-2. In Supabase: Authentication > URL Configuration, set the Site URL to your site and add your site plus `/**` as a redirect URL. Email sign-in works out of the box; phone needs an SMS provider.
-3. The site already contains the project URL and anon key (both public by design). Never put the `service_role` key in the repo.
-4. Phase 1 (done): email sign-in, profile and idea ratings saved, create a circle, invite link, owner approval. Phase 2: run rotation, matching and points on real members.
+Run these in the Supabase SQL editor, in order: `docs/turnout-schema.sql`, `docs/migration-002.sql`, `docs/migration-003.sql`. Each is safe to re-run.
+
+1. In Supabase: Authentication > URL Configuration, set the Site URL to your site and add your site plus `/**` as a redirect URL. Email sign-in works out of the box; phone needs an SMS provider.
+2. The site already contains the project URL and anon key (both public by design). Never put the `service_role` key in the repo.
+3. **Phase 1 (done):** email sign-in, profile and idea ratings saved, create a circle, invite link, owner approval.
+4. **Phase 2 (done):** rotation, parties and matching run on real circle members (see below).
+
+## Phase 2: how a real circle works
+
+When you are signed in and approved into a circle, the Circle tab shows a **Sample circle / Your circle** switch. In your circle, every action is a server call and the screen is built from `circle_state()`:
+
+| Action | Server function | Rules enforced by the database |
+|---|---|---|
+| Spin for the next host | `spin_host` | any approved member; nobody hosts twice per cycle; weighted by months since last hosted (points are not used); one open party at a time; cycle rolls over when everyone has gone |
+| Claim a month / release it | `claim_month`, `pass_turn(circle, month)` | one claim per cycle; no past months |
+| Host can't make it | `pass_turn(circle)` | removes the party, skips the host for that month only |
+| Skip me this month | `set_skip` | |
+| Pick a theme, build the guest list | `set_party` | host or circle owner only; every guest must be an approved member |
+| RSVP | `rsvp` | invited guests only |
+| Rate, lock in friends | `rate_event` | must have been there; once per party; feeds points, connections and matcher feedback |
+| Close the party | `close_event` | host or owner; awards hosting and attendance points; opens the next turn |
+
+**Matching still runs in the host's browser.** It needs the members' answers, so `circle_state()` returns them to every approved member. That means anyone approved into a circle can see the other members' vibe answers and who is friends with whom. Nobody outside the circle can. The vibe quiz says so. Moving matching fully server-side (so answers never leave the database) is the next privacy step and needs either a database function or a server endpoint.
+
+**Models are not stored.** The browser replays the circle's raw feedback (party ratings and who-clicked-with-whom, with no names attached) each time the circle loads, so everyone gets the same weights and there is no model state to tamper with. A member can still submit skewed feedback about themselves; each submission is bounded (at most 20 numbers per row, only for people at the same party, once per party).
+
+**Points are written only by the database.** The points ledger has row-level security with no policies, so the browser cannot read or edit it directly.
+
+### Tests
+
+`docs/sql-tests/` has 57 database checks and the stub that lets them run on plain PostgreSQL (permissions, privacy, rotation fairness, cycle rollover, claims, passing, points, and direct-write attempts that must fail). To run them: start a local PostgreSQL, then `docs/sql-tests/run.sh`.
+
+### Known limits
+
+- No live updates yet: the screen refreshes when you switch back to the tab, or with the Refresh button.
+- The month a party belongs to is based on the server's date (UTC).
+- Phone sign-in is not wired up yet (email only).
