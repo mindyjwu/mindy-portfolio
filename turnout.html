@@ -21,7 +21,7 @@
   --acc:#6C86F0; --cool:#2F6690;
   --t1:#EAF2F8; --t2:#E3EEF5; --t3:#EDF2F4; --t4:#DCE6FA; --t5:#E7E0F5; --t6:#F5E4EA;
   --poster:linear-gradient(135deg,#BFD8EE 0%,#D6D3F3 55%,#F1D6E2 100%);
-  --shadow:0 1px 2px rgba(22,35,46,.05),0 22px 44px -26px rgba(22,35,46,.30); --veil:rgba(11,19,26,.5);
+  --danger:#B4432F; --shadow:0 1px 2px rgba(22,35,46,.05),0 22px 44px -26px rgba(22,35,46,.30); --veil:rgba(11,19,26,.5);
   --glow:radial-gradient(900px 480px at 12% -8%,rgba(160,196,230,.55),transparent 60%),radial-gradient(760px 460px at 96% 4%,rgba(214,200,244,.55),transparent 58%);
   --gate:var(--glow),linear-gradient(#F5F9FC,#E8F0F6);
 }
@@ -31,7 +31,7 @@
   --acc:#93A6FF; --cool:#8CBCE0;
   --t1:#15212C; --t2:#1A2A37; --t3:#19242D; --t4:#1D2A4A; --t5:#292346; --t6:#382637;
   --poster:linear-gradient(135deg,#16405F 0%,#312F6E 55%,#592D5A 100%);
-  --shadow:0 1px 2px rgba(0,0,0,.4),0 24px 48px -28px rgba(0,0,0,.8); --veil:rgba(3,7,12,.72);
+  --danger:#FF9C86; --shadow:0 1px 2px rgba(0,0,0,.4),0 24px 48px -28px rgba(0,0,0,.8); --veil:rgba(3,7,12,.72);
   --glow:radial-gradient(900px 480px at 12% -8%,rgba(40,90,140,.5),transparent 60%),radial-gradient(760px 460px at 96% 4%,rgba(88,60,150,.45),transparent 58%);
   --gate:var(--glow),linear-gradient(#0A1219,#0D1822);
 }
@@ -97,6 +97,11 @@ main{padding:18px 0 40px}
 .chip.pick.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 input[type=text],select{font:inherit;padding:11px 14px;border-radius:14px;border:1px solid var(--line);background:var(--paper2);color:var(--ink);width:100%}
 input[type=text]:focus,select:focus{outline:2px solid var(--sec);outline-offset:1px}
+textarea{font:inherit;padding:11px 14px;border-radius:14px;border:1px solid var(--line);background:var(--paper2);color:var(--ink);width:100%;min-height:84px;resize:vertical}
+textarea:focus{outline:2px solid var(--sec);outline-offset:1px}
+.linkbtn{font-size:12.5px;font-weight:600;color:var(--soft);text-decoration:underline;text-underline-offset:3px;padding:2px 0}
+.linkbtn:hover{color:var(--ink)}
+.btn.danger{color:var(--danger);border-color:var(--danger)}
 input[type=range]{width:100%;accent-color:var(--sec)}
 label.f{display:block;font-weight:600;font-size:13px;margin:14px 0 5px;color:var(--soft);text-transform:uppercase;letter-spacing:.06em}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
@@ -268,6 +273,7 @@ footer{text-align:center;color:var(--soft);font-size:13px;padding:20px 18px 48px
 <footer>Demo build. Everything runs in your browser and saves on this device only. No accounts, no server, no data leaves the page. <a href="#" id="reset">Reset demo</a></footer>
 
 <div class="modal" id="join"><div class="card tint-o" id="join-card"></div></div>
+<div class="modal" id="safety"><div class="card" id="safety-card"></div></div>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
@@ -445,7 +451,8 @@ function buildRoom(hostId,size,noise){
   const att=all.map(id=>S.attended[id]||0),mx=Math.max(...att,0);
   const fair={};all.forEach(id=>fair[id]=.6*(mx-(S.attended[id]||0))/(mx+1)+.8*Math.min(byId(id).points||0,250)/250+((S.attended[id]||0)===0?.4:0)+(noise?Math.random()*.5:0));
   size=Math.min(size,all.length);
-  let room=[...must];const pool=all.filter(id=>!room.includes(id)).sort(()=>Math.random()-.5);
+  const avoid=new Set(REAL.on&&hostId==='me'?S.members.filter(m=>m.blocked).map(m=>m.id):[]);
+  let room=[...must];const pool=all.filter(id=>!room.includes(id)&&!avoid.has(id)).sort(()=>Math.random()-.5);
   while(room.length<size&&pool.length)room.push(pool.pop());
   let cur=roomScore(room,A,fair);
   for(let it=0;it<400;it++){
@@ -548,7 +555,7 @@ function renderCircle(){
     <div class="capbar"><i style="width:${S.members.length/S.circle.cap*100}%"></i></div>
     <div class="members" style="margin-top:14px">${S.members.map(m=>`<div class="mem ${up&&up.host===m.id?'up':''}">${avatar(m)}<div class="h">${esc(label(m))}</div><div class="note">${PLATS[m.platform]||''}</div>
       <div>${S.cycleHosted.includes(m.id)?'<span class="chip g">hosted ✓</span>':'<span class="chip">in the pool</span>'}${m.skip?'<span class="chip b">skipping</span>':''}</div>
-      <div>${m.tags.map(t=>TAGS[t]).join(' ')}</div></div>`).join('')}</div>
+      <div>${m.tags.map(t=>TAGS[t]).join(' ')}</div>${REAL.on&&m.id!=='me'?`<div style="margin-top:6px"><button class="linkbtn" data-act="safety" data-u="${esc(m.id)}">${m.blocked?'Blocked · manage':'Report or block'}</button></div>`:''}</div>`).join('')}</div>
     ${REAL.on?'<p class="note" style="margin-top:18px">To add people, share your invite link from the Me tab. You approve each new person.</p>':`<h3 style="font-size:22px;margin:22px 0 4px">Invite someone</h3>
     <div class="row"><select id="a-plat" style="width:auto">${Object.entries(PLATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select><input type="text" id="a-handle" placeholder="@handle or phone" style="flex:1;min-width:140px" maxlength="30">
       <button class="btn sm g" data-act="add">Add</button></div>
@@ -604,7 +611,7 @@ function renderMix(){
     <div class="note">🟢 ${kn} you know · 🟠 ${nw} new faces</div></div>
     <div style="margin-top:10px">${room.map((id,k)=>{const m=byId(id),isK=knows(A,'me',id);
       return `<div class="guest" style="animation-delay:${k*.05}s">${avatar(m)}<div><b>${esc(label(m))}</b> ${id===up.host?'<span class="chip">host</span>':id==='me'?'<span class="chip b">you</span>':isK?'<span class="chip g">friend</span>':'<span class="chip">new</span>'}${REAL.on&&up.rsvps&&up.rsvps[id]?`<span class="chip ${up.rsvps[id].status==='declined'?'':'g'}">${esc(up.rsvps[id].status)}</span>`:''}
-        <p>${id===up.host?'Hosting. Brings: '+esc(idea.host[0]):'Brings: <b>'+esc((up.assign&&up.assign[id])||'')+'</b>'}</p><p class="note">${icebreaker(id,room,A)}</p></div></div>`}).join('')}</div>
+        <p>${id===up.host?'Hosting. Brings: '+esc(idea.host[0]):'Brings: <b>'+esc((up.assign&&up.assign[id])||'')+'</b>'}</p><p class="note">${icebreaker(id,room,A)}</p>${REAL.on&&id!=='me'?`<button class="linkbtn" data-act="safety" data-u="${esc(id)}">Report or block</button>`:''}</div></div>`}).join('')}</div>
     <div class="row" style="margin-top:14px"><button class="btn g sm" data-act="copy">Copy invite text</button></div>`;
 }
 function assignBring(room,host,idea){
@@ -718,6 +725,7 @@ function suggest(A){
 }
 
 function renderMe(){
+  const safe=safetyCard();
   const me=byId('me'),el=$('#pane-me');
   if(!me){el.innerHTML='<div class="card tint-o" style="text-align:center"><h2>Join to unlock your profile</h2><button class="btn" data-act="setup" data-step="1">Join the circle</button></div>'+accountCard();return}
   const rank=[...S.members].sort((a,b)=>b.points-a.points),pos=rank.findIndex(m=>m.id==='me')+1,mx=Math.max(1,rank[0].points);
@@ -735,7 +743,7 @@ function renderMe(){
   <div class="card tint-b"><h2>What the matcher has learned</h2>
     <p class="sub">Starts with sensible guesses. Every time you lock in (or skip) people after a party, it re-weights which traits actually predict that you'd click. Trained on ${S.pm.n} pair${S.pm.n===1?'':'s'} so far.</p>
     ${w.map(x=>`<div class="wbar"><span>${esc(FEAT_NAME[x.k])}</span><i style="width:${Math.max(4,Math.abs(x.v)/wm*55)}%;${x.v<0?'background:var(--pri)':''}"></i><span style="width:auto">${x.v.toFixed(2)}</span></div>`).join('')}
-    <p class="note" style="margin-top:8px">${REAL.on?'Members of this circle can see each other\'s answers; that is how matching works. Nobody outside the circle can.':'Demo note: the other members in the sample circle are simulated.'}</p></div>${accountCard()}`;
+    <p class="note" style="margin-top:8px">${REAL.on?'Members of this circle can see each other\'s answers; that is how matching works. Nobody outside the circle can.':'Demo note: the other members in the sample circle are simulated.'}</p></div>${accountCard()}${safe}`;
 }
 function renderAll(){renderStats();renderCircle();renderParty();renderMoney();renderAfter();renderMe();
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.tab===ui.tab));
@@ -916,7 +924,7 @@ window.openJoin=()=>openSetup(1,false);
 /* ===================== real circle mode ===================== */
 /* When you are signed in and approved into a circle, the screen is built from the server's
    copy (circle_state) and every action is a server call. The sample circle stays available. */
-const REAL={on:false,demo:null,snap:null,busy:false};
+const REAL={on:false,demo:null,snap:null,busy:false,reports:null};
 const cid=()=>CLOUD.circle.circle_id;
 const rid=u=>REAL.snap&&u===REAL.snap.me?'me':u;
 const did=id=>id==='me'?REAL.snap.me:id;
@@ -928,8 +936,8 @@ const isOwner=()=>!!(REAL.on&&REAL.snap&&REAL.snap.circle.owner_id===REAL.snap.m
 const canPlan=()=>!REAL.on||!!(S.upcoming&&(S.upcoming.host==='me'||isOwner()));
 async function rpc(name,args){if(!CLOUD.sb)throw new Error('Sign in first');const r=await CLOUD.sb.rpc(name,args);if(r.error)throw r.error;return r.data}
 function buildReal(snap){
-  REAL.snap=snap;
-  const ms=snap.members.map((m,i)=>({id:rid(m.user_id),handle:m.handle,platform:m.platform||'other',tags:m.interests||[],is:m.qualities||[],want:m.looking_for||[],vibe:{...(m.vibe||{})},prefs:{...(m.ratings||{})},points:m.points||0,skip:!!m.skip,hosted:(m.hosted||[]).map(ym7),av:'',hue:HUES[i%6],inCycle:!!m.in_cycle,att:m.attended||0}));
+  REAL.snap=snap;const bl=new Set(snap.my_blocks||[]);
+  const ms=snap.members.map((m,i)=>({id:rid(m.user_id),handle:m.handle,platform:m.platform||'other',tags:m.interests||[],is:m.qualities||[],want:m.looking_for||[],vibe:{...(m.vibe||{})},prefs:{...(m.ratings||{})},points:m.points||0,skip:!!m.skip,hosted:(m.hosted||[]).map(ym7),av:'',hue:HUES[i%6],inCycle:!!m.in_cycle,att:m.attended||0,blocked:bl.has(m.user_id)}));
   const ev=snap.event,asg={};if(ev)Object.entries(ev.assign||{}).forEach(([k,v])=>asg[rid(k)]=v);
   const rs={};if(ev)(ev.rsvps||[]).forEach(r=>rs[rid(r.user_id)]={status:r.status,rated:!!r.rated});
   return{me:snap.me,circle:{name:snap.circle.name,cap:snap.circle.capacity},members:ms,
@@ -950,6 +958,7 @@ async function refreshReal(){
   const snap=await rpc('circle_state',{p_circle:cid()});
   S=buildReal(snap);replayModels(snap.feedback||{});
   const mine=byId('me');if(mine&&mine.vibe&&Object.keys(mine.vibe).length)mine.vibeDone=true;
+  REAL.reports=null;if(REAL.snap.circle.owner_id===REAL.snap.me){try{REAL.reports=await rpc('circle_reports',{p_circle:cid()})}catch(e){REAL.reports=[]}}
 }
 async function enterReal(){
   if(!CLOUD.circle||CLOUD.circle.status!=='approved')return;
@@ -988,7 +997,9 @@ async function mixReal(noise){
   const up=S.upcoming;if(!up||!up.idea)return;
   const room=buildRoom(up.host,ui.size,noise||up.guests.length>1),asg=assignBring(room,up.host,ideaOf(up.idea)),a={};
   Object.entries(asg).forEach(([k,v])=>a[did(k)]=v);
-  if(await realDo(()=>rpc('set_party',{p_event:up.id,p_size:ui.size,p_guests:room.map(did),p_assign:a})))toast('Guests invited');
+  let dropped=0;
+  if(await realDo(async()=>{dropped=await rpc('set_party',{p_event:up.id,p_size:ui.size,p_guests:room.map(did),p_assign:a})}))
+    toast(dropped?`Guests invited. ${dropped} member${dropped>1?'s':''} couldn't be placed in this party.`:'Guests invited');
 }
 async function rateReal(){
   const up=S.upcoming,me=byId('me'),A=adj(),here=id=>up.rsvps[id]&&['going','attended'].includes(up.rsvps[id].status);
@@ -1010,8 +1021,71 @@ function realClick(a,t){
     finish:()=>rateReal(),
     close:()=>realDo(()=>rpc('close_event',{p_event:S.upcoming.id})).then(ok=>{if(ok){toast('Party closed. The next turn is open.');ui.tab='circle';renderAll()}}),
     mode:()=>{if(t.dataset.mode==='demo'){setMode('demo');leaveReal()}else{setMode('real');enterReal()}},
-    refresh:()=>realDo(async()=>{})};
+    refresh:()=>realDo(async()=>{}),
+    safety:()=>openSafety(t.dataset.u),
+    safetypick:()=>{const v=$('#sf-pick');if(v)openSafety(v.value)},
+    unblock:()=>realDo(()=>rpc('unblock_member',{p_user:did(t.dataset.u)})).then(ok=>ok&&toast('Unblocked')),
+    resolve:()=>realDo(()=>rpc('resolve_report',{p_report:+t.dataset.r,p_status:'resolved'})).then(ok=>ok&&toast('Marked resolved')),
+    dismiss:()=>realDo(()=>rpc('resolve_report',{p_report:+t.dataset.r,p_status:'dismissed'})).then(ok=>ok&&toast('Dismissed')),
+    removemem:()=>{if(confirm(`Remove ${t.dataset.h} from the circle? They lose access and any invites.`))realDo(()=>rpc('remove_member',{p_circle:cid(),p_user:t.dataset.u})).then(ok=>ok&&toast('Removed from the circle'))}};
   if(!T[a])return false;T[a]();return true;
+}
+/* ===================== safety: report and block ===================== */
+const CATS={unsafe:'Made me feel unsafe',harassment:'Harassment or unwanted contact',inappropriate:'Inappropriate behavior',fake:'Fake or misleading profile',other:'Something else'};
+let SF=null;
+function openSafety(id){const m=byId(id);if(!REAL.on||!m||id==='me')return;SF={id,mode:'block',cat:'',note:'',also:true,busy:false};drawSafety();$('#safety').classList.add('on')}
+function drawSafety(){
+  const m=byId(SF.id),isB=!!m.blocked,blockedNow=SF.mode==='block'&&isB;
+  $('#safety-card').innerHTML=`<h2>${esc(label(m))}</h2><p class="sub">Neither choice tells ${esc(label(m))} it was you.</p>
+   <div class="segs" style="margin-bottom:14px"><button data-s="mode" data-v="block" class="${SF.mode==='block'?'on':''}">Block</button><button data-s="mode" data-v="report" class="${SF.mode==='report'?'on':''}">Report</button></div>
+   ${SF.mode==='block'
+     ?`<p>${isB?'You have already blocked them. You can undo it in the Me tab.':'You two will never be placed in the same party and won\'t be matched with each other. You can undo this any time in the Me tab.'}</p>`
+     :`<label class="f">What happened?</label><div>${Object.entries(CATS).map(([k,v])=>`<span class="chip pick ${SF.cat===k?'on':''}" data-s="cat" data-v="${k}">${v}</span>`).join('')}</div>
+       <label class="f" for="sf-note">Details (optional)</label><textarea id="sf-note" maxlength="500" placeholder="Keep it factual. This helps the circle owner understand.">${esc(SF.note)}</textarea>
+       <label class="check" style="margin-top:12px"><input type="checkbox" data-s="also" ${SF.also?'checked':''}><span>Also block them</span></label>
+       <p class="note">The circle owner can see this report and who it is about, but not who sent it. Reports about the owner go to the Turnout team.</p>`}
+   <p class="note" style="margin-top:10px"><b>In immediate danger?</b> Contact local emergency services first (911 in the US). Turnout can't respond to emergencies.</p>
+   <div class="row" style="margin-top:16px"><button class="btn ghost sm" data-s="close">Cancel</button><button class="btn" data-s="go" ${SF.busy||blockedNow||(SF.mode==='report'&&!SF.cat)?'disabled':''}>${SF.mode==='block'?'Block':'Send report'}</button></div>`;
+}
+async function submitSafety(){
+  if(!SF||SF.busy)return;const id=SF.id,mode=SF.mode,also=SF.also,together=!!(S.upcoming&&S.upcoming.guests.includes(id)&&S.upcoming.guests.includes('me'));
+  SF.busy=true;drawSafety();let shared=false;
+  const ok=await realDo(async()=>{
+    if(mode==='block')shared=await rpc('block_member',{p_user:did(id)});
+    else{await rpc('report_member',{p_circle:cid(),p_user:did(id),p_category:SF.cat,p_note:SF.note||null,p_also_block:also});shared=also&&together}
+  });
+  if(ok){
+    $('#safety').classList.remove('on');SF=null;
+    toast((mode==='block'?'Blocked. You won\'t be placed in the same party.':'Report sent. Thank you for telling us.'+(also?' They are blocked too.':''))+(shared?' You\'re both invited to the current party, so you may want to decline it.':''));
+  }else if(SF){SF.busy=false;drawSafety()}
+}
+$('#safety').addEventListener('click',e=>{
+  const t=e.target.closest('[data-s]');if(!t||!SF)return;const k=t.dataset.s;
+  if(k==='mode'){SF.mode=t.dataset.v;drawSafety()}
+  else if(k==='cat'){SF.cat=t.dataset.v;drawSafety()}
+  else if(k==='also'){SF.also=t.checked}
+  else if(k==='close'){$('#safety').classList.remove('on');SF=null}
+  else if(k==='go')submitSafety();
+});
+$('#safety').addEventListener('input',e=>{if(e.target.id==='sf-note'&&SF)SF.note=e.target.value});
+function safetyCard(){
+  if(!REAL.on)return'';
+  const blocked=S.members.filter(m=>m.blocked),others=S.members.filter(m=>m.id!=='me');
+  let h=`<div class="card"><h2>Safety</h2><p class="sub">Blocking and reporting are private. The person is never told it was you.</p>
+    <h3 style="font-size:20px">Blocked</h3>
+    ${blocked.length?blocked.map(m=>`<div class="rrow"><b>${esc(label(m))}</b><button class="btn ghost sm" data-act="unblock" data-u="${esc(m.id)}">Unblock</button></div>`).join(''):'<p class="note">Nobody blocked.</p>'}
+    <h3 style="font-size:20px;margin-top:16px">Report or block someone</h3>
+    ${others.length?`<div class="row"><select id="sf-pick" style="flex:1;min-width:160px">${others.map(m=>`<option value="${esc(m.id)}">${esc(label(m))}</option>`).join('')}</select><button class="btn sm" data-act="safetypick">Continue</button></div>`:'<p class="note">No other members yet.</p>'}
+    <p class="note" style="margin-top:10px"><b>In immediate danger?</b> Contact local emergency services first (911 in the US).</p>`;
+  if(isOwner()){
+    const rs=REAL.reports||[],open=REAL.snap.open_reports||0;
+    h+=`<h3 style="font-size:20px;margin-top:22px">Reports in your circle ${open?`<span class="chip">${open} open</span>`:''}</h3>
+      <p class="note">You can see who a report is about but not who sent it. Nothing happens automatically: you decide.</p>
+      ${rs.length?rs.map(r=>`<div class="rrow" style="align-items:flex-start"><div><b>${esc(r.handle)}</b> <span class="chip ${r.status==='open'?'':'g'}">${esc(CATS[r.category]||r.category)}</span>${r.open_for_member>1&&r.status==='open'?` <span class="chip">${r.open_for_member} open reports</span>`:''}
+        <div class="note">${r.note?esc(r.note):'No details given'} · ${esc(new Date(r.created_at).toLocaleDateString())} · ${esc(r.status)}</div></div>
+        <div style="text-align:right">${r.status==='open'?`<button class="btn ghost sm" data-act="resolve" data-r="${esc(r.id)}">Resolved</button> <button class="btn ghost sm" data-act="dismiss" data-r="${esc(r.id)}">Dismiss</button> `:''}<button class="btn ghost sm danger" data-act="removemem" data-u="${esc(r.reported)}" data-h="${esc(r.handle)}">Remove from circle</button></div></div>`).join(''):'<p class="note">No reports. Good.</p>'}`;
+  }
+  return h+'</div>';
 }
 /* ===================== cloud (Supabase): optional ===================== */
 /* The URL and anon key are public by design; row-level security in the database protects the data. */

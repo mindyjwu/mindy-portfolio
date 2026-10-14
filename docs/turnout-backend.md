@@ -61,12 +61,13 @@ Moving other people's money (the circle pot) triggers payment-compliance questio
 
 ## Setup status
 
-Run these in the Supabase SQL editor, in order: `docs/turnout-schema.sql`, `docs/migration-002.sql`, `docs/migration-003.sql`. Each is safe to re-run.
+Run these in the Supabase SQL editor, in order: `docs/turnout-schema.sql`, `docs/migration-002.sql`, `docs/migration-003.sql`, `docs/migration-004.sql`. Each is safe to re-run.
 
 1. In Supabase: Authentication > URL Configuration, set the Site URL to your site and add your site plus `/**` as a redirect URL. Email sign-in works out of the box; phone needs an SMS provider.
 2. The site already contains the project URL and anon key (both public by design). Never put the `service_role` key in the repo.
 3. **Phase 1 (done):** email sign-in, profile and idea ratings saved, create a circle, invite link, owner approval.
 4. **Phase 2 (done):** rotation, parties and matching run on real circle members (see below).
+5. **Safety (done):** report and block (see below).
 
 ## Phase 2: how a real circle works
 
@@ -89,9 +90,46 @@ When you are signed in and approved into a circle, the Circle tab shows a **Samp
 
 **Points are written only by the database.** The points ledger has row-level security with no policies, so the browser cannot read or edit it directly.
 
+## Safety: report and block
+
+`docs/migration-004.sql`. Strangers meet at people's homes, so this ships before any stranger-heavy party.
+
+**Block** (private, applies in every circle you're in)
+- A blocked pair is never placed in the same party. The **server** enforces this when the host saves the guest list, so a modified browser can't get around it. Anyone who would share the party with someone they have a block with, in either direction, is quietly left out. The host is always kept; otherwise the earlier name in the list wins.
+- The host only learns *how many* people couldn't be placed, never who or why. Nobody is told who blocked them.
+- The host's matcher also avoids the people the host blocked, so those invites are never attempted.
+- Neither person can lock the other in as a friend after a party.
+- If you block someone you're both invited to a current party with, the screen tells you so, so you can decline. It never removes anyone by itself.
+- Undo any time in the Me tab.
+
+**Report** (reason, optional note up to 500 characters, optionally "also block")
+- Reasons: made me feel unsafe, harassment or unwanted contact, inappropriate behavior, fake or misleading profile, something else.
+- The **circle owner** sees reports about other members (who it's about, reason, note, how many open reports that member has) in the Me tab, and can mark them resolved or dismissed, or remove the member. The owner does **not** see who sent a report.
+- Removing a member cuts their access, deletes their invites, and cancels a party they were hosting.
+- **Reports about the owner can only be read by whoever runs the database** (you, as the app operator). Nothing emails you yet. To review them, run this in the Supabase SQL editor:
+
+```sql
+select r.id, r.created_at, r.status, r.reason, r.note,
+       p.handle as reported, rp.handle as reporter, c.name as circle
+from reports r
+join profiles p on p.id = r.reported
+left join profiles rp on rp.id = r.reporter
+left join circles c on c.id = r.circle_id
+order by (r.status = 'open') desc, r.created_at desc;
+```
+
+- Limit of 5 reports per person per day, to blunt spam.
+- Nothing is automatic. Two people could pile on someone, so reports flag people for a human to review but never remove or hide anyone on their own.
+
+**Limits to know about**
+- Blocking doesn't hide your profile answers from the person (circle members can see each other's answers), and doesn't remove either of you from the circle. Only the owner can remove someone.
+- A report can't be edited or withdrawn after it's sent.
+- Turnout can't respond to emergencies. The report screen says to call local emergency services first.
+- Still to build before strangers come to homes: keep the host's address hidden until a guest RSVPs, phone-verified accounts, and an email alert to you when a safety report comes in.
+
 ### Tests
 
-`docs/sql-tests/` has 57 database checks and the stub that lets them run on plain PostgreSQL (permissions, privacy, rotation fairness, cycle rollover, claims, passing, points, and direct-write attempts that must fail). To run them: start a local PostgreSQL, then `docs/sql-tests/run.sh`.
+`docs/sql-tests/` has 107 database checks and the stub that lets them run on plain PostgreSQL (permissions, privacy, rotation fairness, cycle rollover, claims, passing, points, and direct-write attempts that must fail). To run them: start a local PostgreSQL, then `docs/sql-tests/run.sh`.
 
 ### Known limits
 
