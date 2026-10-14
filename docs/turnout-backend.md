@@ -61,13 +61,13 @@ Moving other people's money (the circle pot) triggers payment-compliance questio
 
 ## Setup status
 
-Run these in the Supabase SQL editor, in order: `docs/turnout-schema.sql`, `docs/migration-002.sql`, `docs/migration-003.sql`, `docs/migration-004.sql`. Each is safe to re-run.
+Run these in the Supabase SQL editor, in order: `docs/turnout-schema.sql`, `docs/migration-002.sql`, `docs/migration-003.sql`, `docs/migration-004.sql`, `docs/migration-005.sql`. Each is safe to re-run.
 
 1. In Supabase: Authentication > URL Configuration, set the Site URL to your site and add your site plus `/**` as a redirect URL. Email sign-in works out of the box; phone needs an SMS provider.
 2. The site already contains the project URL and anon key (both public by design). Never put the `service_role` key in the repo.
 3. **Phase 1 (done):** email sign-in, profile and idea ratings saved, create a circle, invite link, owner approval.
 4. **Phase 2 (done):** rotation, parties and matching run on real circle members (see below).
-5. **Safety (done):** report and block (see below).
+5. **Safety (done):** report and block, and a hidden host address (see below).
 
 ## Phase 2: how a real circle works
 
@@ -125,11 +125,30 @@ order by (r.status = 'open') desc, r.created_at desc;
 - Blocking doesn't hide your profile answers from the person (circle members can see each other's answers), and doesn't remove either of you from the circle. Only the owner can remove someone.
 - A report can't be edited or withdrawn after it's sent.
 - Turnout can't respond to emergencies. The report screen says to call local emergency services first.
-- Still to build before strangers come to homes: keep the host's address hidden until a guest RSVPs, phone-verified accounts, and an email alert to you when a safety report comes in.
+- Still to build before strangers come to homes: phone-verified accounts, and an email alert to you when a safety report comes in.
+
+## Hidden host address
+
+`docs/migration-005.sql`. The host types a neighborhood, an address and getting-in notes in the Party tab.
+
+| Who | Neighborhood | Address and notes |
+|---|---|---|
+| The host | yes | yes |
+| A guest who said they're **going** | yes | **yes** |
+| A guest who is invited but hasn't answered, or declined | yes | no |
+| The circle owner (if not hosting or going) | yes | **no** |
+| A member who wasn't invited | no | no |
+
+- **Where it lives.** In its own table that the browser can't read at all (row-level security, no policies). The server only returns it, inside `circle_state()`, to the people marked "yes" above. The address is never sent to anyone else's browser, so it can't be found in the page, the app's memory, or the network traffic of someone who isn't allowed to see it. The tests check all three.
+- **An older risk this fixed.** The `events` table already had an unused `address` column, and every circle member can read every column of every event. It would have exposed home addresses to the whole circle, so the column is dropped.
+- **It follows the RSVP.** If a guest changes to "can't make it", or the host drops them from the guest list, the address disappears on their next refresh. Anything they already saw is still in their memory until then, and a screenshot can't be taken back.
+- **Deleted when the party closes**, and removed with the party if the host passes the turn. `purge_old_locations(days)` is an operator-only function that clears addresses of parties that were never closed; schedule it with Supabase's cron (pg_cron) if you want it automatic. It is not callable from the browser.
+- **The owner never sees the address** unless they are hosting or going. That's deliberate: owners moderate, they don't need to know where people live.
+- **Limits.** Anyone who is going can copy the address. The "Open in Maps" link sends it to Google if tapped. There's no timed reveal yet (for example, only within a few hours of the party); that's a possible next step.
 
 ### Tests
 
-`docs/sql-tests/` has 107 database checks and the stub that lets them run on plain PostgreSQL (permissions, privacy, rotation fairness, cycle rollover, claims, passing, points, and direct-write attempts that must fail). To run them: start a local PostgreSQL, then `docs/sql-tests/run.sh`.
+`docs/sql-tests/` has 137 database checks and the stub that lets them run on plain PostgreSQL (permissions, privacy, rotation fairness, cycle rollover, claims, passing, points, and direct-write attempts that must fail). To run them: start a local PostgreSQL, then `docs/sql-tests/run.sh`.
 
 ### Known limits
 

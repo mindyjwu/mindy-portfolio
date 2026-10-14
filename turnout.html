@@ -571,7 +571,7 @@ function renderParty(){
   const list=ranked(ui.cat),gl=up.guests||[],max=Math.max(REAL.on?2:6,Math.min(15,S.members.length)),min=REAL.on?2:6;
   ui.size=Math.max(min,Math.min(ui.size,max));
   const my=REAL.on&&up.rsvps&&up.rsvps.me;
-  let html=`${modeBar()}<div class="poster"><span class="chip">${mLabel(up.ym)}</span><span class="chip">${gl.length?gl.length+(REAL.on?' invited':' going'):ui.size+' people'}</span>
+  let html=`${modeBar()}<div class="poster"><span class="chip">${mLabel(up.ym)}</span><span class="chip">${gl.length?gl.length+(REAL.on?' invited':' going'):ui.size+' people'}</span>${REAL.on&&up.loc&&up.loc.area?`<span class="chip">Near ${esc(up.loc.area)}</span>`:''}
     <div class="poster-title">${idea?esc(idea.name):'Pick a theme'}</div>
     <div class="poster-sub">Hosted by ${dot(host)}${esc(label(host))}${idea?' · '+esc(idea.game):''}</div>
     ${gl.length?`<div class="stack">${gl.slice(0,8).map(id=>dot(byId(id))).join('')}${gl.length>8?`<span class="more">+${gl.length-8}</span>`:''}</div>`:''}</div>`;
@@ -593,14 +593,38 @@ function renderParty(){
       <label class="f">Party size: <b id="sz">${ui.size}</b> people (including the host)</label>
       <input type="range" id="size" min="${min}" max="${max}" value="${ui.size}">
       <div class="row" style="margin-top:12px"><button class="btn" data-act="mix">${up.guests&&up.guests.length>(REAL.on?1:0)?'Reshuffle':REAL.on?'Match and invite':'Match my guests'}</button></div>
-      <div id="mix">${renderMix()}</div></div>`;
+      <div id="mix">${renderMix()}</div></div>${locationCard(up)}`;
     }else{
       html+=`${my?`<div class="card tint-b"><h2>Your RSVP</h2><p class="sub">${my.status==='going'||my.status==='attended'?"You're in.":my.status==='declined'?"You said you can't make it. Changed your mind?":'Can you make it?'}${up.assign&&up.assign.me?` You're bringing <b>${esc(up.assign.me)}</b>.`:''}</p>
         <div class="row"><button class="btn ${my.status==='going'?'g':''}" data-act="rsvp" data-s="going">I'm going</button><button class="btn ghost" data-act="rsvp" data-s="declined">Can't make it</button></div></div>`:''}
+      ${locationCard(up)}
       ${gl.length?`<div class="card"><h2>The guest list</h2><div id="mix">${renderMix()}</div></div>`:''}`;
     }
   }
+  if(!idea)html+=locationCard(up);
   el.innerHTML=html;
+}
+function locationCard(up){
+  if(!REAL.on||!up)return'';
+  const L=up.loc||{area:'',has:false,address:null,notes:null},host=up.host==='me',involved=host||!!(up.rsvps&&up.rsvps.me)||isOwner();
+  if(!involved)return'';
+  if(host){
+    const going=Object.entries(up.rsvps||{}).filter(([id,r])=>id!=='me'&&['going','attended'].includes(r.status)).length;
+    return `<div class="card tint-t"><h2>Where is it?</h2>
+      <p class="sub">Everyone invited sees the neighborhood. The exact address and how to get in stay hidden until a guest says they're going, and only guests who are going can see them. Not even the circle owner can.</p>
+      <label class="f" for="loc-area">Neighborhood (shown to invited guests)</label><input type="text" id="loc-area" value="${esc(L.area)}" maxlength="80" placeholder="e.g. East Village">
+      <label class="f" for="loc-addr">Address (private)</label><input type="text" id="loc-addr" value="${esc(L.address||'')}" maxlength="200" placeholder="Street, unit, city" autocomplete="off">
+      <label class="f" for="loc-notes">Getting in (private)</label><textarea id="loc-notes" maxlength="300" placeholder="Buzzer, door code, parking, floor">${esc(L.notes||'')}</textarea>
+      <div class="row" style="margin-top:12px"><button class="btn sm" data-act="saveloc">Save location</button></div>
+      <p class="note" style="margin-top:8px">${L.has?`${going} guest${going===1?'':'s'} who said they're going can see the address.`:'No address saved yet.'} It is deleted when you close the party.</p></div>`;
+  }
+  if(L.address){
+    return `<div class="card tint-g"><h2>Where</h2>${L.area?`<p class="sub">${esc(L.area)}</p>`:''}
+      <div style="font-size:19px;font-weight:600">${esc(L.address)}</div>${L.notes?`<p style="margin-top:8px">${esc(L.notes)}</p>`:''}
+      <div class="row" style="margin-top:12px"><a class="btn sm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(L.address)}" target="_blank" rel="noopener noreferrer">Open in Maps</a></div>
+      <p class="note" style="margin-top:8px">Please keep this address among the guests. Opening Maps sends it to Google. If something feels off, use Report or block.</p></div>`;
+  }
+  return `<div class="card tint-t"><h2>Where</h2><p class="sub">${L.area?`Near ${esc(L.area)}. `:''}${L.has?'The exact address is shared once you RSVP that you\'re going.':'The host hasn\'t added the address yet. It will be shared once you RSVP that you\'re going.'}</p></div>`;
 }
 function renderMix(){
   const up=S.upcoming;if(!up||!up.guests||!up.guests.length)return'';
@@ -944,7 +968,7 @@ function buildReal(snap){
     edges:(snap.connections||[]).map(([a,b])=>rid(a)+'|'+rid(b)),
     history:(snap.history||[]).map(h=>({ym:ym7(h.month),host:rid(h.host_id),idea:h.idea_id,rating:null})),
     cycle:snap.circle.cycle,cycleHosted:ms.filter(m=>m.inCycle).map(m=>m.id),nextYm:ym7(snap.slot),
-    upcoming:ev?{id:ev.id,host:rid(ev.host_id),ym:ym7(ev.month),idea:ev.idea_id||null,status:ev.status,size:ev.size,guests:Object.keys(rs),rsvps:rs,assign:asg}:null,
+    upcoming:ev?{id:ev.id,host:rid(ev.host_id),ym:ym7(ev.month),idea:ev.idea_id||null,status:ev.status,size:ev.size,guests:Object.keys(rs),rsvps:rs,assign:asg,loc:{area:ev.area||'',has:!!ev.has_address,address:ev.address?ev.address.address:null,notes:ev.address?ev.address.notes:null}}:null,
     claims:Object.fromEntries((snap.future||[]).map(f=>[ym7(f.month),rid(f.host_id)])),
     model:{w:{},b:0},pm:PM0(),attended:Object.fromEntries(ms.map(m=>[m.id,m.att]))};
 }
@@ -1022,6 +1046,7 @@ function realClick(a,t){
     close:()=>realDo(()=>rpc('close_event',{p_event:S.upcoming.id})).then(ok=>{if(ok){toast('Party closed. The next turn is open.');ui.tab='circle';renderAll()}}),
     mode:()=>{if(t.dataset.mode==='demo'){setMode('demo');leaveReal()}else{setMode('real');enterReal()}},
     refresh:()=>realDo(async()=>{}),
+    saveloc:()=>{const v=id=>(document.getElementById(id)||{}).value||'';realDo(()=>rpc('set_location',{p_event:S.upcoming.id,p_area:v('loc-area'),p_address:v('loc-addr'),p_notes:v('loc-notes')})).then(ok=>ok&&toast('Location saved'))},
     safety:()=>openSafety(t.dataset.u),
     safetypick:()=>{const v=$('#sf-pick');if(v)openSafety(v.value)},
     unblock:()=>realDo(()=>rpc('unblock_member',{p_user:did(t.dataset.u)})).then(ok=>ok&&toast('Unblocked')),
