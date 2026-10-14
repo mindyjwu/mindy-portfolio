@@ -400,7 +400,7 @@ function seed(){
 }
 S=load();
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.members)return s}catch(e){}return seed()}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){if(REAL.on)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 const ui={tab:'circle',rot:0,spinning:false,cat:'gather',size:8,tier:1,guests:12,dues:5,cap:80,ideaMoney:'charcuterie',rate:0,met:{}};
 const byId=id=>S.members.find(m=>m.id===id);
 const label=m=>m?(m.id==='me'?'You':m.handle):'?';
@@ -422,6 +422,11 @@ function pairFeat(a,b){
   f.push((ov(a.want,b.is)+ov(b.want,a.is))/2);f.push(cos(a,b));return f;
 }
 function pairProb(a,b){const f=pairFeat(a,b);let z=S.pm.b;f.forEach((v,i)=>z+=S.pm.w[FEAT_KEYS[i]]*(v-.5));return sigm(z)}
+function trainPairRaw(pm,f,y){
+  if(!Array.isArray(f)||f.length!==FEAT_KEYS.length)return;
+  let z=pm.b;f.forEach((v,i)=>z+=pm.w[FEAT_KEYS[i]]*(v-.5));
+  const e=y-sigm(z);f.forEach((v,i)=>pm.w[FEAT_KEYS[i]]+=.35*e*(v-.5));pm.b+=.2*e;pm.n=(pm.n||0)+1;
+}
 function trainPair(a,b,y){
   const f=pairFeat(a,b),e=y-pairProb(a,b);
   f.forEach((v,i)=>S.pm.w[FEAT_KEYS[i]]+=.35*e*(v-.5));S.pm.b+=.2*e;S.pm.n++;
@@ -436,7 +441,7 @@ function roomScore(ids,A,fair){
   return s;
 }
 function buildRoom(hostId,size,noise){
-  const A=adj(),all=S.members.map(m=>m.id),must=[...new Set([hostId,...(byId('me')?['me']:[])])];
+  const A=adj(),all=S.members.map(m=>m.id),must=REAL.on?[hostId]:[...new Set([hostId,...(byId('me')?['me']:[])])];
   const att=all.map(id=>S.attended[id]||0),mx=Math.max(...att,0);
   const fair={};all.forEach(id=>fair[id]=.6*(mx-(S.attended[id]||0))/(mx+1)+.8*Math.min(byId(id).points||0,250)/250+((S.attended[id]||0)===0?.4:0)+(noise?Math.random()*.5:0));
   size=Math.min(size,all.length);
@@ -494,7 +499,8 @@ function renderStats(){
   $('#stats').innerHTML=`<div class="stat"><b>${S.members.length}</b><span>in the circle</span></div><div class="stat"><b>${S.history.length}</b><span>parties thrown</span></div><div class="stat"><b>${net}</b><span>friends in your network</span></div>${byId('me')?`<div class="stat"><b>${byId('me').points}</b><span>points</span></div>`:''}`;
 }
 function renderCircle(){
-  const pool=eligible(),up=S.upcoming,n=pool.length||1;
+  let pool=eligible();if(REAL.on&&!pool.length)pool=S.members.filter(m=>!m.skip);
+  const up=S.upcoming,n=pool.length||1;
   let slices='';
   const R=150,C=150;
   pool.forEach((m,i)=>{
@@ -506,10 +512,10 @@ function renderCircle(){
   });
   const sched=schedule(6).map(s=>{
     const m=byId(s.host),mine=s.host==='me';
-    return `<li><span class="m">${mLabel(s.ym,true)}</span><span class="w">${dot(m)} ${esc(label(m))} ${s.fixed?'<span class="chip g">locked</span>':'<span class="chip b">likely</span>'}${s.cyc>S.cycle?'<span class="chip">new cycle</span>':''}</span>${!mine&&!S.claims[s.ym]&&byId('me')&&!S.cycleHosted.includes('me')?`<button class="btn sm" data-act="claim" data-ym="${s.ym}">I'll take it</button>`:''}</li>`;
+    return `<li><span class="m">${mLabel(s.ym,true)}</span><span class="w">${dot(m)} ${esc(label(m))} ${s.fixed?'<span class="chip g">locked</span>':'<span class="chip b">likely</span>'}${s.cyc>S.cycle?'<span class="chip">new cycle</span>':''}</span>${!mine&&!S.claims[s.ym]&&byId('me')&&!S.cycleHosted.includes('me')?`<button class="btn sm" data-act="claim" data-ym="${s.ym}">I'll take it</button>`:''}${REAL.on&&mine&&S.claims[s.ym]?`<button class="btn ghost sm" data-act="release" data-ym="${s.ym}">Release</button>`:''}</li>`;
   }).join('');
   const meSkip=byId('me')&&byId('me').skip;
-  $('#pane-circle').innerHTML=`
+  $('#pane-circle').innerHTML=`${modeBar()}
   <div class="grid2">
     <div class="card tint-o">
       <h2>${esc(S.circle.name)}</h2>
@@ -517,9 +523,9 @@ function renderCircle(){
       <div class="wheelbox"><div class="pointer"></div>
         <svg class="wheel" viewBox="0 0 300 300" style="transform:rotate(${ui.rot}deg)">${pool.length?slices:'<circle cx="150" cy="150" r="150" style="fill:var(--line)"/>'}</svg>
         <div class="hub">${up?dot(byId(up.host)):''}</div></div>
-      ${up?`<div style="text-align:center"><div class="chip g" style="font-size:15px">${mLabel(up.ym)}</div><h3 style="font-size:30px;margin:4px 0">${dot(byId(up.host))} ${esc(label(byId(up.host)))} is hosting!</h3>
-        <div class="row" style="justify-content:center;margin-top:10px"><button class="btn g" data-act="goparty">Plan the party →</button><button class="btn ghost sm" data-act="pass">Can't this month</button></div></div>`
-      :`<div style="text-align:center"><button class="btn" data-act="spin" ${ui.spinning||!pool.length?'disabled':''}>Spin for ${mLabel(S.nextYm)}</button>
+      ${up?`<div style="text-align:center"><div class="chip g" style="font-size:15px">${mLabel(up.ym)}</div><h3 style="font-size:30px;margin:4px 0">${dot(byId(up.host))} ${up.host==='me'?'You are':esc(label(byId(up.host)))+' is'} hosting!</h3>
+        <div class="row" style="justify-content:center;margin-top:10px"><button class="btn g" data-act="goparty">Plan the party →</button>${!REAL.on||up.host==='me'?'<button class="btn ghost sm" data-act="pass">Can\'t this month</button>':''}</div></div>`
+      :`<div style="text-align:center"><button class="btn" data-act="spin" ${ui.spinning||(!pool.length&&!REAL.on)?'disabled':''}>Spin for ${mLabel(S.nextYm)}</button>
         <p class="note" style="margin-top:10px">Longer since someone last hosted means a slightly bigger chance. Everyone eligible gets a real shot.</p></div>`}
       ${byId('me')?`<label class="check" style="margin-top:14px"><input type="checkbox" data-act="skipme" ${meSkip?'checked':''}> <span>Skip me this month (I stay in the pool for later)</span></label>`:`<p class="note" style="margin-top:14px;text-align:center">You're exploring a sample circle. Spin, plan a party, look around. <button class="btn sm g" data-act="setup" data-step="1">Join to get your turn</button></p>`}
     </div>
@@ -538,56 +544,67 @@ function renderCircle(){
   <div class="card">
     <h2>The circle</h2>
     <div class="row" style="justify-content:space-between"><p class="sub" style="margin:0">${S.members.length} of ${S.circle.cap} spots filled · parties host 6–15 at a time</p>
-      <div class="row"><label class="note">Max size</label><select id="cap" style="width:auto">${[12,20,30,50].map(c=>`<option ${c===S.circle.cap?'selected':''}>${c}</option>`).join('')}</select></div></div>
+      ${REAL.on?'':`<div class="row"><label class="note">Max size</label><select id="cap" style="width:auto">${[12,20,30,50].map(c=>`<option ${c===S.circle.cap?'selected':''}>${c}</option>`).join('')}</select></div>`}</div>
     <div class="capbar"><i style="width:${S.members.length/S.circle.cap*100}%"></i></div>
     <div class="members" style="margin-top:14px">${S.members.map(m=>`<div class="mem ${up&&up.host===m.id?'up':''}">${avatar(m)}<div class="h">${esc(label(m))}</div><div class="note">${PLATS[m.platform]||''}</div>
       <div>${S.cycleHosted.includes(m.id)?'<span class="chip g">hosted ✓</span>':'<span class="chip">in the pool</span>'}${m.skip?'<span class="chip b">skipping</span>':''}</div>
       <div>${m.tags.map(t=>TAGS[t]).join(' ')}</div></div>`).join('')}</div>
-    <h3 style="font-size:22px;margin:22px 0 4px">Invite someone</h3>
+    ${REAL.on?'<p class="note" style="margin-top:18px">To add people, share your invite link from the Me tab. You approve each new person.</p>':`<h3 style="font-size:22px;margin:22px 0 4px">Invite someone</h3>
     <div class="row"><select id="a-plat" style="width:auto">${Object.entries(PLATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select><input type="text" id="a-handle" placeholder="@handle or phone" style="flex:1;min-width:140px" maxlength="30">
       <button class="btn sm g" data-act="add">Add</button></div>
     <div id="a-tags" style="margin-top:8px">${Object.entries(TAGS).map(([t,e])=>`<span class="chip pick" data-tag="${t}">${e} ${t}</span>`).join('')}</div>
-  </div>`;
+  `}</div>`;
 }
 
 function ranked(cat){return IDEAS.filter(i=>i.cat===cat).map(i=>({i,p:score(S.model,i)})).sort((a,b)=>b.p-a.p)}
 function renderParty(){
   const el=$('#pane-party'),up=S.upcoming;
-  if(!up){el.innerHTML=`<div class="card tint-o" style="text-align:center"><h2>No host yet</h2><p class="sub">Spin the wheel on the Circle tab to see whose turn it is for ${mLabel(S.nextYm)}.</p><button class="btn" data-act="gocircle">Go spin</button></div>`;return}
-  const host=byId(up.host),A=adj(),idea=up.idea&&ideaOf(up.idea);
-  const list=ranked(ui.cat);
-  const gl=up.guests||[];
-  let html=`<div class="poster"><span class="chip">${mLabel(up.ym)}</span><span class="chip">${gl.length?gl.length+' going':ui.size+' people'}</span>
+  if(!up){el.innerHTML=`${modeBar()}<div class="card tint-o" style="text-align:center"><h2>No host yet</h2><p class="sub">Spin the wheel on the Circle tab to see whose turn it is for ${mLabel(S.nextYm)}.</p><button class="btn" data-act="gocircle">Go spin</button></div>`;return}
+  const host=byId(up.host),idea=up.idea&&ideaOf(up.idea),plan=canPlan();
+  const list=ranked(ui.cat),gl=up.guests||[],max=Math.max(REAL.on?2:6,Math.min(15,S.members.length)),min=REAL.on?2:6;
+  ui.size=Math.max(min,Math.min(ui.size,max));
+  const my=REAL.on&&up.rsvps&&up.rsvps.me;
+  let html=`${modeBar()}<div class="poster"><span class="chip">${mLabel(up.ym)}</span><span class="chip">${gl.length?gl.length+(REAL.on?' invited':' going'):ui.size+' people'}</span>
     <div class="poster-title">${idea?esc(idea.name):'Pick a theme'}</div>
     <div class="poster-sub">Hosted by ${dot(host)}${esc(label(host))}${idea?' · '+esc(idea.game):''}</div>
-    ${gl.length?`<div class="stack">${gl.slice(0,8).map(id=>dot(byId(id))).join('')}${gl.length>8?`<span class="more">+${gl.length-8}</span>`:''}</div>`:''}</div>
-  <div class="card"><h2>1 · Pick an idea</h2>
+    ${gl.length?`<div class="stack">${gl.slice(0,8).map(id=>dot(byId(id))).join('')}${gl.length>8?`<span class="more">+${gl.length-8}</span>`:''}</div>`:''}</div>`;
+  if(plan){
+    html+=`<div class="card"><h2>1 · Pick an idea</h2>
     <p class="sub">Ranked by an on-device model that learns from your circle's ratings. Rate parties in the After tab and it gets smarter.</p>
     <div class="segs"><button data-act="cat" data-cat="gather" class="${ui.cat==='gather'?'on':''}">🍽️ Gather</button><button data-act="cat" data-cat="move" class="${ui.cat==='move'?'on':''}">🏃 Move (preview)</button></div>
     <div class="ideas">${list.map(({i,p})=>`<button class="idea ${up.idea===i.id?'sel':''}" data-act="idea" data-id="${i.id}"><span class="em">${i.emoji}</span><h3>${i.name}</h3>
       <div class="fit"><i style="width:${Math.round(p*100)}%"></i></div><div class="note"><b>${Math.round(p*100)}% fit</b> · ★${avgStar(i).toFixed(1)} circle avg · ${esc(why(i))}</div></button>`).join('')}</div></div>`;
+  }else if(!idea){
+    html+=`<div class="card"><h2>Waiting on the host</h2><p class="sub">${esc(label(host))} hasn't picked a theme yet. You'll see the details here once they do.</p></div>`;
+  }
   if(idea){
     html+=`<div class="card tint-g"><h2>${idea.emoji} ${idea.name}</h2>
-      <div class="grid2"><div><h3 style="font-size:20px">Host brings</h3>${idea.host.map(x=>`<div>${x}</div>`).join('')}</div><div><h3 style="font-size:20px">The game</h3><div>${idea.game}</div></div></div></div>
-    <div class="card"><h2>2 · Build the guest list</h2>
-      <p class="sub">A mix of people you know and people you don't, matched by shared interests so strangers have something to talk about.</p>
+      <div class="grid2"><div><h3 style="font-size:20px">Host brings</h3>${idea.host.map(x=>`<div>${x}</div>`).join('')}</div><div><h3 style="font-size:20px">The game</h3><div>${idea.game}</div></div></div></div>`;
+    if(plan){
+      html+=`<div class="card"><h2>2 · Build the guest list</h2>
+      <p class="sub">A mix of people you know and people you don't, matched by shared interests and vibe so strangers have something to talk about.${REAL.on?' Matching invites them straight away.':''}</p>
       <label class="f">Party size: <b id="sz">${ui.size}</b> people (including the host)</label>
-      <input type="range" id="size" min="6" max="${Math.max(6,Math.min(15,S.members.length))}" value="${ui.size}">
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="mix">${up.guests&&up.guests.length?'Reshuffle':'Match my guests'}</button></div>
+      <input type="range" id="size" min="${min}" max="${max}" value="${ui.size}">
+      <div class="row" style="margin-top:12px"><button class="btn" data-act="mix">${up.guests&&up.guests.length>(REAL.on?1:0)?'Reshuffle':REAL.on?'Match and invite':'Match my guests'}</button></div>
       <div id="mix">${renderMix()}</div></div>`;
+    }else{
+      html+=`${my?`<div class="card tint-b"><h2>Your RSVP</h2><p class="sub">${my.status==='going'||my.status==='attended'?"You're in.":my.status==='declined'?"You said you can't make it. Changed your mind?":'Can you make it?'}${up.assign&&up.assign.me?` You're bringing <b>${esc(up.assign.me)}</b>.`:''}</p>
+        <div class="row"><button class="btn ${my.status==='going'?'g':''}" data-act="rsvp" data-s="going">I'm going</button><button class="btn ghost" data-act="rsvp" data-s="declined">Can't make it</button></div></div>`:''}
+      ${gl.length?`<div class="card"><h2>The guest list</h2><div id="mix">${renderMix()}</div></div>`:''}`;
+    }
   }
   el.innerHTML=html;
 }
 function renderMix(){
   const up=S.upcoming;if(!up||!up.guests||!up.guests.length)return'';
   const A=adj(),room=up.guests,idea=ideaOf(up.idea);
-  let kn=0,nw=0;room.forEach(id=>{if(id==='me')return;knows(A,'me',id)?kn++:nw++});
+  let kn=0,nw=0;room.forEach(id=>{if(id==='me'||!byId('me'))return;knows(A,'me',id)?kn++:nw++});
   const tot=Math.max(1,kn+nw);
   return `<div style="margin-top:16px"><b>Your view of the room</b><div class="mixbar"><i style="width:${kn/tot*100}%;background:var(--sec)"></i><i style="width:${nw/tot*100}%;background:var(--pri)"></i></div>
     <div class="note">🟢 ${kn} you know · 🟠 ${nw} new faces</div></div>
     <div style="margin-top:10px">${room.map((id,k)=>{const m=byId(id),isK=knows(A,'me',id);
-      return `<div class="guest" style="animation-delay:${k*.05}s">${avatar(m)}<div><b>${esc(label(m))}</b> ${id===up.host?'<span class="chip">host</span>':id==='me'?'<span class="chip b">you</span>':isK?'<span class="chip g">friend</span>':'<span class="chip">new</span>'}
-        <p>${id===up.host?'Hosting. Brings: '+esc(idea.host[0]):'Brings: <b>'+esc(up.assign[id]||'')+'</b>'}</p><p class="note">${icebreaker(id,room,A)}</p></div></div>`}).join('')}</div>
+      return `<div class="guest" style="animation-delay:${k*.05}s">${avatar(m)}<div><b>${esc(label(m))}</b> ${id===up.host?'<span class="chip">host</span>':id==='me'?'<span class="chip b">you</span>':isK?'<span class="chip g">friend</span>':'<span class="chip">new</span>'}${REAL.on&&up.rsvps&&up.rsvps[id]?`<span class="chip ${up.rsvps[id].status==='declined'?'':'g'}">${esc(up.rsvps[id].status)}</span>`:''}
+        <p>${id===up.host?'Hosting. Brings: '+esc(idea.host[0]):'Brings: <b>'+esc((up.assign&&up.assign[id])||'')+'</b>'}</p><p class="note">${icebreaker(id,room,A)}</p></div></div>`}).join('')}</div>
     <div class="row" style="margin-top:14px"><button class="btn g sm" data-act="copy">Copy invite text</button></div>`;
 }
 function assignBring(room,host,idea){
@@ -639,10 +656,31 @@ function renderMoney(){
   <div id="money-out">${moneyOut()}</div>`;
 }
 function updMoney(){$('#money-out').innerHTML=moneyOut()}
+function afterReal(up,A){
+  if(!up||!up.guests.length||!up.idea)return `<div class="card tint-o" style="text-align:center"><h2>After the party</h2><p class="sub">Once a party has a theme and invited guests, this is where you rate it and lock in the new people you met.</p><button class="btn" data-act="goparty">Go to the party</button></div>`;
+  const idea=ideaOf(up.idea),host=byId(up.host),my=up.rsvps.me,here=id=>up.rsvps[id]&&['going','attended'].includes(up.rsvps[id].status);
+  const rated=Object.values(up.rsvps).filter(r=>r.rated).length,going=Object.values(up.rsvps).filter(r=>r.status==='going'||r.status==='attended').length;
+  let h=`<div class="card tint-o"><h2>${dot(host)} ${esc(label(host))}'s ${esc(idea.name)}</h2>`;
+  if(my&&(my.status==='going'||my.status==='attended')&&!my.rated){
+    const newc=up.guests.filter(id=>id!=='me'&&!knows(A,'me',id)&&here(id));
+    h+=`<p class="sub">Two quick things.</p><h3 style="font-size:22px">How was it?</h3>
+      <div class="rates">${['😕','🙂','😊','😍','🤩'].map((e,i)=>`<button data-act="rate" data-r="${i+1}" class="${ui.rate===i+1?'on':''}" aria-label="${i+1} out of 5">${e}</button>`).join('')}</div>
+      <p class="note" style="margin-top:6px">Your rating helps rank ideas for your circle.</p>
+      <h3 style="font-size:22px;margin-top:18px">Who did you meet for the first time?</h3>
+      ${newc.length?newc.map(id=>{const m=byId(id);return `<label class="check"><input type="checkbox" data-met="${id}" ${ui.met[id]?'checked':''}>${dot(m)}<span><b>${esc(label(m))}</b><br><span class="note">${m.tags.map(t=>TAGS[t]).join(' ')}</span></span></label>`}).join(''):'<p class="note">You already knew everyone who was there.</p>'}
+      <div class="row" style="margin-top:14px"><button class="btn g" data-act="finish" ${ui.rate?'':'disabled'}>Save my rating and lock-ins</button></div>
+      ${ui.rate?'':'<p class="note" style="margin-top:6px">Pick a rating to continue.</p>'}`;
+  }else if(my&&my.rated)h+=`<p class="sub">Thanks. Your rating and lock-ins are saved.</p>`;
+  else if(my)h+=`<p class="sub">You're invited but haven't said you're going. RSVP in the Party tab and you can rate it afterwards.</p>`;
+  else h+=`<p class="sub">You weren't on this guest list.</p>`;
+  if(canPlan()&&up.status==='confirmed')h+=`<div style="margin-top:18px"><p class="note"><b>${rated} of ${going}</b> guests have rated. Guests can only rate until you close the party.</p><div class="row" style="margin-top:10px"><button class="btn" data-act="close">Close the party</button></div><p class="note" style="margin-top:6px">Closing awards attendance and hosting points and opens the next turn.</p></div>`;
+  return h+'</div>';
+}
 function renderAfter(){
   const up=S.upcoming,el=$('#pane-after'),A=adj();
   let html='';
-  if(!up||!up.guests||!up.guests.length){
+  if(REAL.on){html=afterReal(up,A)}
+  else if(!up||!up.guests||!up.guests.length){
     html=`<div class="card tint-o" style="text-align:center"><h2>After the party</h2><p class="sub">Once a party is planned, this is where you rate it and lock in the new people you met.</p><button class="btn" data-act="goparty">Plan a party</button></div>`;
   }else{
     const idea=ideaOf(up.idea),newcomers=up.guests.filter(id=>id!=='me'&&!knows(A,'me',id));
@@ -697,7 +735,7 @@ function renderMe(){
   <div class="card tint-b"><h2>What the matcher has learned</h2>
     <p class="sub">Starts with sensible guesses. Every time you lock in (or skip) people after a party, it re-weights which traits actually predict that you'd click. Trained on ${S.pm.n} pair${S.pm.n===1?'':'s'} so far.</p>
     ${w.map(x=>`<div class="wbar"><span>${esc(FEAT_NAME[x.k])}</span><i style="width:${Math.max(4,Math.abs(x.v)/wm*55)}%;${x.v<0?'background:var(--pri)':''}"></i><span style="width:auto">${x.v.toFixed(2)}</span></div>`).join('')}
-    <p class="note" style="margin-top:8px">Demo note: the other members' answers here are simulated. In the real app they fill in their own.</p></div>${accountCard()}`;
+    <p class="note" style="margin-top:8px">${REAL.on?'Members of this circle can see each other\'s answers; that is how matching works. Nobody outside the circle can.':'Demo note: the other members in the sample circle are simulated.'}</p></div>${accountCard()}`;
 }
 function renderAll(){renderStats();renderCircle();renderParty();renderMoney();renderAfter();renderMe();
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.tab===ui.tab));
@@ -724,7 +762,7 @@ function spin(){
   const w=document.querySelector('.wheel');w.style.transform=`rotate(${ui.rot}deg)`;
   document.querySelector('[data-act=spin]').disabled=true;
   const done=()=>{ui.spinning=false;S.upcoming={host:pool[idx].id,ym:S.nextYm,idea:null,guests:[],assign:{}};
-    toast(`${label(pool[idx])} is up`);confetti();renderAll()};
+    toast(pool[idx].id==='me'?"It's your turn to host":`${label(pool[idx])} is up`);confetti();renderAll()};
   matchMedia('(prefers-reduced-motion:reduce)').matches?done():setTimeout(done,4300);
 }
 function mix(noise){
@@ -769,6 +807,8 @@ function inviteText(){
 document.addEventListener('click',e=>{
   const t=e.target.closest('[data-act],[data-tab],[data-tag],[data-tier]');if(!t)return;
   if(t.dataset.tab)return go(t.dataset.tab);
+  if(t.dataset.act==='mode'){realClick('mode',t);return}
+  if(REAL.on&&realClick(t.dataset.act,t))return;
   if(t.dataset.tier){ui.tier=+t.dataset.tier;return renderMoney()}
   if(t.dataset.tag&&!t.dataset.act){t.classList.toggle('on');return}
   const a=t.dataset.act;
@@ -781,12 +821,12 @@ document.addEventListener('click',e=>{
   else if(a==='setup')openSetup(+t.dataset.step,true);
   else if(a==='signin'){const em=($('#c-email').value||'').trim();if(!/^\S+@\S+\.\S+$/.test(em))return toast('Enter a valid email');
     cloudDo(async()=>{const r=await CLOUD.sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.origin+location.pathname}});if(r.error)throw r.error;toast('Check your email for the sign-in link')})}
-  else if(a==='signout')cloudDo(async()=>{await CLOUD.sb.auth.signOut();CLOUD.user=null;CLOUD.circle=null;CLOUD.roster=[]});
+  else if(a==='signout')cloudDo(async()=>{await CLOUD.sb.auth.signOut();CLOUD.user=null;CLOUD.circle=null;CLOUD.roster=[];if(REAL.on)leaveReal()});
   else if(a==='mkcircle'){const nm=($('#c-name').value||'').trim();if(!nm)return toast('Name your circle first');
     cloudDo(async()=>{const r=await CLOUD.sb.rpc('create_circle',{p_name:nm,p_cap:S.circle.cap});if(r.error)throw r.error;await loadCircle();toast('Circle created. Share your invite link.')})}
   else if(a==='copylink'){const l=inviteLink();(navigator.clipboard?navigator.clipboard.writeText(l):Promise.reject()).then(()=>toast('Invite link copied'),()=>toast('Copy not available here'))}
   else if(a==='approve'||a==='decline'){const u=t.dataset.u;
-    cloudDo(async()=>{const r=await CLOUD.sb.rpc('approve_member',{p_circle:CLOUD.circle.circle_id,p_user:u,p_ok:a==='approve'});if(r.error)throw r.error;await loadCircle();toast(a==='approve'?'Approved':'Declined')})}
+    cloudDo(async()=>{const r=await CLOUD.sb.rpc('approve_member',{p_circle:CLOUD.circle.circle_id,p_user:u,p_ok:a==='approve'});if(r.error)throw r.error;await loadCircle();if(REAL.on)await refreshReal();toast(a==='approve'?'Approved':'Declined')})}
   else if(a==='cat'){ui.cat=t.dataset.cat;renderParty()}
   else if(a==='idea'){S.upcoming.idea=t.dataset.id;S.upcoming.guests=[];ui.ideaMoney=IDEAS.find(i=>i.id===t.dataset.id).cat==='gather'?t.dataset.id:ui.ideaMoney;renderAll()}
   else if(a==='mix')mix(S.upcoming.guests.length>0);
@@ -796,7 +836,7 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('change',e=>{
   const t=e.target;
-  if(t.dataset.act==='skipme'){byId('me').skip=t.checked;renderAll()}
+  if(t.dataset.act==='skipme'){if(REAL.on)realDo(()=>rpc('set_skip',{p_circle:cid(),p_skip:t.checked}));else{byId('me').skip=t.checked;renderAll()}}
   else if(t.dataset.met){ui.met[t.dataset.met]=t.checked}
   else if(t.id==='cap'){S.circle.cap=+t.value;renderAll()}
   else if(t.id==='m-idea'){ui.ideaMoney=t.value;renderMoney()}
@@ -831,7 +871,7 @@ function drawSetup(){
     h+=`<h2>Which parties would you show up for?</h2><p class="sub">Rate as many as you like. Skipped ones get estimated from people with similar taste. Your circle's top picks are built from everyone's votes.</p>
     ${IDEAS.map(i=>`<div class="rrow"><b>${i.emoji} ${i.name}${i.cat==='move'?' <span class="chip b">move</span>':''}</b><span style="white-space:nowrap">${hearts(i.id)}</span></div>`).join('')}`;
   }else{
-    h+=`<h2>Your vibe</h2><p class="sub">Be honest, there are no right answers. This is for finding people you'd genuinely click with as friends. Others only ever see a match %, never your raw answers.</p>
+    h+=`<h2>Your vibe</h2><p class="sub">Be honest, there are no right answers. This is for finding people you'd genuinely click with as friends. Your answers are shared with the members of circles you've been approved into, because that's how matching works. They aren't public.</p>
     ${DIMS.map(d=>`<div class="vq"><b>${d.q}</b><input type="range" min="1" max="5" value="${SU.vibe[d.k]}" data-dim="${d.k}"><div class="lh"><span>${d.lo}</span><span>${d.hi}</span></div></div>`).join('')}
     <label class="f">Friends would describe me as… (pick up to 3)</label><div>${Object.entries(QUAL).map(([k,e])=>`<span class="chip pick ${SU.is.has(k)?'on':''}" data-is="${k}">${e} ${k}</span>`).join('')}</div>
     <label class="f">In new friends I look for… (pick up to 3)</label><div>${Object.entries(QUAL).map(([k,e])=>`<span class="chip pick ${SU.want.has(k)?'on':''}" data-want="${k}">${e} ${k}</span>`).join('')}</div>`;
@@ -851,7 +891,7 @@ function finishSetup(){
   me.points+=3*Math.max(0,Object.keys(me.prefs).length-before);
   if(SU.step===3&&!me.vibeDone){me.vibeDone=true;me.points+=20}
   $('#join').classList.remove('on');toast(`Saved. You're at ${me.points} pts`);confetti();renderAll();
-  if(CLOUD.user)syncProfile().then(()=>joinPending()).then(()=>loadCircle()).then(renderMe).catch(cloudErr);
+  if(CLOUD.user)syncProfile().then(()=>joinPending()).then(()=>loadCircle()).then(()=>{if(CLOUD.circle&&CLOUD.circle.status==='approved')return rpc('award_onboarding',{p_circle:cid()}).then(()=>REAL.on?refreshReal():0)}).then(renderAll).catch(cloudErr);
 }
 $('#join').addEventListener('click',e=>{
   const t=e.target,q=s=>t.closest(s);
@@ -873,6 +913,106 @@ $('#join').addEventListener('input',e=>{
   else if(e.target.dataset.dim)SU.vibe[e.target.dataset.dim]=+e.target.value;
 });
 window.openJoin=()=>openSetup(1,false);
+/* ===================== real circle mode ===================== */
+/* When you are signed in and approved into a circle, the screen is built from the server's
+   copy (circle_state) and every action is a server call. The sample circle stays available. */
+const REAL={on:false,demo:null,snap:null,busy:false};
+const cid=()=>CLOUD.circle.circle_id;
+const rid=u=>REAL.snap&&u===REAL.snap.me?'me':u;
+const did=id=>id==='me'?REAL.snap.me:id;
+const ym7=d=>String(d).slice(0,7);
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const modePref=()=>{try{return localStorage.getItem('turnout.mode')}catch(e){return null}};
+const setMode=v=>{try{localStorage.setItem('turnout.mode',v)}catch(e){}};
+const isOwner=()=>!!(REAL.on&&REAL.snap&&REAL.snap.circle.owner_id===REAL.snap.me);
+const canPlan=()=>!REAL.on||!!(S.upcoming&&(S.upcoming.host==='me'||isOwner()));
+async function rpc(name,args){if(!CLOUD.sb)throw new Error('Sign in first');const r=await CLOUD.sb.rpc(name,args);if(r.error)throw r.error;return r.data}
+function buildReal(snap){
+  REAL.snap=snap;
+  const ms=snap.members.map((m,i)=>({id:rid(m.user_id),handle:m.handle,platform:m.platform||'other',tags:m.interests||[],is:m.qualities||[],want:m.looking_for||[],vibe:{...(m.vibe||{})},prefs:{...(m.ratings||{})},points:m.points||0,skip:!!m.skip,hosted:(m.hosted||[]).map(ym7),av:'',hue:HUES[i%6],inCycle:!!m.in_cycle,att:m.attended||0}));
+  const ev=snap.event,asg={};if(ev)Object.entries(ev.assign||{}).forEach(([k,v])=>asg[rid(k)]=v);
+  const rs={};if(ev)(ev.rsvps||[]).forEach(r=>rs[rid(r.user_id)]={status:r.status,rated:!!r.rated});
+  return{me:snap.me,circle:{name:snap.circle.name,cap:snap.circle.capacity},members:ms,
+    edges:(snap.connections||[]).map(([a,b])=>rid(a)+'|'+rid(b)),
+    history:(snap.history||[]).map(h=>({ym:ym7(h.month),host:rid(h.host_id),idea:h.idea_id,rating:null})),
+    cycle:snap.circle.cycle,cycleHosted:ms.filter(m=>m.inCycle).map(m=>m.id),nextYm:ym7(snap.slot),
+    upcoming:ev?{id:ev.id,host:rid(ev.host_id),ym:ym7(ev.month),idea:ev.idea_id||null,status:ev.status,size:ev.size,guests:Object.keys(rs),rsvps:rs,assign:asg}:null,
+    claims:Object.fromEntries((snap.future||[]).map(f=>[ym7(f.month),rid(f.host_id)])),
+    model:{w:{},b:0},pm:PM0(),attended:Object.fromEntries(ms.map(m=>[m.id,m.att]))};
+}
+/* Models are never stored. We replay the circle's raw feedback in order, so everyone
+   who loads the circle gets the same weights and there is nothing to tamper with. */
+function replayModels(fb){
+  (fb.ideas||[]).forEach(r=>{if(ideaOf(r.idea)){sgd(S.model,r.idea,r.rating,.3);for(let i=0;i<3;i++)sgd(S.model,r.idea,r.rating,.1)}});
+  (fb.pairs||[]).forEach(r=>trainPairRaw(S.pm,r.f,r.y?1:0));
+}
+async function refreshReal(){
+  const snap=await rpc('circle_state',{p_circle:cid()});
+  S=buildReal(snap);replayModels(snap.feedback||{});
+  const mine=byId('me');if(mine&&mine.vibe&&Object.keys(mine.vibe).length)mine.vibeDone=true;
+}
+async function enterReal(){
+  if(!CLOUD.circle||CLOUD.circle.status!=='approved')return;
+  if(!REAL.on)REAL.demo=S;
+  try{try{await rpc('award_onboarding',{p_circle:cid()})}catch(e){}await refreshReal();REAL.on=true}
+  catch(e){cloudErr(e);if(!REAL.on&&REAL.demo)S=REAL.demo}
+  renderAll();
+}
+function leaveReal(){if(REAL.demo)S=REAL.demo;REAL.on=false;REAL.snap=null;renderAll()}
+async function realDo(fn){
+  if(REAL.busy)return false;REAL.busy=true;let ok=false;
+  try{await fn();await refreshReal();ok=true}catch(e){cloudErr(e)}
+  REAL.busy=false;renderAll();return ok;
+}
+function modeBar(){
+  if(!CLOUD.circle||CLOUD.circle.status!=='approved')return'';
+  const real=REAL.on;
+  return `<div class="row" style="justify-content:space-between;margin-bottom:14px"><div class="segs" style="margin:0"><button data-act="mode" data-mode="demo" class="${real?'':'on'}">Sample circle</button><button data-act="mode" data-mode="real" class="${real?'on':''}">${esc(CLOUD.circle.name)}</button></div>${real?'<button class="btn ghost sm" data-act="refresh">Refresh</button>':''}</div>${real&&S.members.length<3?`<div class="warn" style="margin-bottom:14px">Only ${S.members.length} member${S.members.length===1?'':'s'} so far. Share your invite link from the Me tab. Matching works best with 6 or more people.</div>`:''}`;
+}
+async function spinReal(){
+  if(REAL.busy||ui.spinning)return;
+  REAL.busy=true;ui.spinning=true;renderCircle();
+  let pool=eligible();if(!pool.length)pool=S.members.filter(m=>!m.skip);
+  try{
+    const host=rid(await rpc('spin_host',{p_circle:cid()})),idx=pool.findIndex(m=>m.id===host);
+    if(idx>=0){
+      const n=pool.length,center=(idx+.5)*360/n;ui.rot=ui.rot-(ui.rot%360)+360*5+(360-center);
+      const w=document.querySelector('.wheel');if(w)w.style.transform=`rotate(${ui.rot}deg)`;
+      if(!matchMedia('(prefers-reduced-motion:reduce)').matches)await wait(4300);
+    }
+    await refreshReal();toast(host==='me'?"It's your turn to host":`${label(byId(host))} is up`);confetti();
+  }catch(e){cloudErr(e)}
+  ui.spinning=false;REAL.busy=false;renderAll();
+}
+async function mixReal(noise){
+  const up=S.upcoming;if(!up||!up.idea)return;
+  const room=buildRoom(up.host,ui.size,noise||up.guests.length>1),asg=assignBring(room,up.host,ideaOf(up.idea)),a={};
+  Object.entries(asg).forEach(([k,v])=>a[did(k)]=v);
+  if(await realDo(()=>rpc('set_party',{p_event:up.id,p_size:ui.size,p_guests:room.map(did),p_assign:a})))toast('Guests invited');
+}
+async function rateReal(){
+  const up=S.upcoming,me=byId('me'),A=adj(),here=id=>up.rsvps[id]&&['going','attended'].includes(up.rsvps[id].status);
+  const newc=up.guests.filter(id=>id!=='me'&&!knows(A,'me',id)&&here(id)),locked=newc.filter(id=>ui.met[id]);
+  const fb=newc.map(id=>({other:did(id),clicked:locked.includes(id),features:pairFeat(me,byId(id)).map(v=>+v.toFixed(4))}));
+  const before=me.points;
+  if(await realDo(()=>rpc('rate_event',{p_event:up.id,p_rating:ui.rate,p_met:locked.map(did),p_feedback:fb}))){
+    ui.rate=0;ui.met={};toast(`Saved · +${byId('me').points-before} pts · ${locked.length} new friend${locked.length===1?'':'s'} locked in`);confetti();renderAll();
+  }
+}
+function realClick(a,t){
+  const T={spin:()=>spinReal(),
+    pass:()=>realDo(()=>rpc('pass_turn',{p_circle:cid()})).then(ok=>ok&&toast('You passed this month. You stay in the pool.')),
+    release:()=>realDo(()=>rpc('pass_turn',{p_circle:cid(),p_month:t.dataset.ym+'-01'})),
+    claim:()=>realDo(()=>rpc('claim_month',{p_circle:cid(),p_month:t.dataset.ym+'-01'})).then(ok=>ok&&toast('That month is yours')),
+    idea:()=>{if(!canPlan()||!S.upcoming)return;ui.ideaMoney=IDEAS.find(i=>i.id===t.dataset.id).cat==='gather'?t.dataset.id:ui.ideaMoney;return realDo(()=>rpc('set_party',{p_event:S.upcoming.id,p_idea:t.dataset.id,p_guests:[]}))},
+    mix:()=>canPlan()&&mixReal(false),
+    rsvp:()=>realDo(()=>rpc('rsvp',{p_event:S.upcoming.id,p_status:t.dataset.s})),
+    finish:()=>rateReal(),
+    close:()=>realDo(()=>rpc('close_event',{p_event:S.upcoming.id})).then(ok=>{if(ok){toast('Party closed. The next turn is open.');ui.tab='circle';renderAll()}}),
+    mode:()=>{if(t.dataset.mode==='demo'){setMode('demo');leaveReal()}else{setMode('real');enterReal()}},
+    refresh:()=>realDo(async()=>{})};
+  if(!T[a])return false;T[a]();return true;
+}
 /* ===================== cloud (Supabase): optional ===================== */
 /* The URL and anon key are public by design; row-level security in the database protects the data. */
 const SB_URL='https://nmbrsdnopuhcbhxdgycu.supabase.co';
@@ -890,7 +1030,9 @@ async function initCloud(){
 async function onAuth(){
   if(CLOUD.user){try{await syncProfile();await joinPending();await loadCircle()}catch(e){cloudErr(e)}}
   else{CLOUD.circle=null;CLOUD.roster=[]}
-  renderMe();
+  if(CLOUD.circle&&CLOUD.circle.status==='approved'){if(modePref()!=='demo'&&!REAL.on)await enterReal()}
+  else if(REAL.on)leaveReal();
+  renderAll();
 }
 async function syncProfile(){
   const me=byId('me');if(!CLOUD.user||!me)return;
@@ -919,7 +1061,7 @@ function accountCard(){
     <div class="row"><input type="text" id="c-email" inputmode="email" autocomplete="email" placeholder="you@email.com" style="flex:1;min-width:200px" maxlength="120"><button class="btn sm" data-act="signin">Email me a link</button></div></div>`;
   const c=CLOUD.circle,owner=c&&c.role==='owner';
   let h=`<div class="card tint-t"><div class="row" style="justify-content:space-between"><div><h2>Your account</h2><p class="sub" style="margin:0">Signed in as ${esc(CLOUD.user.email||'your account')}</p></div><button class="btn ghost sm" data-act="signout">Sign out</button></div>`;
-  if(!byId('me'))h+=`<div class="warn">Finish joining (handle, picks, vibe) above, then your profile saves automatically.</div>`;
+  if(!byId('me')&&!c)h+=`<div class="warn">Finish joining (handle, picks, vibe) above, then your profile saves automatically.</div>`;
   else if(!c)h+=`<h3 style="font-size:22px;margin:16px 0 6px">Start a real circle</h3><p class="note">Or open an invite link from a friend to ask to join theirs.</p>
     <div class="row" style="margin-top:8px"><input type="text" id="c-name" placeholder="Name your circle" style="flex:1;min-width:180px" maxlength="60"><button class="btn sm g" data-act="mkcircle">Create</button></div>`;
   else if(c.status==='pending')h+=`<div class="warn">Your request to join <b>${esc(c.name)}</b> is waiting for the owner to approve.</div>`;
@@ -950,6 +1092,7 @@ function accountCard(){
 })();
 renderAll();
 window.addEventListener('load',initCloud);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&REAL.on&&!REAL.busy)refreshReal().then(renderAll).catch(()=>{})});
 </script>
 </body>
 </html>

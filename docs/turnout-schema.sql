@@ -1,6 +1,8 @@
 -- Turnout: Postgres schema for Supabase. Run in the Supabase SQL editor.
 -- Auth: Supabase Auth (phone OTP). auth.users.id is the person's id.
 
+create extension if not exists pgcrypto;
+
 create table profiles (
   id uuid primary key references auth.users on delete cascade,
   handle text not null,
