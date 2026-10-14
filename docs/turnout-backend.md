@@ -61,13 +61,13 @@ Moving other people's money (the circle pot) triggers payment-compliance questio
 
 ## Setup status
 
-Run these in the Supabase SQL editor, in order: `docs/turnout-schema.sql`, `docs/migration-002.sql`, `docs/migration-003.sql`, `docs/migration-004.sql`, `docs/migration-005.sql`, `docs/migration-006.sql`. Each is safe to re-run.
+Run these in the Supabase SQL editor, in order: `docs/turnout-schema.sql`, `docs/migration-002.sql`, `docs/migration-003.sql`, `docs/migration-004.sql`, `docs/migration-005.sql`, `docs/migration-006.sql`, `docs/migration-007.sql`. Each is safe to re-run.
 
 1. In Supabase: Authentication > URL Configuration, set the Site URL to your site and add your site plus `/**` as a redirect URL. Email sign-in works out of the box; phone needs an SMS provider.
 2. The site already contains the project URL and anon key (both public by design). Never put the `service_role` key in the repo.
 3. **Phase 1 (done):** email sign-in, profile and idea ratings saved, create a circle, invite link, owner approval.
 4. **Phase 2 (done):** rotation, parties and matching run on real circle members (see below).
-5. **Safety (done):** report and block, a hidden host address, and an email alert to you for reports (see below).
+5. **Safety (done):** report and block, a hidden host address, an email alert to you for reports, and phone verification (see below).
 
 ## Phase 2: how a real circle works
 
@@ -125,7 +125,7 @@ order by (r.status = 'open') desc, r.created_at desc;
 - Blocking doesn't hide your profile answers from the person (circle members can see each other's answers), and doesn't remove either of you from the circle. Only the owner can remove someone.
 - A report can't be edited or withdrawn after it's sent.
 - Turnout can't respond to emergencies. The report screen says to call local emergency services first.
-- Still to build before strangers come to homes: phone-verified accounts.
+- Ideas not built yet: a timed address reveal (only a few hours before the party), a CAPTCHA on sign-in (protects against text-message fraud), email alerts to circle owners, and banning a phone number across circles.
 
 ## Hidden host address
 
@@ -150,12 +150,18 @@ order by (r.status = 'open') desc, r.created_at desc;
 
 `docs/migration-006.sql`, `api/turnout-report-alert.js`, and the setup guide `docs/turnout-alerts.md` (about 15 minutes, once). Every new report triggers an email to you with the category, who it's about, who filed it, the circle, and the note (handles only: no emails, ids or addresses). It is sent by a database trigger through Supabase's HTTP queue to a small Vercel function, which emails you through Resend. A failure to send can never stop a report from being saved, but it can mean a missed email, because the queue doesn't retry; so the guide also shows how to check the open reports yourself.
 
+## Phone verification
+
+`docs/migration-007.sql` and the setup guide `docs/turnout-phone.md` (about 20 to 30 minutes, once, because it needs a text-message provider such as Twilio). People can verify a number with a texted code from the Me tab, or sign in with their phone. Supabase Auth sends and checks the code; a number can belong to only one account.
+
+A switch, **off by default**, makes a verified phone required to create a circle, join one, or be approved into one (existing members are not locked out). It ships off so that you can't lock everyone out before texts work. The number is never shown to other members: they see only a "verified" badge, and the member themselves sees only the last two digits. Verification proves control of a phone number, not identity.
+
 ### Tests
 
-`docs/sql-tests/` has 156 database checks (plus 13 for the email function in `tests/`, run with `npm test`) and the stub that lets them run on plain PostgreSQL (permissions, privacy, rotation fairness, cycle rollover, claims, passing, points, and direct-write attempts that must fail). To run them: start a local PostgreSQL, then `docs/sql-tests/run.sh`.
+`docs/sql-tests/` has 185 database checks (plus 13 for the email function in `tests/`, run with `npm test`) and the stub that lets them run on plain PostgreSQL (permissions, privacy, rotation fairness, cycle rollover, claims, passing, points, and direct-write attempts that must fail). To run them: start a local PostgreSQL, then `docs/sql-tests/run.sh`.
 
 ### Known limits
 
 - No live updates yet: the screen refreshes when you switch back to the tab, or with the Refresh button.
 - The month a party belongs to is based on the server's date (UTC).
-- Phone sign-in is not wired up yet (email only).
+- Sign-in is by email or by phone (see "Phone verification" below).

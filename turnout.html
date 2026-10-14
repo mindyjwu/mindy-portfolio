@@ -554,7 +554,7 @@ function renderCircle(){
       ${REAL.on?'':`<div class="row"><label class="note">Max size</label><select id="cap" style="width:auto">${[12,20,30,50].map(c=>`<option ${c===S.circle.cap?'selected':''}>${c}</option>`).join('')}</select></div>`}</div>
     <div class="capbar"><i style="width:${S.members.length/S.circle.cap*100}%"></i></div>
     <div class="members" style="margin-top:14px">${S.members.map(m=>`<div class="mem ${up&&up.host===m.id?'up':''}">${avatar(m)}<div class="h">${esc(label(m))}</div><div class="note">${PLATS[m.platform]||''}</div>
-      <div>${S.cycleHosted.includes(m.id)?'<span class="chip g">hosted ✓</span>':'<span class="chip">in the pool</span>'}${m.skip?'<span class="chip b">skipping</span>':''}</div>
+      <div>${S.cycleHosted.includes(m.id)?'<span class="chip g">hosted ✓</span>':'<span class="chip">in the pool</span>'}${m.skip?'<span class="chip b">skipping</span>':''}${REAL.on&&m.verified?'<span class="chip g">verified</span>':''}</div>
       <div>${m.tags.map(t=>TAGS[t]).join(' ')}</div>${REAL.on&&m.id!=='me'?`<div style="margin-top:6px"><button class="linkbtn" data-act="safety" data-u="${esc(m.id)}">${m.blocked?'Blocked · manage':'Report or block'}</button></div>`:''}</div>`).join('')}</div>
     ${REAL.on?'<p class="note" style="margin-top:18px">To add people, share your invite link from the Me tab. You approve each new person.</p>':`<h3 style="font-size:22px;margin:22px 0 4px">Invite someone</h3>
     <div class="row"><select id="a-plat" style="width:auto">${Object.entries(PLATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select><input type="text" id="a-handle" placeholder="@handle or phone" style="flex:1;min-width:140px" maxlength="30">
@@ -634,7 +634,7 @@ function renderMix(){
   return `<div style="margin-top:16px"><b>Your view of the room</b><div class="mixbar"><i style="width:${kn/tot*100}%;background:var(--sec)"></i><i style="width:${nw/tot*100}%;background:var(--pri)"></i></div>
     <div class="note">🟢 ${kn} you know · 🟠 ${nw} new faces</div></div>
     <div style="margin-top:10px">${room.map((id,k)=>{const m=byId(id),isK=knows(A,'me',id);
-      return `<div class="guest" style="animation-delay:${k*.05}s">${avatar(m)}<div><b>${esc(label(m))}</b> ${id===up.host?'<span class="chip">host</span>':id==='me'?'<span class="chip b">you</span>':isK?'<span class="chip g">friend</span>':'<span class="chip">new</span>'}${REAL.on&&up.rsvps&&up.rsvps[id]?`<span class="chip ${up.rsvps[id].status==='declined'?'':'g'}">${esc(up.rsvps[id].status)}</span>`:''}
+      return `<div class="guest" style="animation-delay:${k*.05}s">${avatar(m)}<div><b>${esc(label(m))}</b> ${REAL.on&&m.verified?'<span class="chip g">verified</span>':''}${id===up.host?'<span class="chip">host</span>':id==='me'?'<span class="chip b">you</span>':isK?'<span class="chip g">friend</span>':'<span class="chip">new</span>'}${REAL.on&&up.rsvps&&up.rsvps[id]?`<span class="chip ${up.rsvps[id].status==='declined'?'':'g'}">${esc(up.rsvps[id].status)}</span>`:''}
         <p>${id===up.host?'Hosting. Brings: '+esc(idea.host[0]):'Brings: <b>'+esc((up.assign&&up.assign[id])||'')+'</b>'}</p><p class="note">${icebreaker(id,room,A)}</p>${REAL.on&&id!=='me'?`<button class="linkbtn" data-act="safety" data-u="${esc(id)}">Report or block</button>`:''}</div></div>`}).join('')}</div>
     <div class="row" style="margin-top:14px"><button class="btn g sm" data-act="copy">Copy invite text</button></div>`;
 }
@@ -851,10 +851,14 @@ document.addEventListener('click',e=>{
   else if(a==='claim'){const ym=t.dataset.ym;S.claims[ym]='me';if(ym===S.nextYm&&!S.upcoming)S.upcoming={host:'me',ym,idea:null,guests:[],assign:{}};toast(`${mLabel(ym)} is yours`);confetti();renderAll()}
   else if(a==='add')addMember();
   else if(a==='setup')openSetup(+t.dataset.step,true);
+  else if(a==='signmode'){CLOUD.signMode=t.dataset.v;CLOUD.otp=null;renderMe()}
+  else if(a==='ps-send'||a==='pv-send')sendCode(a.slice(0,2));
+  else if(a==='ps-verify'||a==='pv-verify')verifyCode(a.slice(0,2));
+  else if(a==='ps-reset'||a==='pv-reset'){CLOUD.otp=null;renderMe()}
   else if(a==='signin'){const em=($('#c-email').value||'').trim();if(!/^\S+@\S+\.\S+$/.test(em))return toast('Enter a valid email');
     cloudDo(async()=>{const r=await CLOUD.sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.origin+location.pathname}});if(r.error)throw r.error;toast('Check your email for the sign-in link')})}
-  else if(a==='signout')cloudDo(async()=>{await CLOUD.sb.auth.signOut();CLOUD.user=null;CLOUD.circle=null;CLOUD.roster=[];if(REAL.on)leaveReal()});
-  else if(a==='mkcircle'){const nm=($('#c-name').value||'').trim();if(!nm)return toast('Name your circle first');
+  else if(a==='signout')cloudDo(async()=>{await CLOUD.sb.auth.signOut();CLOUD.user=null;CLOUD.circle=null;CLOUD.roster=[];CLOUD.ps=null;CLOUD.otp=null;if(REAL.on)leaveReal()});
+  else if(a==='mkcircle'){const nm=($('#c-name').value||'').trim();if(!nm)return toast('Name your circle first');if(needPhone())return toast('Verify your phone first. It only takes a minute.');
     cloudDo(async()=>{const r=await CLOUD.sb.rpc('create_circle',{p_name:nm,p_cap:S.circle.cap});if(r.error)throw r.error;await loadCircle();toast('Circle created. Share your invite link.')})}
   else if(a==='copylink'){const l=inviteLink();(navigator.clipboard?navigator.clipboard.writeText(l):Promise.reject()).then(()=>toast('Invite link copied'),()=>toast('Copy not available here'))}
   else if(a==='approve'||a==='decline'){const u=t.dataset.u;
@@ -961,7 +965,7 @@ const canPlan=()=>!REAL.on||!!(S.upcoming&&(S.upcoming.host==='me'||isOwner()));
 async function rpc(name,args){if(!CLOUD.sb)throw new Error('Sign in first');const r=await CLOUD.sb.rpc(name,args);if(r.error)throw r.error;return r.data}
 function buildReal(snap){
   REAL.snap=snap;const bl=new Set(snap.my_blocks||[]);
-  const ms=snap.members.map((m,i)=>({id:rid(m.user_id),handle:m.handle,platform:m.platform||'other',tags:m.interests||[],is:m.qualities||[],want:m.looking_for||[],vibe:{...(m.vibe||{})},prefs:{...(m.ratings||{})},points:m.points||0,skip:!!m.skip,hosted:(m.hosted||[]).map(ym7),av:'',hue:HUES[i%6],inCycle:!!m.in_cycle,att:m.attended||0,blocked:bl.has(m.user_id)}));
+  const ms=snap.members.map((m,i)=>({id:rid(m.user_id),handle:m.handle,platform:m.platform||'other',tags:m.interests||[],is:m.qualities||[],want:m.looking_for||[],vibe:{...(m.vibe||{})},prefs:{...(m.ratings||{})},points:m.points||0,skip:!!m.skip,hosted:(m.hosted||[]).map(ym7),av:'',hue:HUES[i%6],inCycle:!!m.in_cycle,att:m.attended||0,blocked:bl.has(m.user_id),verified:!!m.verified}));
   const ev=snap.event,asg={};if(ev)Object.entries(ev.assign||{}).forEach(([k,v])=>asg[rid(k)]=v);
   const rs={};if(ev)(ev.rsvps||[]).forEach(r=>rs[rid(r.user_id)]={status:r.status,rated:!!r.rated});
   return{me:snap.me,circle:{name:snap.circle.name,cap:snap.circle.capacity},members:ms,
@@ -1116,7 +1120,57 @@ function safetyCard(){
 /* The URL and anon key are public by design; row-level security in the database protects the data. */
 const SB_URL='https://nmbrsdnopuhcbhxdgycu.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tYnJzZG5vcHVoY2JoeGRneWN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4NjU0OTgsImV4cCI6MjEwNjQ0MTQ5OH0.2SYfJKNbVU2EfJUyfY75iD-pjpCu6-8jYfORr8mmfrY';
-const CLOUD={sb:null,user:null,circle:null,roster:[],busy:false,msg:''};
+const CLOUD={sb:null,user:null,circle:null,roster:[],busy:false,msg:'',ps:null,otp:null,signMode:'email',phoneLast:''};
+/* ===================== phone verification ===================== */
+/* Supabase Auth sends and checks the text-message code. The server decides what a verified phone is
+   needed for (switch in docs/migration-007.sql); this is just the screens. The number is never shown to
+   other members, and we only ever display its last two digits. */
+function normPhone(raw){
+  const t=String(raw||'').trim(),d=t.replace(/\D/g,'');
+  if(t.startsWith('+'))return d.length>=8&&d.length<=15?'+'+d:null;
+  if(d.length===10)return '+1'+d;
+  if(d.length===11&&d[0]==='1')return '+'+d;
+  return null;
+}
+const maskNum=p=>'\u2022\u2022\u2022\u2022 '+String(p||'').slice(-2);
+const isVerified=()=>CLOUD.ps?!!CLOUD.ps.verified:!!(CLOUD.user&&CLOUD.user.phone_confirmed_at);
+const needPhone=()=>!!(CLOUD.ps&&CLOUD.ps.required&&!CLOUD.ps.verified);
+async function loadPhoneStatus(){try{const r=await CLOUD.sb.rpc('phone_status');CLOUD.ps=r.error?null:r.data}catch(e){CLOUD.ps=null}}
+function phoneSection(){
+  if(isVerified()){const ph=(CLOUD.user&&CLOUD.user.phone)||CLOUD.phoneLast;return `<div class="row" style="margin-top:10px"><span class="chip g">Phone verified${ph?' '+esc(maskNum(ph)):''}</span></div>`}
+  const req=!!(CLOUD.ps&&CLOUD.ps.required),o=CLOUD.otp&&CLOUD.otp.mode==='verify'?CLOUD.otp:null,cool=o&&Date.now()-o.at<45000;
+  return `<div class="${req?'warn':''}" style="margin-top:14px"><h3 style="font-size:20px;margin-bottom:4px">Verify your phone</h3>
+    <p class="note">${req?'Circles need a verified phone number to create or join. ':'A verified number tells your circle you\'re a real person. '}We text you a 6-digit code. Your number is never shown to other members.</p>
+    ${!o?`<div class="row" style="margin-top:8px"><input type="text" id="pv-phone" inputmode="tel" autocomplete="tel" placeholder="+1 555 123 4567" maxlength="20" style="flex:1;min-width:170px"><button class="btn sm" data-act="pv-send">Text me a code</button></div><p class="note" style="margin-top:6px">Outside the US, start with your country code, like +44.</p>`
+     :`<p class="note" style="margin-top:8px">Code sent to ${esc(maskNum(o.phone))}.</p><div class="row"><input type="text" id="pv-code" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="6" style="width:140px"><button class="btn sm g" data-act="pv-verify">Verify</button><button class="btn ghost sm" data-act="pv-send" ${cool?'disabled':''}>Send again</button><button class="btn ghost sm" data-act="pv-reset">Use another number</button></div>`}</div>`;
+}
+function sendCode(kind){
+  const el=document.getElementById(kind+'-phone');let phone;
+  if(el){phone=normPhone(el.value);if(!phone)return toast('Enter a valid phone number. Outside the US, start with your country code.')}
+  else if(CLOUD.otp){phone=CLOUD.otp.phone;if(Date.now()-CLOUD.otp.at<45000)return toast('Please wait a moment before asking for another code.')}
+  else return;
+  cloudDo(async()=>{
+    const r=kind==='ps'?await CLOUD.sb.auth.signInWithOtp({phone}):await CLOUD.sb.auth.updateUser({phone});
+    if(r.error)throw r.error;
+    CLOUD.otp={mode:kind==='ps'?'signin':'verify',phone,at:Date.now()};toast('Code sent. Check your texts.');
+    setTimeout(()=>{if(CLOUD.otp&&CLOUD.otp.phone===phone)renderMe()},46000);
+  });
+}
+function verifyCode(kind){
+  const c=((document.getElementById(kind+'-code')||{}).value||'').replace(/\D/g,'');
+  if(c.length!==6||!CLOUD.otp)return toast('Enter the 6-digit code from the text.');
+  const phone=CLOUD.otp.phone;
+  cloudDo(async()=>{
+    const r=await CLOUD.sb.auth.verifyOtp({phone,token:c,type:kind==='ps'?'sms':'phone_change'});
+    if(r.error)throw new Error(/expired|invalid/i.test(r.error.message||'')?'That code didn\'t work or has expired. Ask for a new one.':r.error.message);
+    CLOUD.otp=null;
+    if(kind==='pv'){
+      CLOUD.phoneLast=phone.slice(-2);await loadPhoneStatus();
+      try{await joinPending();await loadCircle();if(REAL.on)await refreshReal()}catch(e){cloudErr(e)}
+      toast('Phone verified');
+    }
+  });
+}
 try{const q=new URLSearchParams(location.search);if(q.get('join'))localStorage.setItem('turnout.join',JSON.stringify({c:q.get('join'),by:q.get('by')||null}))}catch(e){}
 const cloudErr=e=>toast((e&&e.message)||'Something went wrong. Try again.');
 async function initCloud(){
@@ -1127,8 +1181,8 @@ async function initCloud(){
   await onAuth();
 }
 async function onAuth(){
-  if(CLOUD.user){try{await syncProfile();await joinPending();await loadCircle()}catch(e){cloudErr(e)}}
-  else{CLOUD.circle=null;CLOUD.roster=[]}
+  if(CLOUD.user){try{await loadPhoneStatus();await syncProfile();await joinPending();await loadCircle()}catch(e){cloudErr(e)}}
+  else{CLOUD.circle=null;CLOUD.roster=[];CLOUD.ps=null}
   if(CLOUD.circle&&CLOUD.circle.status==='approved'){if(modePref()!=='demo'&&!REAL.on)await enterReal()}
   else if(REAL.on)leaveReal();
   renderAll();
@@ -1143,7 +1197,9 @@ async function syncProfile(){
 async function joinPending(){
   let j=null;try{j=JSON.parse(localStorage.getItem('turnout.join')||'null')}catch(e){}
   if(!j||!byId('me'))return;
+  if(needPhone()){toast('Verify your phone to join. Your invite is saved.');return}
   const r=await CLOUD.sb.rpc('join_circle',{p_code:j.c,p_by:j.by});
+  if(r.error&&/verify your phone/i.test(r.error.message||'')){await loadPhoneStatus();toast('Verify your phone to join. Your invite is saved.');return}
   try{localStorage.removeItem('turnout.join')}catch(e){}
   if(r.error)throw r.error;toast(`Request sent to join ${r.data}. The owner will approve you.`);
 }
@@ -1156,10 +1212,17 @@ async function cloudDo(fn){if(CLOUD.busy)return;CLOUD.busy=true;try{await fn()}c
 const inviteLink=()=>CLOUD.circle&&CLOUD.circle.invite_code?`${location.origin}${location.pathname}?join=${CLOUD.circle.invite_code}&by=${CLOUD.user.id}`:'';
 function accountCard(){
   if(!CLOUD.sb)return `<div class="card"><h2>Your account</h2><p class="sub">Cloud sign-in isn't available right now. The demo above still works and saves on this device.</p></div>`;
-  if(!CLOUD.user)return `<div class="card tint-t"><h2>Save your profile</h2><p class="sub">Sign in with your email. We send you a one-time link, no password. Phone sign-in is coming.</p>
-    <div class="row"><input type="text" id="c-email" inputmode="email" autocomplete="email" placeholder="you@email.com" style="flex:1;min-width:200px" maxlength="120"><button class="btn sm" data-act="signin">Email me a link</button></div></div>`;
+  if(!CLOUD.user){
+    const ph=CLOUD.signMode==='phone',o=CLOUD.otp&&CLOUD.otp.mode==='signin'?CLOUD.otp:null,cool=o&&Date.now()-o.at<45000;
+    return `<div class="card tint-t"><h2>Save your profile</h2><p class="sub">Sign in with your email (we send a one-time link) or your phone (we text a code). No password either way.</p>
+      <div class="segs"><button data-act="signmode" data-v="email" class="${ph?'':'on'}">Email</button><button data-act="signmode" data-v="phone" class="${ph?'on':''}">Phone</button></div>
+      ${!ph?`<div class="row"><input type="text" id="c-email" inputmode="email" autocomplete="email" placeholder="you@email.com" style="flex:1;min-width:200px" maxlength="120"><button class="btn sm" data-act="signin">Email me a link</button></div>`
+       :!o?`<div class="row"><input type="text" id="ps-phone" inputmode="tel" autocomplete="tel" placeholder="+1 555 123 4567" maxlength="20" style="flex:1;min-width:190px"><button class="btn sm" data-act="ps-send">Text me a code</button></div><p class="note" style="margin-top:6px">Outside the US, start with your country code, like +44. Message and data rates may apply.</p>`
+       :`<p class="note">Code sent to ${esc(maskNum(o.phone))}.</p><div class="row"><input type="text" id="ps-code" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="6" style="width:140px"><button class="btn sm g" data-act="ps-verify">Verify</button><button class="btn ghost sm" data-act="ps-send" ${cool?'disabled':''}>Send again</button><button class="btn ghost sm" data-act="ps-reset">Use another number</button></div>`}</div>`;
+  }
   const c=CLOUD.circle,owner=c&&c.role==='owner';
-  let h=`<div class="card tint-t"><div class="row" style="justify-content:space-between"><div><h2>Your account</h2><p class="sub" style="margin:0">Signed in as ${esc(CLOUD.user.email||'your account')}</p></div><button class="btn ghost sm" data-act="signout">Sign out</button></div>`;
+  let h=`<div class="card tint-t"><div class="row" style="justify-content:space-between"><div><h2>Your account</h2><p class="sub" style="margin:0">Signed in as ${esc(CLOUD.user.email||(CLOUD.user.phone?'phone '+maskNum(CLOUD.user.phone):'your account'))}</p></div><button class="btn ghost sm" data-act="signout">Sign out</button></div>`;
+  h+=phoneSection();
   if(!byId('me')&&!c)h+=`<div class="warn">Finish joining (handle, picks, vibe) above, then your profile saves automatically.</div>`;
   else if(!c)h+=`<h3 style="font-size:22px;margin:16px 0 6px">Start a real circle</h3><p class="note">Or open an invite link from a friend to ask to join theirs.</p>
     <div class="row" style="margin-top:8px"><input type="text" id="c-name" placeholder="Name your circle" style="flex:1;min-width:180px" maxlength="60"><button class="btn sm g" data-act="mkcircle">Create</button></div>`;
@@ -1171,7 +1234,7 @@ function accountCard(){
       <div class="row"><input type="text" readonly value="${esc(inviteLink())}" style="flex:1;min-width:200px"><button class="btn sm" data-act="copylink">Copy</button></div>
       ${owner&&pend.length?`<h3 style="font-size:20px;margin:16px 0 6px">Waiting for your approval</h3>${pend.map(r=>`<div class="rrow"><b>${esc(r.handle)}</b><span><button class="btn sm g" data-act="approve" data-u="${esc(r.user_id)}">Approve</button> <button class="btn ghost sm" data-act="decline" data-u="${esc(r.user_id)}">Decline</button></span></div>`).join('')}`:''}
       <h3 style="font-size:20px;margin:16px 0 6px">Members</h3>${ok.map(r=>`<div class="rrow"><b>${esc(r.handle)}</b><span class="chip ${r.role==='owner'?'g':''}">${esc(r.role)}</span></div>`).join('')}
-      <p class="note" style="margin-top:10px">Next phase: the rotation, matching and points above will run on these real members.</p>`;
+`;
   }
   return h+'</div>';
 }
