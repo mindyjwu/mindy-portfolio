@@ -13,12 +13,10 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   var list = document.querySelector('.plist');
-  if (!list) return;
-  var rows = Array.prototype.slice.call(list.querySelectorAll('.prow'));
+  var rows = list ? Array.prototype.slice.call(list.querySelectorAll('.prow')) : [];
   rows.forEach(function (r, i) { r.dataset.i = i; });
 
-  initPreview();
-  initPicker();
+  if (list) { initPreview(); initPicker(); }
   initConstellation();
 
   // ── 1. Project previews ──────────────────────────────────────────────────
