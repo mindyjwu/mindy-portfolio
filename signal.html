@@ -439,7 +439,7 @@ function feedDate(){return mode==='snapshot'&&SNAP?new Date(SNAP.date+'T12:00:00
 // Past that, the page says so instead of letting old news pass as current.
 function snapAge(){return Math.max(0,Math.round((Date.parse(TODAY+'T00:00:00Z')-Date.parse(SNAP.date+'T00:00:00Z'))/864e5));}
 function snapDaily(){return !!(SNAP&&SNAP.refresh==='daily');}
-function snapStale(){return !!SNAP&&snapAge()>2;}   // however the snapshot was made
+function snapStale(){return !!SNAP&&snapAge()>2&&!(SNAP.frozen&&!snapDaily());}   // however the snapshot was made
 function snapHealthy(){return snapDaily()&&!snapStale();}
 function dateLabel(){
   if(mode==='snapshot'&&SNAP)return snapDaily()&&snapAge()===0?'Today — '+fmtDay(SNAP.date):'Sweep from '+fmtDay(SNAP.date);
@@ -455,7 +455,7 @@ function setMode(m){
 }
 function snapStatus(){
   const age=snapAge(),day=fmtDay(SNAP.date);
-  if(age>2){
+  if(age>2&&!(SNAP.frozen&&!snapDaily())){
     // Old news must say so, whether or not the daily job ever ran: a snapshot
     // that was never auto-refreshed looks exactly like one that silently stopped.
     return snapDaily()
@@ -464,7 +464,7 @@ function snapStatus(){
   }
   if(snapDaily())return 'Updated daily · latest sweep '+day;
   return SNAP.frozen
-    ? 'Frozen snapshot · sweep from '+day+' · live refresh off'
+    ? 'Saved sweep from '+day+' · live refresh off, so this page costs nothing to run'
     : 'Live refresh unavailable · showing the '+day+' sweep';
 }
 function snapBar(){setSt(snapHealthy()?'daily':'snap',snapHealthy()?'#3a5c40':'#b45309',snapStatus());}
