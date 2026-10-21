@@ -42,7 +42,7 @@ Texts cost money, and criminals trigger codes to unrelated numbers to run up bil
 Texts cost roughly a cent or a few cents each in the US; check Twilio's current pricing page. For your first 100 sign-ups, plan on a small amount of money, not a large one, unless someone abuses it. If you see unexpected charges, tell me and I'll add a CAPTCHA to sign-in, which is the proper fix.
 
 ### 3. Run the migration
-Run `docs/migration-007.sql` in the Supabase SQL editor, after the earlier migrations. It changes nothing for anyone yet, because the requirement is off.
+Run `docs/turnout/sql/007-phone-verification.sql` in the Supabase SQL editor, after the earlier migrations. It changes nothing for anyone yet, because the requirement is off.
 
 ### 4. Test with your own number
 1. Open Turnout, sign in, go to the **Me** tab, and use **Verify your phone**.
@@ -101,5 +101,5 @@ order by phone_verified, p.handle;
 
 ## Tests
 
-- `docs/sql-tests/phone-verification.test.sql` (29 checks): the requirement off by default and fails open; create, join and approve refused for unverified people when it's on, allowed once verified; existing members not locked out; the number never appears in anything a member receives; the number can't be attached to two accounts.
+- `docs/turnout/sql/tests/phone-verification.test.sql` (29 checks): the requirement off by default and fails open; create, join and approve refused for unverified people when it's on, allowed once verified; existing members not locked out; the number never appears in anything a member receives; the number can't be attached to two accounts.
 - The screens were exercised end to end against the real database rules: stopped when unverified, bad numbers rejected before anything is sent, wrong codes rejected, the saved invite used after verifying, and no phone number in any page, memory or server response of another member. The text messages themselves were **not** tested, because the sandbox can't reach Supabase or Twilio; the setup test above in step 4 is how you confirm that part.

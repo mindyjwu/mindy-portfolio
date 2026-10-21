@@ -1,6 +1,6 @@
 -- Turnout migration 006: email alert when a safety report is filed.
--- Run AFTER docs/turnout-schema.sql and migration-002 to 005, in the Supabase SQL editor.
--- Setup steps are in docs/turnout-alerts.md.
+-- Run AFTER 001-schema.sql and migrations 002 to 005, in the Supabase SQL editor.
+-- Setup steps are in docs/turnout/alerts.md.
 --
 -- How it works: a trigger fires on every new row in `reports` and asks the database's
 -- built-in HTTP queue (pg_net) to POST the details to the serverless function at

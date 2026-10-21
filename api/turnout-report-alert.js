@@ -1,6 +1,6 @@
 // api/turnout-report-alert.js
 // Vercel serverless function: emails the app operator when someone files a safety
-// report in Turnout. Called by the database (see docs/migration-006.sql), never by
+// report in Turnout. Called by the database (see docs/turnout/sql/006-report-email-alert.sql), never by
 // the browser. It checks a shared secret, then sends one plain-text email with Resend.
 //
 // Environment variables (Vercel: Project, Settings, Environment Variables):

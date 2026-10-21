@@ -1,5 +1,5 @@
 -- Turnout migration 005: hidden host address.
--- Run AFTER docs/turnout-schema.sql and migration-002 to 004, in the Supabase SQL editor.
+-- Run AFTER 001-schema.sql and migrations 002 to 004, in the Supabase SQL editor.
 --
 -- Who can see what:
 --   area (a neighborhood the host types, e.g. "East Village")  -> the host, the owner, and everyone invited

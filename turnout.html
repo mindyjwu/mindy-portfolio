@@ -1123,7 +1123,7 @@ const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const CLOUD={sb:null,user:null,circle:null,roster:[],busy:false,msg:'',ps:null,otp:null,signMode:'email',phoneLast:''};
 /* ===================== phone verification ===================== */
 /* Supabase Auth sends and checks the text-message code. The server decides what a verified phone is
-   needed for (switch in docs/migration-007.sql); this is just the screens. The number is never shown to
+   needed for (switch in docs/turnout/sql/007-phone-verification.sql); this is just the screens. The number is never shown to
    other members, and we only ever display its last two digits. */
 function normPhone(raw){
   const t=String(raw||'').trim(),d=t.replace(/\D/g,'');

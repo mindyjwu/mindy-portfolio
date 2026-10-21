@@ -50,7 +50,7 @@ Honest warning: your closest friends will say yes out of kindness. Their enthusi
 
 - [ ] Supabase migrations 004 to 007 are run (otherwise Report/Block and the hidden address show errors).
 - [ ] Hard-refresh the live site, create your own real circle, join it from a second account (a second email), and walk through: spin a host, claim a month, RSVP, close the party, rate it.
-- [ ] Report email alerts: either finish `docs/turnout-alerts.md` or accept that you will check the `reports` table by hand. With strangers coming, I'd do the alert setup first.
+- [ ] Report email alerts: either finish `docs/turnout/alerts.md` or accept that you will check the `reports` table by hand. With strangers coming, I'd do the alert setup first.
 - [ ] Phone verification: **leave it off** for the first four circles. These are friends of friends, and Twilio setup is 20 to 30 minutes plus a spend cap. Turn it on before you open any circle to people two or more steps from you. That is a judgment call, so tell me if you disagree.
 - [ ] Write your own address line for the first party (the exact address is only shown to the host and to guests who RSVP going).
 

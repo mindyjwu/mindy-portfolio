@@ -6,7 +6,7 @@ Audience: friends in their 20s to 30s, starting with one small friend group plus
 
 | Need | Pick | Why |
 |---|---|---|
-| Database, auth, realtime | **Supabase** (Postgres) | Phone-number login with SMS codes, row-level security, realtime updates, free tier covers the first circles. Schema is in `docs/turnout-schema.sql`. |
+| Database, auth, realtime | **Supabase** (Postgres) | Phone-number login with SMS codes, row-level security, realtime updates, free tier covers the first circles. Schema is in `docs/turnout/sql/001-schema.sql`. |
 | Front end | The existing static site, then a **PWA** | Installable on phones from the browser, no App Store review. Wrap with Capacitor later if you want store listings. |
 | API / jobs | Vercel functions (already in `/api`) | Matching, rotation and points need server-side authority, not browser code. |
 | ML service | Same Vercel functions first; a small Python service later | Everything in v1 is cheap enough to run in a function. |
@@ -61,7 +61,7 @@ Moving other people's money (the circle pot) triggers payment-compliance questio
 
 ## Setup status
 
-Run these in the Supabase SQL editor, in order: `docs/turnout-schema.sql`, `docs/migration-002.sql`, `docs/migration-003.sql`, `docs/migration-004.sql`, `docs/migration-005.sql`, `docs/migration-006.sql`, `docs/migration-007.sql`. Each is safe to re-run.
+Run these in the Supabase SQL editor, in order: `docs/turnout/sql/001-schema.sql`, `docs/turnout/sql/002-membership-and-invites.sql`, `docs/turnout/sql/003-rotation-and-parties.sql`, `docs/turnout/sql/004-report-and-block.sql`, `docs/turnout/sql/005-hidden-address.sql`, `docs/turnout/sql/006-report-email-alert.sql`, `docs/turnout/sql/007-phone-verification.sql`. Each is safe to re-run.
 
 1. In Supabase: Authentication > URL Configuration, set the Site URL to your site and add your site plus `/**` as a redirect URL. Email sign-in works out of the box; phone needs an SMS provider.
 2. The site already contains the project URL and anon key (both public by design). Never put the `service_role` key in the repo.
@@ -92,7 +92,7 @@ When you are signed in and approved into a circle, the Circle tab shows a **Samp
 
 ## Safety: report and block
 
-`docs/migration-004.sql`. Strangers meet at people's homes, so this ships before any stranger-heavy party.
+`docs/turnout/sql/004-report-and-block.sql`. Strangers meet at people's homes, so this ships before any stranger-heavy party.
 
 **Block** (private, applies in every circle you're in)
 - A blocked pair is never placed in the same party. The **server** enforces this when the host saves the guest list, so a modified browser can't get around it. Anyone who would share the party with someone they have a block with, in either direction, is quietly left out. The host is always kept; otherwise the earlier name in the list wins.
@@ -106,7 +106,7 @@ When you are signed in and approved into a circle, the Circle tab shows a **Samp
 - Reasons: made me feel unsafe, harassment or unwanted contact, inappropriate behavior, fake or misleading profile, something else.
 - The **circle owner** sees reports about other members (who it's about, reason, note, how many open reports that member has) in the Me tab, and can mark them resolved or dismissed, or remove the member. The owner does **not** see who sent a report.
 - Removing a member cuts their access, deletes their invites, and cancels a party they were hosting.
-- **Reports about the owner can only be read by whoever runs the database** (you, as the app operator). Every report also emails you (`docs/migration-006.sql`; setup in [`docs/turnout-alerts.md`](turnout-alerts.md)). The email is a nudge, not the record. To review reports, run this in the Supabase SQL editor:
+- **Reports about the owner can only be read by whoever runs the database** (you, as the app operator). Every report also emails you (`docs/turnout/sql/006-report-email-alert.sql`; setup in [`docs/turnout/alerts.md`](alerts.md)). The email is a nudge, not the record. To review reports, run this in the Supabase SQL editor:
 
 ```sql
 select r.id, r.created_at, r.status, r.reason, r.note,
@@ -129,7 +129,7 @@ order by (r.status = 'open') desc, r.created_at desc;
 
 ## Hidden host address
 
-`docs/migration-005.sql`. The host types a neighborhood, an address and getting-in notes in the Party tab.
+`docs/turnout/sql/005-hidden-address.sql`. The host types a neighborhood, an address and getting-in notes in the Party tab.
 
 | Who | Neighborhood | Address and notes |
 |---|---|---|
@@ -148,17 +148,17 @@ order by (r.status = 'open') desc, r.created_at desc;
 
 ## Email alert for reports
 
-`docs/migration-006.sql`, `api/turnout-report-alert.js`, and the setup guide `docs/turnout-alerts.md` (about 15 minutes, once). Every new report triggers an email to you with the category, who it's about, who filed it, the circle, and the note (handles only: no emails, ids or addresses). It is sent by a database trigger through Supabase's HTTP queue to a small Vercel function, which emails you through Resend. A failure to send can never stop a report from being saved, but it can mean a missed email, because the queue doesn't retry; so the guide also shows how to check the open reports yourself.
+`docs/turnout/sql/006-report-email-alert.sql`, `api/turnout-report-alert.js`, and the setup guide `docs/turnout/alerts.md` (about 15 minutes, once). Every new report triggers an email to you with the category, who it's about, who filed it, the circle, and the note (handles only: no emails, ids or addresses). It is sent by a database trigger through Supabase's HTTP queue to a small Vercel function, which emails you through Resend. A failure to send can never stop a report from being saved, but it can mean a missed email, because the queue doesn't retry; so the guide also shows how to check the open reports yourself.
 
 ## Phone verification
 
-`docs/migration-007.sql` and the setup guide `docs/turnout-phone.md` (about 20 to 30 minutes, once, because it needs a text-message provider such as Twilio). People can verify a number with a texted code from the Me tab, or sign in with their phone. Supabase Auth sends and checks the code; a number can belong to only one account.
+`docs/turnout/sql/007-phone-verification.sql` and the setup guide `docs/turnout/phone.md` (about 20 to 30 minutes, once, because it needs a text-message provider such as Twilio). People can verify a number with a texted code from the Me tab, or sign in with their phone. Supabase Auth sends and checks the code; a number can belong to only one account.
 
 A switch, **off by default**, makes a verified phone required to create a circle, join one, or be approved into one (existing members are not locked out). It ships off so that you can't lock everyone out before texts work. The number is never shown to other members: they see only a "verified" badge, and the member themselves sees only the last two digits. Verification proves control of a phone number, not identity.
 
 ### Tests
 
-`docs/sql-tests/` has 185 database checks (plus 13 for the email function in `tests/`, run with `npm test`) and the stub that lets them run on plain PostgreSQL (permissions, privacy, rotation fairness, cycle rollover, claims, passing, points, and direct-write attempts that must fail). To run them: start a local PostgreSQL, then `docs/sql-tests/run.sh`.
+`docs/turnout/sql/tests/` has 185 database checks (plus 13 for the email function in `tests/`, run with `npm test`) and the stub that lets them run on plain PostgreSQL (permissions, privacy, rotation fairness, cycle rollover, claims, passing, points, and direct-write attempts that must fail). To run them: start a local PostgreSQL, then `docs/turnout/sql/tests/run.sh`.
 
 ### Known limits
 
