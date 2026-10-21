@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Real-time AI and innovation intelligence across 16 industries — 15+ stories daily, each with an estimated read time.">
+  <meta name="description" content="AI and innovation news across 16 industries, gathered with Claude web search. Every story links to its source and shows an estimated read time.">
   <meta property="og:title" content="SIGNAL — AI Innovation Feed · Mindy Wu">
-  <meta property="og:description" content="Live AI and tech intelligence across Biotech, Hardware, Media, Finance, and 12 more industries.">
+  <meta property="og:description" content="AI and tech news across Biotech, Hardware, Media, Finance, and 12 more industries, with source links and read times.">
   <title>SIGNAL — AI Innovation Feed · Mindy Wu</title>
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -135,6 +135,14 @@
     .empty{text-align:center;padding:60px 32px;color:var(--mu)}
     .empty h2{color:var(--tx);margin-bottom:8px}
     .aempty{text-align:center;padding:50px;color:var(--mu);font-size:13px;line-height:1.8}
+    .empty p{font-size:13px;margin-top:6px;line-height:1.6}
+    .altlbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--mu);margin-top:26px}
+    .altchips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+    .altchip{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:20px;border:1px solid var(--br);background:#fff;color:var(--tx);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+    .altchip:hover{border-color:var(--sage);background:var(--sl);color:var(--sd)}
+    .altchip b{font-weight:700;color:var(--mu)}
+    .emptyact{display:flex;justify-content:center;margin-top:22px}
+    .dfail{font-size:12px;color:var(--mu);padding:6px 0 14px}
 
     /* ── Read time badge ── */
     .cmeta2{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:3px}
@@ -211,7 +219,7 @@ html[data-mw-theme="dark"] .mpnav__theme .moon{display:none;}
     <div class="brand">SIG<span>NAL</span></div>
     <div class="lvbg sample" id="lvbg">LOADING</div>
   </div>
-  <div class="hsub">AI &amp; innovation intelligence · 15+ stories daily across 16 industries</div>
+  <div class="hsub">AI &amp; innovation intelligence across 16 industries</div>
 </div>
 
 <!-- ── Stats bar ───────────────────────────────── -->
@@ -297,7 +305,12 @@ const PHOTO={
 };
 const TODAY=new Date().toISOString().split('T')[0];
 const IND_COUNT=Object.keys(META).length;
-let todayStories=[],archiveDays=[],curView='today',selIndustry=null;
+let todayStories=[],curView='today',selIndustry=null;
+// Shared archive: index.json lists the days, each day file is fetched on demand.
+// archiveCache holds a loaded day, or false if its file failed to load.
+const ARCHIVE_PAGE=7;
+let archiveIndex=[],localDays=[],archiveReady=false,archiveLoading=false,archiveWant=ARCHIVE_PAGE;
+const archiveCache={};
 // mode: 'live' (today's sweep) | 'snapshot' (the committed last-good sweep) | 'sample' (hardcoded placeholder)
 let mode='sample',SNAP=null,sweepsDone=0,fetchingInd=null;
 const fetchedInd=new Set();
@@ -332,7 +345,7 @@ function saveDay(st){
   }
 }
 function loadDay(){try{const r=localStorage.getItem('sig:'+TODAY);return r?JSON.parse(r):null;}catch(e){return null;}}
-function loadArchive(){
+function loadLocalDays(){
   try{
     const days=[];
     for(let i=0;i<localStorage.length;i++){
@@ -343,6 +356,61 @@ function loadArchive(){
     }
     return days.sort((a,b)=>b.date.localeCompare(a.date)).slice(0,ARCHIVE_DAYS);
   }catch(e){return[];}
+}
+
+/* ═══ Archive ═════════════════════════════════════════════
+   Every daily sweep is committed as data/signal/<date>.json, so the archive is
+   one shared history, not each browser's memory. index.json lists the days; a
+   day's file is only fetched when it is about to be shown. Days a visitor's own
+   browser cached from older live fetches still appear, but the shared file wins. */
+async function loadArchiveIndex(){
+  try{
+    const r=await fetch('/data/signal/index.json',{cache:'no-cache'});
+    if(!r.ok)return [];
+    const j=await r.json();
+    return Array.isArray(j.days)?j.days.filter(d=>d&&/^\d{4}-\d{2}-\d{2}$/.test(d.date)):[];
+  }catch(e){return [];}
+}
+async function loadArchiveDay(date){
+  try{
+    const r=await fetch('/data/signal/'+date+'.json');
+    if(!r.ok)return null;
+    const j=await r.json();
+    return Array.isArray(j.stories)?{date:date,stories:j.stories}:null;
+  }catch(e){return null;}
+}
+// The day on the Today tab is not repeated in the archive.
+function todayDate(){return mode==='snapshot'&&SNAP?SNAP.date:TODAY;}
+function archiveDates(){
+  const cur=todayDate(),seen=new Set(),out=[];
+  archiveIndex.forEach(d=>{if(d.date!==cur&&!seen.has(d.date)){seen.add(d.date);out.push({date:d.date,count:d.stories});}});
+  localDays.forEach(d=>{if(d.date!==cur&&!seen.has(d.date)){seen.add(d.date);out.push({date:d.date,count:d.stories.length,local:d});}});
+  return out.sort((a,b)=>b.date.localeCompare(a.date));
+}
+function loadedArchive(){
+  return archiveDates().slice(0,archiveWant).map(d=>archiveCache[d.date]).filter(Boolean);
+}
+async function ensureArchive(){
+  const need=archiveDates().slice(0,archiveWant).filter(d=>!(d.date in archiveCache));
+  if(!need.length){archiveStatus();renderView();return;}
+  archiveLoading=true;renderView();
+  await Promise.all(need.map(async d=>{archiveCache[d.date]=d.local?d.local:(await loadArchiveDay(d.date))||false;}));
+  archiveLoading=false;archiveStatus();renderView();
+}
+function archiveStatus(){
+  if(curView!=='archive')return;
+  const n=archiveDates().length;
+  setSt('arch','#8b5cf6',archiveReady?(n?`Archive · ${n} earlier ${n===1?'sweep':'sweeps'}`:'Archive · no earlier sweeps yet'):'Loading the archive…');
+}
+// Only the browser's own cached days are read up front. The shared index grows
+// by a line a day, so it is fetched the first time Archive is opened, not by
+// every visitor who only wants today's stories.
+let archiveStarted=false;
+function startArchive(){localDays=loadLocalDays();}
+function openArchive(){
+  if(archiveStarted)return;
+  archiveStarted=true;
+  loadArchiveIndex().then(i=>{archiveIndex=i;archiveReady=true;if(curView==='archive')ensureArchive();});
 }
 
 /* ═══ Read time ═══════════════════════════════════════════
@@ -371,7 +439,7 @@ function feedDate(){return mode==='snapshot'&&SNAP?new Date(SNAP.date+'T12:00:00
 // Past that, the page says so instead of letting old news pass as current.
 function snapAge(){return Math.max(0,Math.round((Date.parse(TODAY+'T00:00:00Z')-Date.parse(SNAP.date+'T00:00:00Z'))/864e5));}
 function snapDaily(){return !!(SNAP&&SNAP.refresh==='daily');}
-function snapStale(){return snapDaily()&&snapAge()>2;}
+function snapStale(){return !!SNAP&&snapAge()>2;}   // however the snapshot was made
 function snapHealthy(){return snapDaily()&&!snapStale();}
 function dateLabel(){
   if(mode==='snapshot'&&SNAP)return snapDaily()&&snapAge()===0?'Today — '+fmtDay(SNAP.date):'Sweep from '+fmtDay(SNAP.date);
@@ -382,19 +450,22 @@ function setMode(m){
   mode=m;
   const b=document.getElementById('lvbg'),d=document.getElementById('ldot');
   b.className='lvbg'+(m==='live'?'':m==='snapshot'?(snapHealthy()?' daily':' snap'):' sample');
-  b.textContent=m==='live'?'LIVE':m==='snapshot'?(snapDaily()?(snapStale()?'STALE':'DAILY'):'SNAPSHOT'):'SAMPLE';
+  b.textContent=m==='live'?'LIVE':m==='snapshot'?(snapStale()?'STALE':snapDaily()?'DAILY':'SNAPSHOT'):'SAMPLE';
   d.classList.toggle('off',m!=='live');
 }
 function snapStatus(){
-  if(snapDaily()){
-    const age=snapAge();
-    return age>2
-      ? 'Daily refresh has stopped · latest sweep '+fmtDay(SNAP.date)+' ('+age+' days old)'
-      : 'Updated daily · latest sweep '+fmtDay(SNAP.date);
+  const age=snapAge(),day=fmtDay(SNAP.date);
+  if(age>2){
+    // Old news must say so, whether or not the daily job ever ran: a snapshot
+    // that was never auto-refreshed looks exactly like one that silently stopped.
+    return snapDaily()
+      ? 'Daily refresh has stopped · latest sweep '+day+' ('+age+' days old)'
+      : (SNAP.frozen?'Live refresh is off':'Live refresh unavailable')+' · stories are '+age+' days old · sweep from '+day;
   }
+  if(snapDaily())return 'Updated daily · latest sweep '+day;
   return SNAP.frozen
-    ? 'Frozen snapshot · sweep from '+fmtDay(SNAP.date)+' · live refresh off'
-    : 'Live refresh unavailable · showing the '+fmtDay(SNAP.date)+' sweep';
+    ? 'Frozen snapshot · sweep from '+day+' · live refresh off'
+    : 'Live refresh unavailable · showing the '+day+' sweep';
 }
 function snapBar(){setSt(snapHealthy()?'daily':'snap',snapHealthy()?'#3a5c40':'#b45309',snapStatus());}
 
@@ -412,7 +483,7 @@ function mergeStories(incoming){
 function visibleStories(){
   if(curView==='today')return selIndustry?todayStories.filter(s=>s.industry===selIndustry):todayStories;
   const out=[];
-  archiveDays.forEach(d=>{
+  loadedArchive().forEach(d=>{
     (selIndustry?d.stories.filter(s=>s.industry===selIndustry):d.stories).forEach(s=>out.push(s));
   });
   return out;
@@ -513,8 +584,10 @@ function rGrid(stories,container){
   container.appendChild(g);
 }
 
+// A frozen snapshot never calls the API, so there is nothing to search with.
+function canSearch(){return !(SNAP&&SNAP.frozen);}
 function fetchRow(id,haveSome){
-  if(SNAP&&SNAP.frozen)return null;
+  if(!canSearch())return null;
   const m=META[id];if(!m)return null;
   const wrap=document.createElement('div');wrap.className='fetchrow';
   const b=document.createElement('button');b.className='fetchmore';
@@ -537,26 +610,67 @@ function showToday(){
       ? `${dateLabel()} · ${META[selIndustry].label} · ${fs.length} ${fs.length===1?'story':'stories'} · ${readTotal(fs)} min of reading`
       : `${dateLabel()} · ${fs.length} stories · ${readTotal(fs)} min of reading`;
     c.appendChild(lbl);rGrid(fs,c);
+  }else if(selIndustry){
+    const m=META[selIndustry];
+    const searchable=canSearch();
+    const when=mode==='live'?'yet today':'in this sweep';
+    // Never promise an action the page can't take: the old copy said "Signal can
+    // go looking for it" over a button that is hidden while frozen.
+    c.innerHTML=`<div class="empty"><h2>${esc(m.label)}: nothing ${when}</h2>
+      <p>${searchable
+        ? 'Signal can go looking for it right now.'
+        : `The ${esc(fmtDay(todayDate()))} sweep covered ${coveredCount()} of ${IND_COUNT} industries, and this wasn't one of them.`}</p></div>`;
+    const counts={};todayStories.forEach(s=>{counts[s.industry]=(counts[s.industry]||0)+1;});
+    const ids=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]||META[a].label.localeCompare(META[b].label));
+    if(ids.length){
+      const box=document.createElement('div');box.className='empty';box.style.padding='0 32px 8px';
+      box.innerHTML=`<div class="altlbl">${searchable?'Or read what the sweep found':'In this sweep'}</div>`;
+      const chips=document.createElement('div');chips.className='altchips';
+      ids.forEach(id=>{
+        const b=document.createElement('button');b.className='altchip';
+        b.innerHTML=`<span class="ddd" style="background:${META[id].color}"></span>${esc(META[id].label)} <b>${counts[id]}</b>`;
+        b.onclick=()=>selInd(id);chips.appendChild(b);
+      });
+      box.appendChild(chips);c.appendChild(box);
+      const act=document.createElement('div');act.className='emptyact';
+      const all=document.createElement('button');all.className='fetchmore';
+      all.textContent='← Show all industries';all.onclick=()=>selInd(null);
+      act.appendChild(all);c.appendChild(act);
+    }
   }else{
-    c.innerHTML=`<div class="empty"><h2>${selIndustry?'Nothing in this category yet today':'No stories yet'}</h2>
-      <p style="font-size:13px;margin-top:6px">${selIndustry?'Signal can go looking for it right now.':''}</p></div>`;
+    c.innerHTML='<div class="empty"><h2>No stories yet</h2></div>';
   }
   if(selIndustry){const r=fetchRow(selIndustry,fs.length>0);if(r)c.appendChild(r);}
 }
 
 function showArchive(){
   const c=document.getElementById('content');c.innerHTML='';
-  if(!archiveDays.length){c.innerHTML='<div class="aempty">Archive is empty — past stories are saved automatically each day.</div>';return;}
+  if(!archiveReady){c.innerHTML='<div class="aempty">Loading the archive…</div>';return;}
+  const dates=archiveDates();
+  if(!dates.length){c.innerHTML='<div class="aempty">No earlier sweeps yet.<br>When a newer sweep replaces the current one, it is kept here.</div>';return;}
   let any=false;
-  archiveDays.forEach(day=>{
+  dates.slice(0,archiveWant).forEach(d=>{
+    const day=archiveCache[d.date];
+    const head=(n,tail)=>{const dh=document.createElement('div');dh.className='dhdr';
+      dh.textContent=fmtDay(d.date)+', '+d.date.slice(0,4)+tail;return dh;};
+    if(day===false){any=true;c.appendChild(head(0,''));
+      const f=document.createElement('div');f.className='dfail';f.textContent="Couldn't load this day.";c.appendChild(f);return;}
+    if(!day)return;   // still loading
     const fs=selIndustry?day.stories.filter(s=>s.industry===selIndustry):day.stories;
     if(!fs.length)return;any=true;
-    const dh=document.createElement('div');dh.className='dhdr';
-    dh.textContent=new Date(day.date+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})
-      +` · ${fs.length} ${fs.length===1?'story':'stories'}`;
-    c.appendChild(dh);rGrid(fs,c);
+    c.appendChild(head(fs.length,` · ${fs.length} ${fs.length===1?'story':'stories'}`));
+    rGrid(fs,c);
   });
-  if(!any)c.innerHTML='<div class="aempty">No archived stories match this filter.</div>';
+  if(archiveLoading){const l=document.createElement('div');l.className='aempty';l.textContent='Loading…';c.appendChild(l);}
+  else if(!any)c.innerHTML='<div class="aempty">No stories match this filter in the days loaded so far.</div>';
+  const more=dates.length-archiveWant;
+  if(more>0&&!archiveLoading){
+    const w=document.createElement('div');w.className='fetchrow';
+    const b=document.createElement('button');b.className='fetchmore';
+    b.textContent=`Show earlier days (${more} more) →`;
+    b.onclick=()=>{archiveWant+=ARCHIVE_PAGE;ensureArchive();};
+    w.appendChild(b);c.appendChild(w);
+  }
 }
 
 function renderView(){
@@ -576,7 +690,7 @@ function switchView(v){
   curView=v;
   document.getElementById('t-today').classList.toggle('active',v==='today');
   document.getElementById('t-arch').classList.toggle('active',v==='archive');
-  if(v==='archive')setSt('arch','#8b5cf6','Viewing archive — past stories stored locally');
+  if(v==='archive'){openArchive();archiveStatus();if(archiveReady)ensureArchive();}
   else if(mode==='live'&&todayStories.length)setSt('live','#15803d',`✓ ${todayStories.length} stories today · ${coveredCount()} industries · ${TODAY}`);
   else if(mode==='snapshot'&&SNAP)snapBar();
   renderView();
@@ -758,7 +872,7 @@ function useSample(){
 
 async function init(){
   buildDD();wireControls();
-  archiveDays=loadArchive();
+  startArchive();
   SNAP=await loadSnapshot();
   const hasSnap=!!(SNAP&&SNAP.stories.length);
 

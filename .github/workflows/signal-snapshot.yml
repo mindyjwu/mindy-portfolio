@@ -42,13 +42,15 @@ jobs:
 
       - name: Commit and push if it changed
         run: |
-          if git diff --quiet -- data/signal-snapshot.json; then
-            echo "Snapshot unchanged, nothing to commit."
+          # status --porcelain, not diff: a brand-new archive day is untracked,
+          # which `git diff` cannot see.
+          if [ -z "$(git status --porcelain -- data/signal-snapshot.json data/signal)" ]; then
+            echo "Snapshot and archive unchanged, nothing to commit."
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/signal-snapshot.json
+          git add data/signal-snapshot.json data/signal
           git commit -m "chore(signal): daily snapshot $(date -u +%F)"
           # Other people and sessions push to main too; replay on top of theirs.
           git pull --rebase origin main

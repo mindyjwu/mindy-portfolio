@@ -17,6 +17,13 @@
 //
 //   node scripts/snapshot-signal.mjs freeze | unfreeze   Whether the page may call the API.
 //   node scripts/snapshot-signal.mjs status              Show what's saved and how old it is.
+//   node scripts/snapshot-signal.mjs archive             Save the current snapshot into the archive
+//                                                        (how the first day was seeded).
+//   node scripts/snapshot-signal.mjs index               Rebuild data/signal/index.json from the files.
+//
+// Every successful capture also saves its sweep as data/signal/<date>.json, so
+// the Archive tab is a real, shared history instead of one browser's memory.
+// index.json is derived from those files and can always be rebuilt.
 //
 // Run by hand, commit data/signal-snapshot.json afterwards. The Action commits for itself.
 
@@ -26,6 +33,8 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FILE = path.join(ROOT, 'data', 'signal-snapshot.json');
+const ARCHIVE = path.join(ROOT, 'data', 'signal');
+const DAY_FILE = /^\d{4}-\d{2}-\d{2}\.json$/;
 const DEFAULT_HOST = 'https://mindy-portfolio.vercel.app';
 
 // The last snapshot that cleared review had 8 stories across 6 industries, so
@@ -48,6 +57,38 @@ function save(snap) {
   fs.mkdirSync(path.dirname(FILE), { recursive: true });
   fs.writeFileSync(FILE, JSON.stringify(snap, null, 2) + '\n');
 }
+
+// One file per day holds just the content (no frozen/refresh flags: those
+// describe how the live page should behave, not what the day contained).
+function writeArchiveDay(snap) {
+  fs.mkdirSync(ARCHIVE, { recursive: true });
+  const day = { date: snap.date, capturedAt: snap.capturedAt, meta: snap.meta, stories: snap.stories };
+  fs.writeFileSync(path.join(ARCHIVE, `${snap.date}.json`), JSON.stringify(day, null, 2) + '\n');
+}
+
+// The index lists what exists so the page never needs a directory listing
+// (static hosting has none). Rebuilt from the day files every time, so it can
+// not drift, and the output is deterministic so reruns don't churn the diff.
+function rebuildIndex() {
+  fs.mkdirSync(ARCHIVE, { recursive: true });
+  const days = [];
+  for (const f of fs.readdirSync(ARCHIVE).filter(n => DAY_FILE.test(n))) {
+    try {
+      const j = JSON.parse(fs.readFileSync(path.join(ARCHIVE, f), 'utf8'));
+      if (!Array.isArray(j.stories)) throw new Error('no stories array');
+      days.push({ date: f.slice(0, 10), stories: j.stories.length, industries: new Set(j.stories.map(x => x.industry)).size });
+    } catch (e) {
+      console.error(`  archive: skipping ${f} (${e.message})`);
+    }
+  }
+  days.sort((a, b) => b.date.localeCompare(a.date));
+  fs.writeFileSync(path.join(ARCHIVE, 'index.json'), JSON.stringify({ days }, null, 2) + '\n');
+  return days;
+}
+function archiveCount() {
+  try { return fs.readdirSync(ARCHIVE).filter(n => DAY_FILE.test(n)).length; } catch { return 0; }
+}
+
 function ageDays(iso) {
   if (!iso) return null;
   return Math.round((Date.parse(new Date().toISOString().slice(0, 10) + 'T00:00:00Z') - Date.parse(iso + 'T00:00:00Z')) / 864e5);
@@ -60,6 +101,7 @@ function describe(snap) {
   console.log(`  sweep date: ${snap.date ?? '(none)'}${age != null ? `  (${age === 0 ? 'today' : age + ' day' + (age === 1 ? '' : 's') + ' old'})` : ''}`);
   console.log(`  captured:   ${snap.capturedAt ?? '(none)'}`);
   console.log(`  stories:    ${snap.stories.length} across ${inds} industries`);
+  console.log(`  archive:    ${archiveCount()} day${archiveCount() === 1 ? '' : 's'} in data/signal/`);
 }
 
 // Shows up on the Actions run page, so a glance tells you what a run did.
@@ -142,6 +184,8 @@ async function capture() {
     stories,
   };
   save(snap);
+  writeArchiveDay(snap);
+  const archived = rebuildIndex().length;
 
   const secs = ((Date.now() - t0) / 1000).toFixed(0);
   console.log(`\nSaved ${stories.length} stories in ${secs}s → ${path.relative(ROOT, FILE)}`);
@@ -157,6 +201,7 @@ async function capture() {
     `| Stories | ${stories.length} |`,
     `| Industries | ${industries} of 16 |`,
     `| New since ${prev.date ?? 'previous'} | ${fresh} |`,
+    `| Days in archive | ${archived} |`,
     `| Time | ${secs}s |`,
     ...(thin ? ['', '> ⚠️ Thinner than a healthy sweep. Worth a look, but within the floor.'] : []),
   ].join('\n'));
@@ -181,7 +226,16 @@ switch (cmd) {
   case 'freeze':   setFrozen(true); break;
   case 'unfreeze': setFrozen(false); break;
   case 'status':   describe(load()); break;
+  case 'archive': {
+    const snap = load();
+    if (!snap.stories.length || !snap.date) { console.error('No snapshot to archive.'); process.exit(1); }
+    writeArchiveDay(snap);
+    console.log(`Archived ${snap.date} (${snap.stories.length} stories).`);
+    console.log(`Index now lists ${rebuildIndex().length} day(s).`);
+    break;
+  }
+  case 'index': console.log(`Index rebuilt: ${rebuildIndex().length} day(s).`); break;
   default:
-    console.error(`Unknown command "${cmd}". Use: capture [--scheduled] [--freeze] | freeze | unfreeze | status`);
+    console.error(`Unknown command "${cmd}". Use: capture [--scheduled] [--freeze] | freeze | unfreeze | status | archive | index`);
     process.exit(2);
 }
