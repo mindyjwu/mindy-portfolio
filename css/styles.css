@@ -1495,3 +1495,9 @@ html[data-mw-theme="dark"] .np-pick { box-shadow: 0 0 0 1px rgba(140,188,224,.2)
   .np-vinyl { animation: none; }
   .np.is-playing .np-eq i { animation: none; height: 7px; }
 }
+
+/* Projects shown without a public link (private repo) */
+body.liquid .prow a.pname.nolink::after { display: none; }
+body.liquid .prow:hover a.pname.nolink { color: var(--ink); }
+.prow:has(.nolink), .sk-proj:not([href]), .about-wrap .ab-proj a:not([href]) { cursor: default; }
+.about-wrap .ab-proj a:not([href]):hover { color: var(--ink); }
