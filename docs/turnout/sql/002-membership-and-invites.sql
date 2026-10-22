@@ -1,4 +1,4 @@
--- Turnout migration 002. Run AFTER docs/schema.sql, in the Supabase SQL editor.
+-- Turnout migration 002. Run AFTER 001-schema.sql, in the Supabase SQL editor.
 -- Adds: approved-only membership checks, the idea catalog, and the functions the site calls
 -- to create a circle, join through an invite link, and approve new people.
 

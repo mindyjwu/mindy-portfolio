@@ -10,7 +10,7 @@ My personal site — a clean **Portfolio** and **History** up front, an **About*
 - **About** (`about.html`) — who I am, why this site exists, and what I believe about building with AI.
 - **Buddy** — Wellness Buddy, a wearable-free wellness check-in prototype with its own repo: [mindyjwu/wellness-buddy](https://github.com/mindyjwu/wellness-buddy), live at [wellness-buddy-chi.vercel.app](https://wellness-buddy-chi.vercel.app). Linked from the Portfolio list like Global Explorer and GenAI. `/wellness` on this site redirects there.
 - **The AI Ecosystem** — an interactive map of who funds, builds and powers AI: 26 layers and ~320 players, from what people spend on down through labs, clouds, chips, fabs and energy to raw materials. Its own repo: [mindyjwu/ai-eco-diagram](https://github.com/mindyjwu/ai-eco-diagram), live at [ai-eco-diagram.vercel.app](https://ai-eco-diagram.vercel.app). Linked from the Portfolio list like Buddy.
-- **Mood Wall** (`mood.html`) — tell it how you feel and get a wall of real art, books, music and film chosen for that feeling. Claude picks; the browser resolves every pick against The Met, Open Library, iTunes (30-second previews) and Wikipedia, so every card is a real thing with a real link. Save cards to a local wall, share a mood by URL. Eleven walls are hand-authored in `data/moods/source.json` and snapshotted once into static JSON so they load instantly and cost nothing.
+- **Mood Wall** (`mood.html`) — tell it how you feel and get a wall of real art, books, music and film chosen for that feeling. Claude picks; the browser resolves every pick against The Met, Open Library, iTunes (30-second previews) and Wikipedia, so every card is a real thing with a real link. Save cards to a local wall, share a mood by URL. Fifteen walls are hand-authored in `data/moods/source.json` and snapshotted once into static JSON so they load instantly and cost nothing.
 - **SIGNAL** (`signal.html`) — an AI-news feed across 16 industries, built to refresh each morning, with an estimated read time on every story, a shared archive of past sweeps, and a downloadable podcast script.
 - **Turnout** (`turnout.html`) — a rotating-host community. A fair rotation wheel, themed party ideas ranked by an on-device logistic-regression model that learns from ratings, a hill-climbing guest matcher that mixes friends with new people by shared interests, a host-cost model with a circle pot, and a post-party "lock in new friends" network. Demo build: state lives in `localStorage`, no backend yet.
 - **Stock Advisor** (`stock-advisor.html`) — scores stocks on fundamentals, technicals and news sentiment, then grades its own calls. Sample data, not investment advice.
@@ -21,6 +21,19 @@ My personal site — a clean **Portfolio** and **History** up front, an **About*
 ## Stack
 
 Plain HTML, CSS, and JavaScript — no framework, no build step, so it loads instantly for anyone. The interactive pages call the Claude API through Vercel serverless functions in `/api`. A small Python script filters MoMA's open dataset for the Mood Wall art.
+
+## Repo layout
+
+```
+*.html            one page per project (plain HTML, no build step)
+css/, js/, assets/ shared styles, scripts and images
+api/              Vercel serverless functions (Claude calls, Turnout alert email)
+data/             committed Mood Wall and SIGNAL snapshots
+scripts/          snapshot tools and the MoMA dataset filter
+tests/            Node tests for the Turnout alert function (npm test)
+docs/turnout/     Turnout guides, plus sql/ (numbered migrations and database tests)
+docs/             other product notes
+```
 
 ## Running it locally
 

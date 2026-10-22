@@ -1,6 +1,6 @@
 -- Turnout migration 007: phone verification.
--- Run AFTER docs/turnout-schema.sql and migration-002 to 006, in the Supabase SQL editor.
--- Setup steps (text-message provider, rate limits, turning the requirement on) are in docs/turnout-phone.md.
+-- Run AFTER 001-schema.sql and migrations 002 to 006, in the Supabase SQL editor.
+-- Setup steps (text-message provider, rate limits, turning the requirement on) are in docs/turnout/phone.md.
 --
 -- Sending and checking the text-message code is done by Supabase Auth. This migration adds:
 --   * a switch, OFF by default, that makes a verified phone number required to create a circle, join one,
@@ -13,7 +13,7 @@
 --   insert into app_settings (key, value) values ('require_phone_verification', 'true')
 --   on conflict (key) do update set value = excluded.value, updated_at = now();     -- 'false' turns it off
 
--- Needs app_settings from migration 006.
+-- Needs app_settings from 006-report-email-alert.sql.
 create or replace function phone_required() returns boolean
 language sql stable security definer set search_path = public as $$
   select coalesce((select lower(trim(value)) = 'true' from app_settings where key = 'require_phone_verification'), false)

@@ -1,5 +1,5 @@
 -- Turnout migration 004: report and block.
--- Run AFTER docs/turnout-schema.sql, migration-002.sql and migration-003.sql, in the Supabase SQL editor.
+-- Run AFTER 001-schema.sql, 002-membership-and-invites.sql and 003-rotation-and-parties.sql, in the Supabase SQL editor.
 --
 -- Block: private, applies in every circle. A blocked pair is never placed in the same party. The
 -- server enforces it when the guest list is saved, so a modified browser cannot bypass it, and it

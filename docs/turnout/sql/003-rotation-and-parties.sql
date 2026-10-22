@@ -1,5 +1,5 @@
 -- Turnout migration 003: rotation, parties and matching on real circle members.
--- Run AFTER docs/turnout-schema.sql and docs/migration-002.sql, in the Supabase SQL editor.
+-- Run AFTER 001-schema.sql and 002-membership-and-invites.sql, in the Supabase SQL editor.
 --
 -- Design: the server is the source of truth for who hosts, who is invited, points and
 -- feedback. The browser still computes the guest matching (it needs members' answers to do

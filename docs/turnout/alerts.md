@@ -43,7 +43,7 @@ Optional: `TURNOUT_ALERT_LEVEL` = `serious` to skip routine reports (fake profil
 Then **redeploy** (Deployments, the latest one, Redeploy). Changes to environment variables only apply to new deployments. The function itself ships when the PR is merged.
 
 ### 3. Supabase (sends the alert)
-1. Run `docs/migration-006.sql` in the SQL editor (after the earlier migrations).
+1. Run `docs/turnout/sql/006-report-email-alert.sql` in the SQL editor (after the earlier migrations).
 2. In **Database → Extensions**, check that **pg_net** is enabled. The migration tries to turn it on.
 3. Tell the database where to send alerts. Paste the **same secret** you used in Vercel:
 
@@ -106,5 +106,5 @@ Run it now and then, even when no emails arrive, in case an alert was missed. Ci
 
 ## Tests
 
-- `docs/sql-tests/report-alert.test.sql` (19 checks): alerts are sent once per report with the right contents and secret; nothing is sent until set up; sending can never break reporting; settings and the sender can't be reached from the app.
+- `docs/turnout/sql/tests/report-alert.test.sql` (19 checks): alerts are sent once per report with the right contents and secret; nothing is sent until set up; sending can never break reporting; settings and the sender can't be reached from the app.
 - `tests/turnout-report-alert.test.mjs` (13 checks, `npm test`): the function rejects wrong secrets and bad input, builds the right email from a **real payload captured from the database**, strips hostile text, honors the alert level, and never leaks the secret or API key. It never sends real email.

@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import handler, { buildEmail } from '../api/turnout-report-alert.js';
 
-// A real payload captured from the database (docs/migration-006.sql), so this also proves
+// A real payload captured from the database (docs/turnout/sql/006-report-email-alert.sql), so this also proves
 // the function understands exactly what the database sends.
 const FIX = JSON.parse(fs.readFileSync(new URL('./fixtures/report-alert-payload.json', import.meta.url), 'utf8'));
 const ENV = { TURNOUT_ALERT_SECRET: 's3cret-value-123', RESEND_API_KEY: 're_test_key', TURNOUT_ALERT_TO: 'me@example.com' };
