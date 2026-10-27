@@ -1,7 +1,7 @@
 /* ============================================
    FIND + KEYBOARD SHORTCUTS (index.html, about.html)
    F or / (or Cmd/Ctrl+K) opens a numbered palette of every page, project and
-   job. H Home, P Portfolio, Y History, A About, M dark mode. Shortcuts are
+   job. H Home, P Portfolio, S Shipped, Y History, A About, M dark mode. Shortcuts are
    ignored while typing in a field. The nav button is added from here so the
    shared nav markup stays identical on every page.
    ============================================ */
@@ -15,6 +15,7 @@
     { g: 'Pages', t: 'Home', h: 'Start here', u: 'index.html', k: 'H' },
     { g: 'Pages', t: 'Portfolio', h: 'Six featured projects and what else I am building', u: 'index.html#portfolio', k: 'P' },
     { g: 'Pages', t: 'How I build', h: 'Tech skills, wired to the projects that use them', u: 'index.html#skills' },
+    { g: 'Pages', t: 'Shipped', h: 'Everything I have built, newest first', u: 'index.html#shipped', k: 'S' },
     { g: 'Pages', t: 'History', h: 'Work and school, from high level', u: 'index.html#history', k: 'Y' },
     { g: 'Pages', t: 'About', h: 'My story', u: 'about.html', k: 'A' },
     { g: 'Pages', t: 'How I think', h: 'Soft skills, tied to jobs and projects', u: 'about.html#think' },
@@ -200,11 +201,8 @@
 
     var lk = k.length === 1 ? k.toLowerCase() : k;
     if (lk === 'f' || lk === '/') { e.preventDefault(); open(); }
-    else if (lk === 'h') go(ITEMS[0]);
-    else if (lk === 'p') go(ITEMS[1]);
-    else if (lk === 'y') go(ITEMS[3]);
-    else if (lk === 'a') go(ITEMS[4]);
     else if (lk === 'm') theme();
+    else { var hit = ITEMS.filter(function (it) { return it.k && it.k.toLowerCase() === lk && it.u; })[0]; if (hit) go(hit); }
   });
 
   // ── nav button (added here so the shared nav stays identical on every page)
