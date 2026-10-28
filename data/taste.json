@@ -1,0 +1,9 @@
+{
+  "_note": "Extra sections for taste.html. A section only appears once it has items. Item: { title, by, note, link, art, square }. Songs live in now-playing.json.",
+  "sections": [
+    { "id": "watching", "title": "Watching", "blurb": "Films and shows I keep coming back to.", "items": [] },
+    { "id": "reading",  "title": "Reading",  "blurb": "Books that changed how I think.", "items": [] },
+    { "id": "going",    "title": "Eating and going", "blurb": "Places worth the trip.", "items": [] },
+    { "id": "looking",  "title": "Looking at", "blurb": "Art and artists I follow.", "items": [] }
+  ]
+}
